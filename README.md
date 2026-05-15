@@ -49,8 +49,7 @@ The C++ shim declares the matching C ABI. Host builds use no-op stubs so example
 Rust translations/smoke ports of every upstream M5Unified example directory live in the `examples` workspace package. See [`examples/README.md`](examples/README.md) for the upstream-to-Rust mapping.
 
 ```bash
-cargo check --workspace --examples --bins --tests
-cargo test --workspace
+bash scripts/check-host.sh
 cargo run -p m5unified-examples --bin basic_displays
 ```
 
