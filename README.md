@@ -25,7 +25,8 @@ This is not intended to bind the full C++ API directly. The Rust side should bin
 crates/
   m5unified-sys/   raw bindings + native C/C++ shim
   m5unified/       safe Rust wrapper
-examples/          on-device examples, added as support lands
+examples/          host-checkable Rust ports of upstream M5Unified examples
+firmware/          ESP-IDF Rust firmware spikes for real hardware validation
 ```
 
 ## Status
@@ -42,7 +43,7 @@ The workspace now has a host-checkable Rust API surface for the upstream example
 - logging
 - SD-card boundary
 
-The C++ shim declares the matching C ABI. Host builds use no-op stubs so examples compile without hardware. ESP-IDF builds now have a native component scaffold in [`crates/m5unified-sys/native`](crates/m5unified-sys/native), but still need an on-device firmware spike to prove the full Cargo/ESP-IDF linkage and hardware behavior.
+The C++ shim declares the matching C ABI. Host builds use no-op stubs so examples compile without hardware. ESP-IDF builds now have a native component scaffold in [`crates/m5unified-sys/native`](crates/m5unified-sys/native), plus a first firmware package in [`firmware/hello-display`](firmware/hello-display) that consumes that shim as an ESP-IDF component for M5StickS3-class hardware validation.
 
 ## Examples
 
@@ -52,6 +53,18 @@ Rust translations/smoke ports of every upstream M5Unified example directory live
 bash scripts/check-host.sh
 cargo run -p m5unified-examples --bin basic_displays
 ```
+
+## Firmware spike
+
+The first ESP-IDF Rust firmware package lives in [`firmware/hello-display`](firmware/hello-display). It is excluded from the host workspace because it requires the esp-rs `xtensa-esp32s3-espidf` toolchain.
+
+```bash
+cd firmware/hello-display
+cargo build --target xtensa-esp32s3-espidf
+espflash flash --monitor target/xtensa-esp32s3-espidf/debug/m5unified-hello-display
+```
+
+Expected hardware behavior: the display shows `hello from rust`; Button A/B presses change the screen.
 
 ## Plan
 

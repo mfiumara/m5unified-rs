@@ -1,0 +1,28 @@
+# M5Unified hello-display firmware spike
+
+This is the first real ESP-IDF Rust firmware package for the repo. It is intentionally separate from the host-checkable `m5unified-examples` package because it targets `xtensa-esp32s3-espidf` and requires the esp-rs toolchain.
+
+Behavior:
+
+- initializes `M5Unified` through the Rust `m5unified` crate;
+- draws `hello from rust` through the C ABI shim;
+- polls `M5.update()`;
+- changes the display when Button A or Button B is pressed.
+
+The `components/m5unified-rs` ESP-IDF component references `crates/m5unified-sys/native/m5u_shim.cpp` by relative path, so the firmware consumes the same native shim scaffold used by the Rust API instead of carrying a copied shim.
+
+## Build
+
+Install the esp-rs toolchain first, then from this directory run:
+
+```bash
+cargo build --target xtensa-esp32s3-espidf
+```
+
+## Flash
+
+```bash
+espflash flash --monitor target/xtensa-esp32s3-espidf/debug/m5unified-hello-display
+```
+
+Expected hardware result on M5StickS3-class hardware: the screen shows `hello from rust`; pressing Button A or B changes the screen text/background.
