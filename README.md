@@ -42,7 +42,7 @@ The workspace now has a host-checkable Rust API surface for the upstream example
 - logging
 - SD-card boundary
 
-The C++ shim declares the matching C ABI. Host builds use no-op stubs so examples compile without hardware; ESP-IDF builds still need the real M5Unified/M5GFX component integration enabled in `m5unified-sys/build.rs`.
+The C++ shim declares the matching C ABI. Host builds use no-op stubs so examples compile without hardware. ESP-IDF builds now have a native component scaffold in [`crates/m5unified-sys/native`](crates/m5unified-sys/native), but still need an on-device firmware spike to prove the full Cargo/ESP-IDF linkage and hardware behavior.
 
 ## Examples
 
