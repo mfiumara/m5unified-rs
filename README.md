@@ -30,7 +30,29 @@ examples/          on-device examples, added as support lands
 
 ## Status
 
-Early skeleton. APIs are placeholders and will change.
+The workspace now has a host-checkable Rust API surface for the upstream example categories:
+
+- display drawing/text
+- buttons
+- microphone/speaker
+- IMU
+- touch
+- RTC
+- power/battery
+- logging
+- SD-card boundary
+
+The C++ shim declares the matching C ABI. Host builds use no-op stubs so examples compile without hardware; ESP-IDF builds still need the real M5Unified/M5GFX component integration enabled in `m5unified-sys/build.rs`.
+
+## Examples
+
+Rust translations/smoke ports of every upstream M5Unified example directory live in the `examples` workspace package. See [`examples/README.md`](examples/README.md) for the upstream-to-Rust mapping.
+
+```bash
+cargo check --workspace --examples --bins --tests
+cargo test --workspace
+cargo run -p m5unified-examples --bin basic_displays
+```
 
 ## Plan
 

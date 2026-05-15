@@ -3,6 +3,7 @@ resolver = "2"
 members = [
     "crates/m5unified-sys",
     "crates/m5unified",
+    "examples",
 ]
 
 [workspace.package]
