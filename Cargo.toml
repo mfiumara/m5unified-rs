@@ -1,0 +1,15 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/m5unified-sys",
+    "crates/m5unified",
+]
+
+[workspace.package]
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/mfiumara/m5unified-rs"
+readme = "README.md"
+
+[workspace.dependencies]
+m5unified-sys = { path = "crates/m5unified-sys", version = "0.1.0" }
