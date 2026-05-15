@@ -31,3 +31,7 @@ examples/          on-device examples, added as support lands
 ## Status
 
 Early skeleton. APIs are placeholders and will change.
+
+## Plan
+
+See [`docs/plans/2026-05-15-m5unified-rs-roadmap.md`](docs/plans/2026-05-15-m5unified-rs-roadmap.md) for the implementation roadmap and Codex handoff plan.
