@@ -96,11 +96,38 @@ pub struct Power;
 
 impl Power {
     pub fn battery_level(&self) -> Option<u8> {
-        let level = unsafe { m5unified_sys::m5u_battery_level() };
-        if (0..=100).contains(&level) {
-            Some(level as u8)
-        } else {
-            None
-        }
+        battery_level_from_raw(unsafe { m5unified_sys::m5u_battery_level() })
+    }
+}
+
+fn battery_level_from_raw(level: c_int) -> Option<u8> {
+    if (0..=100).contains(&level) {
+        Some(level as u8)
+    } else {
+        None
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn battery_level_accepts_percent_range() {
+        assert_eq!(battery_level_from_raw(0), Some(0));
+        assert_eq!(battery_level_from_raw(42), Some(42));
+        assert_eq!(battery_level_from_raw(100), Some(100));
+    }
+
+    #[test]
+    fn battery_level_rejects_out_of_range_values() {
+        assert_eq!(battery_level_from_raw(-1), None);
+        assert_eq!(battery_level_from_raw(101), None);
+    }
+
+    #[test]
+    fn display_print_rejects_interior_nul() {
+        let mut display = Display;
+        assert_eq!(display.print("hello\0world"), Err(Error::InvalidString));
     }
 }

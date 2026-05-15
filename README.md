@@ -31,3 +31,7 @@ examples/          on-device examples, added as support lands
 ## Status
 
 Early skeleton. APIs are placeholders and will change.
+
+The `m5unified-sys` crate now compiles the C++ shim as part of its Cargo build. When `<M5Unified.h>` is available to the C++ compiler, the shim forwards calls to the real M5Unified singleton. On host machines without M5Unified installed, the shim builds inert fallback implementations so the Rust workspace can still be checked and tested.
+
+Set `M5UNIFIED_SYS_REQUIRE_REAL=1` during the build to fail fast if the real M5Unified header is not found.

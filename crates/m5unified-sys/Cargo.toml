@@ -12,3 +12,4 @@ build = "build.rs"
 path = "src/lib.rs"
 
 [build-dependencies]
+cc = "1"

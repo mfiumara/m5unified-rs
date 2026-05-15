@@ -1,62 +1,99 @@
 #include "m5u_shim.h"
 
-// TODO: include M5Unified once ESP-IDF component build integration is wired up.
-// #include <M5Unified.h>
+#if defined(__has_include)
+#if __has_include(<M5Unified.h>)
+#define M5U_HAS_REAL_M5UNIFIED 1
+#include <M5Unified.h>
+#endif
+#endif
+
+#if defined(M5U_REQUIRE_REAL_M5UNIFIED) && !defined(M5U_HAS_REAL_M5UNIFIED)
+#error "M5UNIFIED_SYS_REQUIRE_REAL is set, but <M5Unified.h> was not found."
+#endif
 
 extern "C" {
 
 bool m5u_begin(void) {
-    // auto cfg = M5.config();
-    // M5.begin(cfg);
-    // return true;
+#if defined(M5U_HAS_REAL_M5UNIFIED)
+    auto cfg = M5.config();
+    M5.begin(cfg);
+    return true;
+#else
     return false;
+#endif
 }
 
 void m5u_update(void) {
-    // M5.update();
+#if defined(M5U_HAS_REAL_M5UNIFIED)
+    M5.update();
+#endif
 }
 
 void m5u_display_fill_screen(uint16_t color) {
+#if defined(M5U_HAS_REAL_M5UNIFIED)
+    M5.Display.fillScreen(color);
+#else
     (void)color;
-    // M5.Display.fillScreen(color);
+#endif
 }
 
 void m5u_display_set_cursor(int x, int y) {
+#if defined(M5U_HAS_REAL_M5UNIFIED)
+    M5.Display.setCursor(x, y);
+#else
     (void)x;
     (void)y;
-    // M5.Display.setCursor(x, y);
+#endif
 }
 
 void m5u_display_print(const char* text) {
+#if defined(M5U_HAS_REAL_M5UNIFIED)
+    M5.Display.print(text);
+#else
     (void)text;
-    // M5.Display.print(text);
+#endif
 }
 
 bool m5u_btn_a_is_pressed(void) {
-    // return M5.BtnA.isPressed();
+#if defined(M5U_HAS_REAL_M5UNIFIED)
+    return M5.BtnA.isPressed();
+#else
     return false;
+#endif
 }
 
 bool m5u_btn_b_was_pressed(void) {
-    // return M5.BtnB.wasPressed();
+#if defined(M5U_HAS_REAL_M5UNIFIED)
+    return M5.BtnB.wasPressed();
+#else
     return false;
+#endif
 }
 
 bool m5u_mic_begin(void) {
-    // return M5.Mic.begin();
+#if defined(M5U_HAS_REAL_M5UNIFIED)
+    return M5.Mic.begin();
+#else
     return false;
+#endif
 }
 
 bool m5u_mic_record_i16(int16_t* buffer, size_t samples) {
+#if defined(M5U_HAS_REAL_M5UNIFIED)
+    return M5.Mic.record(buffer, samples);
+#else
     (void)buffer;
     (void)samples;
-    // return M5.Mic.record(buffer, samples);
     return false;
+#endif
 }
 
 int m5u_battery_level(void) {
-    // return M5.Power.getBatteryLevel();
+#if defined(M5U_HAS_REAL_M5UNIFIED)
+    return M5.Power.getBatteryLevel();
+#else
     return -1;
+#endif
 }
 
 }
