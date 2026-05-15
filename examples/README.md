@@ -31,7 +31,7 @@ They compile against the local `m5unified` Rust API. On non-ESP-IDF host targets
 ## Run/check
 
 ```bash
-cargo check --workspace --examples --bins --tests
+bash scripts/check-host.sh
 cargo run -p m5unified-examples --bin basic_displays
 ```
 
