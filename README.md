@@ -75,6 +75,15 @@ On macOS, if the ESP-IDF build later reports missing native build tools, install
 brew install cmake ninja dfu-util ccache
 ```
 
+If the ESP-IDF install fails while creating an environment named like `idf5.3_py3.14_env`, Homebrew's `python3` is too new for this ESP-IDF version. Use Python 3.12 for the build:
+
+```bash
+brew install python@3.12
+export PATH="$(brew --prefix python@3.12)/libexec/bin:$PATH"
+python3 --version  # should print Python 3.12.x
+rm -rf firmware/hello-display/.embuild/espressif/python_env
+```
+
 ```bash
 cd firmware/hello-display
 cargo build --target xtensa-esp32s3-espidf

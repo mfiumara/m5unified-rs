@@ -30,6 +30,16 @@ On macOS, if the ESP-IDF build later complains about missing host tools, install
 brew install cmake ninja dfu-util ccache
 ```
 
+ESP-IDF v5.3.x may fail if Homebrew's `python3` points at a too-new Python such as 3.14. If `.embuild` fails while creating `idf5.3_py3.14_env`, install Python 3.12 and put its `python3` shim first on `PATH` before rebuilding:
+
+```bash
+brew install python@3.12
+export PATH="$(brew --prefix python@3.12)/libexec/bin:$PATH"
+python3 --version  # should print Python 3.12.x
+rm -rf .embuild/espressif/python_env
+cargo build --target xtensa-esp32s3-espidf
+```
+
 Then from this directory run:
 
 ```bash
