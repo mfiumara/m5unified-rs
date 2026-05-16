@@ -28,7 +28,7 @@ void m5u_update(void) {
 
 void m5u_delay_ms(uint32_t ms) {
 #ifdef M5UNIFIED_RS_USE_REAL_M5UNIFIED
-    delay(ms);
+    M5.delay(ms);
 #else
     (void)ms;
 #endif
@@ -381,11 +381,10 @@ void m5u_log_println(const char* text) {
 }
 
 bool m5u_sd_begin(void) {
-#ifdef M5UNIFIED_RS_USE_REAL_M5UNIFIED
-    return SD.begin(GPIO_NUM_NC, SPI, 25000000);
-#else
+    // SD support needs an explicit ESP-IDF/Arduino SD component wiring step.
+    // Keep the shim target-buildable for display/button firmware until that
+    // component is added instead of referencing Arduino globals (SD, SPI) here.
     return false;
-#endif
 }
 
 } // extern "C"
