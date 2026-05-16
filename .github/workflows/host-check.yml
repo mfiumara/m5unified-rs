@@ -31,3 +31,41 @@ jobs:
 
       - name: Run host checks
         run: bash scripts/check-host.sh
+
+  esp32s3-firmware:
+    name: ESP32-S3 firmware build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install host dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            clang \
+            cmake \
+            git \
+            libclang-dev \
+            ninja-build \
+            python3 \
+            python3-pip
+
+      - name: Install stable Rust for espup
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install esp-rs toolchain
+        run: |
+          cargo +stable install espup --locked
+          espup install
+
+      - name: Cache ESP-IDF firmware cargo artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: firmware/hello-display -> target
+          key: esp32s3-firmware
+
+      - name: Build hello-display firmware
+        run: |
+          . ~/export-esp.sh
+          bash scripts/check-esp32s3-firmware.sh
