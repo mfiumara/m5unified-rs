@@ -57,6 +57,7 @@ jobs:
       - name: Install esp-rs toolchain
         run: |
           cargo +stable install espup --locked
+          cargo +stable install ldproxy --locked
           espup install
 
       - name: Cache ESP-IDF firmware cargo artifacts
