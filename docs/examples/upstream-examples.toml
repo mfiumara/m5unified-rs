@@ -1,0 +1,156 @@
+# Mapping from upstream M5Unified examples to Rust example binaries.
+# status values: not_started, skeleton, host_compiles, espidf_compiles, hardware_verified, blocked
+
+[[example]]
+upstream = "Advanced/Bluetooth_with_ESP32A2DP/Bluetooth_with_ESP32A2DP.ino"
+rust_bin = "advanced_bluetooth_with_esp32a2dp"
+status = "host_compiles"
+category = "advanced"
+requires = ["speaker", "buttons", "display", "bluetooth-a2dp"]
+notes = "Bluetooth stack remains example-level/feature-gated; core crate provides speaker raw playback."
+
+[[example]]
+upstream = "Advanced/MP3_with_ESP8266Audio/MP3_with_ESP8266Audio.ino"
+rust_bin = "advanced_mp3_with_esp8266audio"
+status = "host_compiles"
+category = "advanced"
+requires = ["speaker", "display", "sd", "mp3-decoder"]
+notes = "ESP8266Audio is not part of core binding; prefer Rust decoder or feature-gated adapter."
+
+[[example]]
+upstream = "Advanced/Mic_FFT/Mic_FFT.ino"
+rust_bin = "advanced_mic_fft"
+status = "host_compiles"
+category = "advanced"
+requires = ["microphone", "display", "fft"]
+notes = "Rust FFT should live in example package, not m5unified core."
+
+[[example]]
+upstream = "Advanced/Speak_with_AquesTalk/Speak_with_AquesTalk.ino"
+rust_bin = "advanced_speak_with_aquestalk"
+status = "host_compiles"
+category = "advanced"
+requires = ["speaker", "display", "aquestalk"]
+notes = "AquesTalk remains optional due licensing/binary availability."
+
+[[example]]
+upstream = "Advanced/Speaker_SD_wav_file/Speaker_SD_wav_file.ino"
+rust_bin = "advanced_speaker_sd_wav_file"
+status = "host_compiles"
+category = "advanced"
+requires = ["speaker", "sd", "wav"]
+notes = "SD shim currently reports unavailable until ESP-IDF/Arduino SD wiring is selected."
+
+[[example]]
+upstream = "Advanced/WebRadio_with_ESP8266Audio/WebRadio_with_ESP8266Audio.ino"
+rust_bin = "advanced_webradio_with_esp8266audio"
+status = "host_compiles"
+category = "advanced"
+requires = ["wifi", "speaker", "display", "mp3-decoder"]
+notes = "Networking/codec dependencies remain example-level."
+
+[[example]]
+upstream = "Basic/Axp2101/IRQ/IRQExample/IRQExample.ino"
+rust_bin = "basic_axp2101_irq"
+status = "host_compiles"
+category = "basic"
+requires = ["power", "axp2101", "display"]
+notes = "AXP2101 methods are represented; generic shim stubs unavailable on non-supported boards."
+
+[[example]]
+upstream = "Basic/Button/Button.ino"
+rust_bin = "basic_button"
+status = "host_compiles"
+category = "basic"
+requires = ["buttons", "display", "log"]
+notes = "Safe API includes A/B/C/PWR/EXT and click/hold state."
+
+[[example]]
+upstream = "Basic/Displays/Displays.ino"
+rust_bin = "basic_displays"
+status = "host_compiles"
+category = "basic"
+requires = ["display", "multi-display"]
+notes = "Indexed display access avoids exposing C++ display objects."
+
+[[example]]
+upstream = "Basic/HowToUse/HowToUse.ino"
+rust_bin = "basic_how_to_use"
+status = "host_compiles"
+category = "basic"
+requires = ["display", "buttons", "speaker", "rtc", "imu", "power", "touch", "led"]
+notes = "Core integration sample; LED is not currently modeled as a separate API."
+
+[[example]]
+upstream = "Basic/Imu/Imu.ino"
+rust_bin = "basic_imu"
+status = "host_compiles"
+category = "basic"
+requires = ["imu", "display", "buttons", "touch"]
+notes = "Safe API includes type, update, data, and calibration methods."
+
+[[example]]
+upstream = "Basic/LogOutput/LogOutput.ino"
+rust_bin = "basic_log_output"
+status = "host_compiles"
+category = "basic"
+requires = ["log", "display", "buttons"]
+notes = "Callback/color/suffix logging are intentionally simplified for now."
+
+[[example]]
+upstream = "Basic/Microphone/Microphone.ino"
+rust_bin = "basic_microphone"
+status = "host_compiles"
+category = "basic"
+requires = ["microphone", "speaker", "display", "buttons", "touch"]
+notes = "Mic config currently exposes noise filter; pin config can be added when needed."
+
+[[example]]
+upstream = "Basic/Rtc/Rtc.ino"
+rust_bin = "basic_rtc"
+status = "host_compiles"
+category = "basic"
+requires = ["rtc", "log", "display"]
+notes = "NTP/WiFi behavior belongs in example-level ESP-IDF networking code."
+
+[[example]]
+upstream = "Basic/Speaker/Speaker.ino"
+rust_bin = "basic_speaker"
+status = "host_compiles"
+category = "basic"
+requires = ["speaker", "display", "buttons", "touch"]
+notes = "Safe API includes volume, channel volume, tone, raw, wav, stop/is_playing."
+
+[[example]]
+upstream = "Basic/Touch/DragDrop/DragDrop.ino"
+rust_bin = "basic_touch_drag_drop"
+status = "host_compiles"
+category = "basic"
+requires = ["touch", "display"]
+notes = "Touch detail struct includes press/click/hold and delta data."
+
+[[example]]
+upstream = "Basic/Touch/SliderUI/SliderUI.ino"
+rust_bin = "basic_touch_slider_ui"
+status = "host_compiles"
+category = "basic"
+requires = ["touch", "display"]
+notes = "Uses safe touch detail and drawing APIs."
+
+[[example]]
+upstream = "Test/build_test/build_test.ino"
+rust_bin = "test_build_test"
+status = "host_compiles"
+category = "test"
+requires = []
+notes = "Compile-only smoke example."
+
+
+[[example]]
+upstream = "extra/platformio_sdl"
+rust_bin = "platformio_sdl"
+status = "host_compiles"
+category = "extra"
+requires = ["display"]
+extra = true
+notes = "Repository-local smoke/example target, not an upstream .ino example."

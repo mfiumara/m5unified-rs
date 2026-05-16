@@ -1,0 +1,625 @@
+# M5Unified upstream example API gap report
+
+Generated from `/tmp/M5Unified-examples-inventory`.
+
+## Examples
+
+### `Advanced/Bluetooth_with_ESP32A2DP/Bluetooth_with_ESP32A2DP.ino`
+- Classes: `BluetoothA2DPSink`
+- Methods:
+  - `M5.BtnA.getClickCount`
+  - `M5.BtnA.isHolding`
+  - `M5.BtnA.wasDecideClickCount`
+  - `M5.BtnA.wasPressed`
+  - `M5.BtnB.isPressed`
+  - `M5.BtnC.isPressed`
+  - `M5.Speaker.begin`
+  - `M5.Speaker.config`
+  - `M5.Speaker.getVolume`
+  - `M5.Speaker.playRaw`
+  - `M5.Speaker.setVolume`
+  - `M5.Speaker.tone`
+  - `M5.begin`
+  - `M5.config`
+  - `M5.update`
+
+### `Advanced/MP3_with_ESP8266Audio/MP3_with_ESP8266Audio.ino`
+- Classes: `AudioFileSourceID3`, `AudioFileSourceSD`, `AudioGeneratorMP3`
+- Methods:
+  - `M5.BtnA.isHolding`
+  - `M5.BtnA.wasClicked`
+  - `M5.BtnB.isPressed`
+  - `M5.BtnC.isPressed`
+  - `M5.Display.display`
+  - `M5.Display.fillRect`
+  - `M5.Display.getBaseColor`
+  - `M5.Display.getCursorY`
+  - `M5.Display.printf`
+  - `M5.Display.setCursor`
+  - `M5.Display.width`
+  - `M5.Speaker.begin`
+  - `M5.Speaker.config`
+  - `M5.Speaker.getVolume`
+  - `M5.Speaker.isPlaying`
+  - `M5.Speaker.setVolume`
+  - `M5.Speaker.tone`
+  - `M5.begin`
+  - `M5.config`
+  - `M5.delay`
+  - `M5.update`
+
+### `Advanced/Mic_FFT/Mic_FFT.ino`
+- Classes: none
+- Methods:
+  - `M5.Display.display`
+  - `M5.Display.height`
+  - `M5.Display.printf`
+  - `M5.Display.setEpdMode`
+  - `M5.Display.setFont`
+  - `M5.Display.setTextSize`
+  - `M5.Display.startWrite`
+  - `M5.Display.width`
+  - `M5.Mic.begin`
+  - `M5.Mic.config`
+  - `M5.Mic.isEnabled`
+  - `M5.Mic.isRecording`
+  - `M5.Mic.record`
+  - `M5.Speaker.end`
+  - `M5.Speaker.tone`
+  - `M5.begin`
+  - `M5.config`
+  - `M5.delay`
+  - `M5.getPin`
+  - `M5.setPrimaryDisplayType`
+
+### `Advanced/Speak_with_AquesTalk/Speak_with_AquesTalk.ino`
+- Classes: `AquesTalk`
+- Methods:
+  - `M5.BtnA.wasClicked`
+  - `M5.BtnA.wasHold`
+  - `M5.BtnA.wasReleased`
+  - `M5.BtnB.wasReleased`
+  - `M5.BtnC.wasReleased`
+  - `M5.Display.printf`
+  - `M5.Display.println`
+  - `M5.Display.setEpdMode`
+  - `M5.Display.setTextWrap`
+  - `M5.Speaker.config`
+  - `M5.Speaker.playRaw`
+  - `M5.Speaker.setVolume`
+  - `M5.begin`
+  - `M5.config`
+  - `M5.update`
+
+### `Advanced/Speaker_SD_wav_file/Speaker_SD_wav_file.ino`
+- Classes: none
+- Methods:
+  - `M5.Speaker.playRaw`
+  - `M5.Speaker.setVolume`
+  - `M5.begin`
+  - `M5.delay`
+
+### `Advanced/WebRadio_with_ESP8266Audio/WebRadio_with_ESP8266Audio.ino`
+- Classes: `AudioFileSourceBuffer`, `AudioFileSourceICYStream`, `AudioGeneratorMP3`
+- Methods:
+  - `M5.BtnA.getClickCount`
+  - `M5.BtnA.isHolding`
+  - `M5.BtnA.wasDecideClickCount`
+  - `M5.BtnA.wasPressed`
+  - `M5.BtnB.isPressed`
+  - `M5.BtnC.isPressed`
+  - `M5.Display.clear`
+  - `M5.Display.print`
+  - `M5.Display.printf`
+  - `M5.Display.println`
+  - `M5.Speaker.begin`
+  - `M5.Speaker.config`
+  - `M5.Speaker.getVolume`
+  - `M5.Speaker.setVolume`
+  - `M5.Speaker.tone`
+  - `M5.Touch.getDetail`
+  - `M5.begin`
+  - `M5.config`
+  - `M5.delay`
+  - `M5.update`
+
+### `Basic/Axp2101/IRQ/IRQExample/IRQExample.ino`
+- Classes: none
+- Methods:
+  - `M5.Display.drawString`
+  - `M5.Display.fillScreen`
+  - `M5.Display.setTextSize`
+  - `M5.begin`
+  - `M5.update`
+
+### `Basic/Button/Button.ino`
+- Classes: none
+- Methods:
+  - `M5.BtnA.getClickCount`
+  - `M5.BtnA.wasClicked`
+  - `M5.BtnA.wasDecideClickCount`
+  - `M5.BtnA.wasHold`
+  - `M5.BtnA.wasPressed`
+  - `M5.BtnA.wasReleased`
+  - `M5.BtnB.getClickCount`
+  - `M5.BtnB.wasClicked`
+  - `M5.BtnB.wasDecideClickCount`
+  - `M5.BtnB.wasHold`
+  - `M5.BtnB.wasPressed`
+  - `M5.BtnB.wasReleased`
+  - `M5.BtnC.getClickCount`
+  - `M5.BtnC.wasClicked`
+  - `M5.BtnC.wasDecideClickCount`
+  - `M5.BtnC.wasHold`
+  - `M5.BtnC.wasPressed`
+  - `M5.BtnC.wasReleased`
+  - `M5.BtnEXT.getClickCount`
+  - `M5.BtnEXT.wasClicked`
+  - `M5.BtnEXT.wasDecideClickCount`
+  - `M5.BtnEXT.wasHold`
+  - `M5.BtnEXT.wasPressed`
+  - `M5.BtnEXT.wasReleased`
+  - `M5.BtnPWR.getClickCount`
+  - `M5.BtnPWR.wasClicked`
+  - `M5.BtnPWR.wasDecideClickCount`
+  - `M5.BtnPWR.wasHold`
+  - `M5.BtnPWR.wasPressed`
+  - `M5.BtnPWR.wasReleased`
+  - `M5.Display.endWrite`
+  - `M5.Display.fillRect`
+  - `M5.Display.getRotation`
+  - `M5.Display.height`
+  - `M5.Display.setEpdMode`
+  - `M5.Display.setRotation`
+  - `M5.Display.startWrite`
+  - `M5.Display.width`
+  - `M5.begin`
+  - `M5.delay`
+  - `M5.update`
+
+### `Basic/Displays/Displays.ino`
+- Classes: none
+- Methods:
+  - `M5.Display.print`
+  - `M5.Displays`
+  - `M5.begin`
+  - `M5.config`
+  - `M5.delay`
+  - `M5.getDisplayCount`
+  - `M5.getDisplayIndex`
+  - `M5.setPrimaryDisplayType`
+
+### `Basic/HowToUse/HowToUse.ino`
+- Classes: none
+- Methods:
+  - `M5.BtnA.getClickCount`
+  - `M5.BtnA.wasClicked`
+  - `M5.BtnA.wasDecideClickCount`
+  - `M5.BtnA.wasHold`
+  - `M5.BtnA.wasPressed`
+  - `M5.BtnA.wasReleased`
+  - `M5.BtnB.getClickCount`
+  - `M5.BtnB.wasClicked`
+  - `M5.BtnB.wasDecideClickCount`
+  - `M5.BtnB.wasHold`
+  - `M5.BtnB.wasPressed`
+  - `M5.BtnB.wasReleased`
+  - `M5.BtnC.getClickCount`
+  - `M5.BtnC.wasClicked`
+  - `M5.BtnC.wasDecideClickCount`
+  - `M5.BtnC.wasHold`
+  - `M5.BtnC.wasPressed`
+  - `M5.BtnC.wasReleased`
+  - `M5.BtnEXT.getClickCount`
+  - `M5.BtnEXT.wasClicked`
+  - `M5.BtnEXT.wasDecideClickCount`
+  - `M5.BtnEXT.wasHold`
+  - `M5.BtnEXT.wasPressed`
+  - `M5.BtnEXT.wasReleased`
+  - `M5.BtnPWR.getClickCount`
+  - `M5.BtnPWR.wasClicked`
+  - `M5.BtnPWR.wasDecideClickCount`
+  - `M5.BtnPWR.wasHold`
+  - `M5.BtnPWR.wasPressed`
+  - `M5.BtnPWR.wasReleased`
+  - `M5.Display.clearClipRect`
+  - `M5.Display.color888`
+  - `M5.Display.display`
+  - `M5.Display.displayBusy`
+  - `M5.Display.drawString`
+  - `M5.Display.endWrite`
+  - `M5.Display.fillRect`
+  - `M5.Display.fontHeight`
+  - `M5.Display.getBaseColor`
+  - `M5.Display.getRotation`
+  - `M5.Display.height`
+  - `M5.Display.print`
+  - `M5.Display.printf`
+  - `M5.Display.println`
+  - `M5.Display.setBrightness`
+  - `M5.Display.setClipRect`
+  - `M5.Display.setColor`
+  - `M5.Display.setCursor`
+  - `M5.Display.setEpdMode`
+  - `M5.Display.setRotation`
+  - `M5.Display.setTextSize`
+  - `M5.Display.startWrite`
+  - `M5.Display.width`
+  - `M5.Displays`
+  - `M5.Imu.getAccel`
+  - `M5.Imu.getGyro`
+  - `M5.Imu.getType`
+  - `M5.Imu.isEnabled`
+  - `M5.Led.setAllColor`
+  - `M5.Power.getBatteryLevel`
+  - `M5.Rtc.getDateTime`
+  - `M5.Rtc.isEnabled`
+  - `M5.Rtc.setDateTime`
+  - `M5.Rtc.setSystemTimeFromRtc`
+  - `M5.Speaker.isEnabled`
+  - `M5.Speaker.isPlaying`
+  - `M5.Speaker.playRaw`
+  - `M5.Speaker.setVolume`
+  - `M5.Speaker.tone`
+  - `M5.begin`
+  - `M5.config`
+  - `M5.delay`
+  - `M5.getBoard`
+  - `M5.getDisplayCount`
+  - `M5.setPrimaryDisplayType`
+  - `M5.setTouchButtonHeight`
+  - `M5.setTouchButtonHeightByRatio`
+  - `M5.update`
+
+### `Basic/Imu/Imu.ino`
+- Classes: none
+- Methods:
+  - `M5.BtnA.wasClicked`
+  - `M5.BtnPWR.wasClicked`
+  - `M5.Display.printf`
+  - `M5.Imu.getImuData`
+  - `M5.Imu.getOffsetData`
+  - `M5.Imu.getType`
+  - `M5.Imu.loadOffsetFromNVS`
+  - `M5.Imu.saveOffsetToNVS`
+  - `M5.Imu.setCalibration`
+  - `M5.Imu.update`
+  - `M5.Touch.getDetail`
+  - `M5.begin`
+  - `M5.config`
+  - `M5.update`
+
+### `Basic/LogOutput/LogOutput.ino`
+- Classes: none
+- Methods:
+  - `M5.BtnPWR.getClickCount`
+  - `M5.BtnPWR.wasClicked`
+  - `M5.Display.clear`
+  - `M5.Display.getCursorY`
+  - `M5.Display.setTextScroll`
+  - `M5.Display.setTextWrap`
+  - `M5.Log`
+  - `M5.Log.printf`
+  - `M5.Log.setCallback`
+  - `M5.Log.setEnableColor`
+  - `M5.Log.setLogLevel`
+  - `M5.Log.setSuffix`
+  - `M5.begin`
+  - `M5.delay`
+  - `M5.setLogDisplayIndex`
+  - `M5.update`
+
+### `Basic/Microphone/Microphone.ino`
+- Classes: none
+- Methods:
+  - `M5.BtnA.wasClicked`
+  - `M5.BtnA.wasHold`
+  - `M5.BtnB.wasClicked`
+  - `M5.Display.clear`
+  - `M5.Display.display`
+  - `M5.Display.getRotation`
+  - `M5.Display.height`
+  - `M5.Display.print`
+  - `M5.Display.printf`
+  - `M5.Display.setCursor`
+  - `M5.Display.setRotation`
+  - `M5.Display.startWrite`
+  - `M5.Display.width`
+  - `M5.Display.writeFastVLine`
+  - `M5.Mic.begin`
+  - `M5.Mic.config`
+  - `M5.Mic.end`
+  - `M5.Mic.isEnabled`
+  - `M5.Mic.isRecording`
+  - `M5.Mic.record`
+  - `M5.Speaker.begin`
+  - `M5.Speaker.end`
+  - `M5.Speaker.isEnabled`
+  - `M5.Speaker.isPlaying`
+  - `M5.Speaker.playRaw`
+  - `M5.Speaker.setVolume`
+  - `M5.Touch.getCount`
+  - `M5.Touch.getDetail`
+  - `M5.begin`
+  - `M5.config`
+  - `M5.delay`
+  - `M5.update`
+
+### `Basic/Rtc/Rtc.ino`
+- Classes: none
+- Methods:
+  - `M5.Display.clear`
+  - `M5.Display.setCursor`
+  - `M5.Display.setEpdMode`
+  - `M5.Log.print`
+  - `M5.Log.printf`
+  - `M5.Log.println`
+  - `M5.Rtc.getDateTime`
+  - `M5.Rtc.isEnabled`
+  - `M5.Rtc.setDateTime`
+  - `M5.begin`
+  - `M5.config`
+  - `M5.delay`
+  - `M5.getBoard`
+  - `M5.setLogDisplayIndex`
+
+### `Basic/Speaker/Speaker.ino`
+- Classes: none
+- Methods:
+  - `M5.BtnA.isHolding`
+  - `M5.BtnA.wasClicked`
+  - `M5.BtnA.wasHold`
+  - `M5.BtnB.isHolding`
+  - `M5.BtnB.wasClicked`
+  - `M5.BtnB.wasHold`
+  - `M5.BtnC.wasClicked`
+  - `M5.BtnC.wasHold`
+  - `M5.BtnPWR.wasClicked`
+  - `M5.Display.displayBusy`
+  - `M5.Display.drawRect`
+  - `M5.Display.drawString`
+  - `M5.Display.endWrite`
+  - `M5.Display.fillRect`
+  - `M5.Display.fillScreen`
+  - `M5.Display.getBaseColor`
+  - `M5.Display.getRotation`
+  - `M5.Display.height`
+  - `M5.Display.print`
+  - `M5.Display.setColor`
+  - `M5.Display.setEpdMode`
+  - `M5.Display.setFont`
+  - `M5.Display.setRotation`
+  - `M5.Display.setTextColor`
+  - `M5.Display.setTextDatum`
+  - `M5.Display.startWrite`
+  - `M5.Display.width`
+  - `M5.Speaker.begin`
+  - `M5.Speaker.config`
+  - `M5.Speaker.getChannelVolume`
+  - `M5.Speaker.getVolume`
+  - `M5.Speaker.isEnabled`
+  - `M5.Speaker.isPlaying`
+  - `M5.Speaker.playRaw`
+  - `M5.Speaker.playWav`
+  - `M5.Speaker.setAllChannelVolume`
+  - `M5.Speaker.setChannelVolume`
+  - `M5.Speaker.setVolume`
+  - `M5.Speaker.stop`
+  - `M5.Speaker.tone`
+  - `M5.Touch.getCount`
+  - `M5.Touch.getDetail`
+  - `M5.begin`
+  - `M5.config`
+  - `M5.delay`
+  - `M5.getBoard`
+  - `M5.setPrimaryDisplayType`
+  - `M5.update`
+
+### `Basic/Touch/DragDrop/DragDrop.ino`
+- Classes: none
+- Methods:
+  - `M5.Display.display`
+  - `M5.Display.drawRect`
+  - `M5.Display.getBaseColor`
+  - `M5.Display.height`
+  - `M5.Display.setColor`
+  - `M5.Display.setEpdMode`
+  - `M5.Display.setTextSize`
+  - `M5.Display.startWrite`
+  - `M5.Display.waitDisplay`
+  - `M5.Display.width`
+  - `M5.Touch.getCount`
+  - `M5.Touch.getDetail`
+  - `M5.begin`
+  - `M5.delay`
+  - `M5.update`
+
+### `Basic/Touch/SliderUI/SliderUI.ino`
+- Classes: none
+- Methods:
+  - `M5.Display.fillCircle`
+  - `M5.Display.fillRect`
+  - `M5.Display.height`
+  - `M5.Display.setEpdMode`
+  - `M5.Display.setTextSize`
+  - `M5.Display.width`
+  - `M5.Touch.getCount`
+  - `M5.Touch.getDetail`
+  - `M5.begin`
+  - `M5.delay`
+  - `M5.update`
+
+### `Test/build_test/build_test.ino`
+- Classes: none
+- Methods:
+  - none detected
+
+## Methods by subsystem
+
+### `BtnA`
+- `getClickCount`
+- `isHolding`
+- `wasClicked`
+- `wasDecideClickCount`
+- `wasHold`
+- `wasPressed`
+- `wasReleased`
+
+### `BtnB`
+- `getClickCount`
+- `isHolding`
+- `isPressed`
+- `wasClicked`
+- `wasDecideClickCount`
+- `wasHold`
+- `wasPressed`
+- `wasReleased`
+
+### `BtnC`
+- `getClickCount`
+- `isPressed`
+- `wasClicked`
+- `wasDecideClickCount`
+- `wasHold`
+- `wasPressed`
+- `wasReleased`
+
+### `BtnEXT`
+- `getClickCount`
+- `wasClicked`
+- `wasDecideClickCount`
+- `wasHold`
+- `wasPressed`
+- `wasReleased`
+
+### `BtnPWR`
+- `getClickCount`
+- `wasClicked`
+- `wasDecideClickCount`
+- `wasHold`
+- `wasPressed`
+- `wasReleased`
+
+### `Display`
+- `clear`
+- `clearClipRect`
+- `color888`
+- `display`
+- `displayBusy`
+- `drawRect`
+- `drawString`
+- `endWrite`
+- `fillCircle`
+- `fillRect`
+- `fillScreen`
+- `fontHeight`
+- `getBaseColor`
+- `getCursorY`
+- `getRotation`
+- `height`
+- `print`
+- `printf`
+- `println`
+- `setBrightness`
+- `setClipRect`
+- `setColor`
+- `setCursor`
+- `setEpdMode`
+- `setFont`
+- `setRotation`
+- `setTextColor`
+- `setTextDatum`
+- `setTextScroll`
+- `setTextSize`
+- `setTextWrap`
+- `startWrite`
+- `waitDisplay`
+- `width`
+- `writeFastVLine`
+
+### `Imu`
+- `getAccel`
+- `getGyro`
+- `getImuData`
+- `getOffsetData`
+- `getType`
+- `isEnabled`
+- `loadOffsetFromNVS`
+- `saveOffsetToNVS`
+- `setCalibration`
+- `update`
+
+### `Led`
+- `setAllColor`
+
+### `Log`
+- `print`
+- `printf`
+- `println`
+- `setCallback`
+- `setEnableColor`
+- `setLogLevel`
+- `setSuffix`
+
+### `M5`
+- `Displays`
+- `Log`
+- `begin`
+- `config`
+- `delay`
+- `getBoard`
+- `getDisplayCount`
+- `getDisplayIndex`
+- `getPin`
+- `setLogDisplayIndex`
+- `setPrimaryDisplayType`
+- `setTouchButtonHeight`
+- `setTouchButtonHeightByRatio`
+- `update`
+
+### `Mic`
+- `begin`
+- `config`
+- `end`
+- `isEnabled`
+- `isRecording`
+- `record`
+
+### `Power`
+- `getBatteryLevel`
+
+### `Rtc`
+- `getDateTime`
+- `isEnabled`
+- `setDateTime`
+- `setSystemTimeFromRtc`
+
+### `Speaker`
+- `begin`
+- `config`
+- `end`
+- `getChannelVolume`
+- `getVolume`
+- `isEnabled`
+- `isPlaying`
+- `playRaw`
+- `playWav`
+- `setAllChannelVolume`
+- `setChannelVolume`
+- `setVolume`
+- `stop`
+- `tone`
+
+### `Touch`
+- `getCount`
+- `getDetail`
+
+## External/direct classes
+
+- `AquesTalk`
+- `AudioFileSourceBuffer`
+- `AudioFileSourceICYStream`
+- `AudioFileSourceID3`
+- `AudioFileSourceSD`
+- `AudioGeneratorMP3`
+- `BluetoothA2DPSink`

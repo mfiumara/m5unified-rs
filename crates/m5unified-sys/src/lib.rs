@@ -11,7 +11,23 @@
 //! targets these functions are stubbed so the safe wrapper and translated
 //! samples can be checked in CI without hardware.
 
-use core::ffi::{c_char, c_int};
+use core::ffi::{c_char, c_float, c_int};
+
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]
+pub struct m5u_touch_detail_t {
+    pub x: c_int,
+    pub y: c_int,
+    pub prev_x: c_int,
+    pub prev_y: c_int,
+    pub is_pressed: bool,
+    pub was_pressed: bool,
+    pub was_released: bool,
+    pub was_clicked: bool,
+    pub was_hold: bool,
+    pub is_holding: bool,
+    pub click_count: c_int,
+}
 
 #[cfg(target_os = "espidf")]
 extern "C" {
@@ -80,7 +96,84 @@ extern "C" {
     pub fn m5u_battery_voltage_mv() -> c_int;
     pub fn m5u_power_is_charging() -> bool;
 
+    pub fn m5u_display_get_rotation() -> c_int;
+    pub fn m5u_display_set_brightness(brightness: u8);
+    pub fn m5u_display_set_epd_fastest();
+    pub fn m5u_display_start_write();
+    pub fn m5u_display_end_write();
+    pub fn m5u_display_display();
+    pub fn m5u_display_display_busy() -> bool;
+    pub fn m5u_display_wait_display();
+    pub fn m5u_display_get_cursor_y() -> c_int;
+    pub fn m5u_display_font_height() -> c_int;
+    pub fn m5u_display_get_base_color() -> u16;
+    pub fn m5u_display_set_color(color: u16);
+    pub fn m5u_display_set_text_wrap(wrap_x: bool, wrap_y: bool);
+    pub fn m5u_display_set_text_datum(datum: c_int);
+    pub fn m5u_display_draw_string(text: *const c_char, x: c_int, y: c_int) -> c_int;
+    pub fn m5u_display_write_pixel(x: c_int, y: c_int, color: u16);
+    pub fn m5u_display_write_fast_vline(x: c_int, y: c_int, h: c_int, color: u16);
+    pub fn m5u_display_set_clip_rect(x: c_int, y: c_int, w: c_int, h: c_int);
+    pub fn m5u_display_clear_clip_rect();
+    pub fn m5u_display_color888(r: u8, g: u8, b: u8) -> u16;
+    pub fn m5u_display_count() -> c_int;
+    pub fn m5u_display_index_for_kind(kind: c_int) -> c_int;
+    pub fn m5u_display_width_at(index: c_int) -> c_int;
+    pub fn m5u_display_height_at(index: c_int) -> c_int;
+    pub fn m5u_display_print_at(index: c_int, text: *const c_char);
+    pub fn m5u_display_fill_circle_at(index: c_int, x: c_int, y: c_int, r: c_int, color: u16);
+
+    pub fn m5u_button_is_pressed(button: c_int) -> bool;
+    pub fn m5u_button_was_pressed(button: c_int) -> bool;
+    pub fn m5u_button_was_released(button: c_int) -> bool;
+    pub fn m5u_button_was_clicked(button: c_int) -> bool;
+    pub fn m5u_button_was_hold(button: c_int) -> bool;
+    pub fn m5u_button_is_holding(button: c_int) -> bool;
+    pub fn m5u_button_was_decide_click_count(button: c_int) -> bool;
+    pub fn m5u_button_get_click_count(button: c_int) -> c_int;
+
+    pub fn m5u_mic_is_enabled() -> bool;
+    pub fn m5u_mic_is_recording() -> bool;
+    pub fn m5u_mic_end();
+    pub fn m5u_mic_record_i16_at(buffer: *mut i16, samples: usize, sample_rate_hz: u32) -> bool;
+    pub fn m5u_mic_get_noise_filter_level() -> c_int;
+    pub fn m5u_mic_set_noise_filter_level(level: c_int) -> bool;
+
+    pub fn m5u_speaker_is_enabled() -> bool;
+    pub fn m5u_speaker_end();
+    pub fn m5u_speaker_get_volume() -> u8;
+    pub fn m5u_speaker_tone_ex(frequency_hz: c_float, duration_ms: u32, channel: c_int) -> bool;
+    pub fn m5u_speaker_play_u8(samples: *const u8, len: usize, sample_rate_hz: u32) -> bool;
+    pub fn m5u_speaker_play_wav(data: *const u8, len: usize) -> bool;
+    pub fn m5u_speaker_is_playing(channel: c_int) -> bool;
+    pub fn m5u_speaker_stop(channel: c_int);
+    pub fn m5u_speaker_get_channel_volume(channel: c_int) -> u8;
+    pub fn m5u_speaker_set_channel_volume(channel: c_int, volume: u8);
+    pub fn m5u_speaker_set_all_channel_volume(volume: u8);
+
+    pub fn m5u_imu_is_enabled() -> bool;
+    pub fn m5u_imu_get_type() -> c_int;
+    pub fn m5u_imu_update() -> bool;
+    pub fn m5u_imu_load_offset_from_nvs() -> bool;
+    pub fn m5u_imu_save_offset_to_nvs() -> bool;
+    pub fn m5u_imu_get_offset_data(index: c_int) -> c_float;
+    pub fn m5u_imu_set_calibration(x: c_float, y: c_float, z: c_float);
+
+    pub fn m5u_touch_get_detail(index: c_int, out: *mut m5u_touch_detail_t) -> bool;
+    pub fn m5u_rtc_is_enabled() -> bool;
+
+    pub fn m5u_power_axp2101_disable_irq(mask: u64) -> bool;
+    pub fn m5u_power_axp2101_enable_irq(mask: u64) -> bool;
+    pub fn m5u_power_axp2101_clear_irq_statuses() -> bool;
+    pub fn m5u_power_axp2101_get_irq_statuses() -> u64;
+    pub fn m5u_power_axp2101_is_bat_charger_under_temperature_irq() -> bool;
+    pub fn m5u_power_axp2101_is_bat_charger_over_temperature_irq() -> bool;
+    pub fn m5u_power_axp2101_is_vbus_insert_irq() -> bool;
+    pub fn m5u_power_axp2101_is_vbus_remove_irq() -> bool;
+
+    pub fn m5u_log_print(text: *const c_char);
     pub fn m5u_log_println(text: *const c_char);
+    pub fn m5u_log_level(level: c_int, text: *const c_char);
     pub fn m5u_sd_begin() -> bool;
 }
 
@@ -265,7 +358,91 @@ mod host_stubs {
         false
     }
 
+    pub unsafe fn m5u_display_get_rotation() -> c_int { 0 }
+    pub unsafe fn m5u_display_set_brightness(_brightness: u8) {}
+    pub unsafe fn m5u_display_set_epd_fastest() {}
+    pub unsafe fn m5u_display_start_write() {}
+    pub unsafe fn m5u_display_end_write() {}
+    pub unsafe fn m5u_display_display() {}
+    pub unsafe fn m5u_display_display_busy() -> bool { false }
+    pub unsafe fn m5u_display_wait_display() {}
+    pub unsafe fn m5u_display_get_cursor_y() -> c_int { 0 }
+    pub unsafe fn m5u_display_font_height() -> c_int { 16 }
+    pub unsafe fn m5u_display_get_base_color() -> u16 { 0 }
+    pub unsafe fn m5u_display_set_color(_color: u16) {}
+    pub unsafe fn m5u_display_set_text_wrap(_wrap_x: bool, _wrap_y: bool) {}
+    pub unsafe fn m5u_display_set_text_datum(_datum: c_int) {}
+    pub unsafe fn m5u_display_draw_string(_text: *const c_char, _x: c_int, _y: c_int) -> c_int { 0 }
+    pub unsafe fn m5u_display_write_pixel(_x: c_int, _y: c_int, _color: u16) {}
+    pub unsafe fn m5u_display_write_fast_vline(_x: c_int, _y: c_int, _h: c_int, _color: u16) {}
+    pub unsafe fn m5u_display_set_clip_rect(_x: c_int, _y: c_int, _w: c_int, _h: c_int) {}
+    pub unsafe fn m5u_display_clear_clip_rect() {}
+    pub unsafe fn m5u_display_color888(r: u8, g: u8, b: u8) -> u16 {
+        ((u16::from(r & 0xF8)) << 8) | ((u16::from(g & 0xFC)) << 3) | u16::from(b >> 3)
+    }
+    pub unsafe fn m5u_display_count() -> c_int { 1 }
+    pub unsafe fn m5u_display_index_for_kind(_kind: c_int) -> c_int { -1 }
+    pub unsafe fn m5u_display_width_at(_index: c_int) -> c_int { 320 }
+    pub unsafe fn m5u_display_height_at(_index: c_int) -> c_int { 240 }
+    pub unsafe fn m5u_display_print_at(_index: c_int, _text: *const c_char) {}
+    pub unsafe fn m5u_display_fill_circle_at(_index: c_int, _x: c_int, _y: c_int, _r: c_int, _color: u16) {}
+
+    pub unsafe fn m5u_button_is_pressed(_button: c_int) -> bool { false }
+    pub unsafe fn m5u_button_was_pressed(_button: c_int) -> bool { false }
+    pub unsafe fn m5u_button_was_released(_button: c_int) -> bool { false }
+    pub unsafe fn m5u_button_was_clicked(_button: c_int) -> bool { false }
+    pub unsafe fn m5u_button_was_hold(_button: c_int) -> bool { false }
+    pub unsafe fn m5u_button_is_holding(_button: c_int) -> bool { false }
+    pub unsafe fn m5u_button_was_decide_click_count(_button: c_int) -> bool { false }
+    pub unsafe fn m5u_button_get_click_count(_button: c_int) -> c_int { 0 }
+
+    pub unsafe fn m5u_mic_is_enabled() -> bool { true }
+    pub unsafe fn m5u_mic_is_recording() -> bool { false }
+    pub unsafe fn m5u_mic_end() {}
+    pub unsafe fn m5u_mic_record_i16_at(buffer: *mut i16, samples: usize, _sample_rate_hz: u32) -> bool {
+        m5u_mic_record_i16(buffer, samples)
+    }
+    pub unsafe fn m5u_mic_get_noise_filter_level() -> c_int { 0 }
+    pub unsafe fn m5u_mic_set_noise_filter_level(_level: c_int) -> bool { true }
+
+    pub unsafe fn m5u_speaker_is_enabled() -> bool { true }
+    pub unsafe fn m5u_speaker_end() {}
+    pub unsafe fn m5u_speaker_get_volume() -> u8 { 64 }
+    pub unsafe fn m5u_speaker_tone_ex(_frequency_hz: c_float, _duration_ms: u32, _channel: c_int) -> bool { true }
+    pub unsafe fn m5u_speaker_play_u8(_samples: *const u8, _len: usize, _sample_rate_hz: u32) -> bool { true }
+    pub unsafe fn m5u_speaker_play_wav(_data: *const u8, _len: usize) -> bool { true }
+    pub unsafe fn m5u_speaker_is_playing(_channel: c_int) -> bool { false }
+    pub unsafe fn m5u_speaker_stop(_channel: c_int) {}
+    pub unsafe fn m5u_speaker_get_channel_volume(_channel: c_int) -> u8 { 255 }
+    pub unsafe fn m5u_speaker_set_channel_volume(_channel: c_int, _volume: u8) {}
+    pub unsafe fn m5u_speaker_set_all_channel_volume(_volume: u8) {}
+
+    pub unsafe fn m5u_imu_is_enabled() -> bool { true }
+    pub unsafe fn m5u_imu_get_type() -> c_int { 0 }
+    pub unsafe fn m5u_imu_update() -> bool { true }
+    pub unsafe fn m5u_imu_load_offset_from_nvs() -> bool { false }
+    pub unsafe fn m5u_imu_save_offset_to_nvs() -> bool { false }
+    pub unsafe fn m5u_imu_get_offset_data(_index: c_int) -> c_float { 0.0 }
+    pub unsafe fn m5u_imu_set_calibration(_x: c_float, _y: c_float, _z: c_float) {}
+
+    pub unsafe fn m5u_touch_get_detail(_index: c_int, out: *mut m5u_touch_detail_t) -> bool {
+        if !out.is_null() { *out = m5u_touch_detail_t::default(); }
+        false
+    }
+    pub unsafe fn m5u_rtc_is_enabled() -> bool { true }
+
+    pub unsafe fn m5u_power_axp2101_disable_irq(_mask: u64) -> bool { false }
+    pub unsafe fn m5u_power_axp2101_enable_irq(_mask: u64) -> bool { false }
+    pub unsafe fn m5u_power_axp2101_clear_irq_statuses() -> bool { false }
+    pub unsafe fn m5u_power_axp2101_get_irq_statuses() -> u64 { 0 }
+    pub unsafe fn m5u_power_axp2101_is_bat_charger_under_temperature_irq() -> bool { false }
+    pub unsafe fn m5u_power_axp2101_is_bat_charger_over_temperature_irq() -> bool { false }
+    pub unsafe fn m5u_power_axp2101_is_vbus_insert_irq() -> bool { false }
+    pub unsafe fn m5u_power_axp2101_is_vbus_remove_irq() -> bool { false }
+
+    pub unsafe fn m5u_log_print(_text: *const c_char) {}
     pub unsafe fn m5u_log_println(_text: *const c_char) {}
+    pub unsafe fn m5u_log_level(_level: c_int, _text: *const c_char) {}
     pub unsafe fn m5u_sd_begin() -> bool {
         false
     }
