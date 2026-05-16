@@ -61,11 +61,13 @@ The first ESP-IDF Rust firmware package lives in [`firmware/hello-display`](firm
 If Cargo reports `custom toolchain 'esp' ... is not installed`, install the esp-rs toolchain first:
 
 ```bash
-cargo install espup
+cargo +stable install espup
 espup install
 . ~/export-esp.sh
-cargo install espflash
+cargo +stable install espflash
 ```
+
+Use `+stable` for the install commands, or run them outside `firmware/hello-display`, because that directory's `rust-toolchain.toml` selects the not-yet-installed `esp` toolchain.
 
 On macOS, if the ESP-IDF build later reports missing native build tools, install:
 
