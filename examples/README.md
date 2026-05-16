@@ -32,7 +32,11 @@ They compile against the local `m5unified` Rust API. On non-ESP-IDF host targets
 
 ```bash
 bash scripts/check-host.sh
+cargo run
 cargo run -p m5unified-examples --bin basic_displays
+cargo run --bin basic_button
 ```
+
+From the workspace root, plain `cargo run` launches `basic_how_to_use` as the default host-checkable smoke example. Use `cargo run --bin <name>` for any specific translated upstream example listed above.
 
 The advanced network/Bluetooth/codec examples currently define the Rust API boundary and compile-time sample shape. They intentionally leave codec/network stack selection to the application crate while routing display/speaker/control operations through `m5unified`.
