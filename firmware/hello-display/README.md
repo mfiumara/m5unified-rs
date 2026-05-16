@@ -40,6 +40,28 @@ rm -rf .embuild/espressif/python_env
 cargo build --target xtensa-esp32s3-espidf
 ```
 
+If `ensurepip` fails with `pyexpat`/`libexpat` symbol errors, repair Homebrew's Python/expat linkage or use a non-Homebrew Python:
+
+```bash
+brew reinstall expat python@3.12
+export PATH="$(brew --prefix python@3.12)/libexec/bin:$PATH"
+export DYLD_LIBRARY_PATH="$(brew --prefix expat)/lib:${DYLD_LIBRARY_PATH:-}"
+python3 -c 'import pyexpat; print(pyexpat.EXPAT_VERSION)'
+rm -rf .embuild/espressif/python_env
+cargo build --target xtensa-esp32s3-espidf
+```
+
+If Homebrew Python still imports `/usr/lib/libexpat.1.dylib`, use a pyenv Python instead:
+
+```bash
+brew install pyenv
+pyenv install 3.11.9
+export PATH="$(pyenv root)/versions/3.11.9/bin:$PATH"
+python3 -c 'import pyexpat; print(pyexpat.EXPAT_VERSION)'
+rm -rf .embuild/espressif/python_env
+cargo build --target xtensa-esp32s3-espidf
+```
+
 Then from this directory run:
 
 ```bash

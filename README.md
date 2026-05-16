@@ -84,6 +84,26 @@ python3 --version  # should print Python 3.12.x
 rm -rf firmware/hello-display/.embuild/espressif/python_env
 ```
 
+If Python 3.12 then fails in `ensurepip` with a `pyexpat`/`libexpat` symbol error, repair Homebrew's expat linkage or use pyenv:
+
+```bash
+brew reinstall expat python@3.12
+export PATH="$(brew --prefix python@3.12)/libexec/bin:$PATH"
+export DYLD_LIBRARY_PATH="$(brew --prefix expat)/lib:${DYLD_LIBRARY_PATH:-}"
+python3 -c 'import pyexpat; print(pyexpat.EXPAT_VERSION)'
+rm -rf firmware/hello-display/.embuild/espressif/python_env
+```
+
+Fallback:
+
+```bash
+brew install pyenv
+pyenv install 3.11.9
+export PATH="$(pyenv root)/versions/3.11.9/bin:$PATH"
+python3 -c 'import pyexpat; print(pyexpat.EXPAT_VERSION)'
+rm -rf firmware/hello-display/.embuild/espressif/python_env
+```
+
 ```bash
 cd firmware/hello-display
 cargo build --target xtensa-esp32s3-espidf
