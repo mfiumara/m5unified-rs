@@ -58,6 +58,21 @@ cargo run -p m5unified-examples --bin basic_displays
 
 The first ESP-IDF Rust firmware package lives in [`firmware/hello-display`](firmware/hello-display). It is excluded from the host workspace because it requires the esp-rs `xtensa-esp32s3-espidf` toolchain.
 
+If Cargo reports `custom toolchain 'esp' ... is not installed`, install the esp-rs toolchain first:
+
+```bash
+cargo install espup
+espup install
+. ~/export-esp.sh
+cargo install espflash
+```
+
+On macOS, if the ESP-IDF build later reports missing native build tools, install:
+
+```bash
+brew install cmake ninja dfu-util ccache
+```
+
 ```bash
 cd firmware/hello-display
 cargo build --target xtensa-esp32s3-espidf

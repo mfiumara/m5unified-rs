@@ -13,7 +13,22 @@ The `components/m5unified-rs` ESP-IDF component references `crates/m5unified-sys
 
 ## Build
 
-Install the esp-rs toolchain first, then from this directory run:
+Install the esp-rs toolchain first. If Cargo reports `custom toolchain 'esp' ... is not installed`, install it with `espup`:
+
+```bash
+cargo install espup
+espup install
+. ~/export-esp.sh
+cargo install espflash
+```
+
+On macOS, if the ESP-IDF build later complains about missing host tools, install the common prerequisites:
+
+```bash
+brew install cmake ninja dfu-util ccache
+```
+
+Then from this directory run:
 
 ```bash
 cargo build --target xtensa-esp32s3-espidf
