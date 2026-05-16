@@ -1,4 +1,6 @@
 /target/
+**/target/
+**/.embuild/
 **/*.rs.bk
 .DS_Store
 .env
