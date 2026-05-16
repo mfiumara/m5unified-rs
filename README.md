@@ -112,6 +112,9 @@ espflash flash --monitor target/xtensa-esp32s3-espidf/debug/m5unified-hello-disp
 
 Expected hardware behavior: the display shows `hello from rust`; Button A/B presses change the screen.
 
-## Plan
+## Plans and publishing
 
-See [`docs/plans/2026-05-15-m5unified-rs-roadmap.md`](docs/plans/2026-05-15-m5unified-rs-roadmap.md) for the implementation roadmap and Codex handoff plan.
+- [`docs/plans/2026-05-15-m5unified-rs-roadmap.md`](docs/plans/2026-05-15-m5unified-rs-roadmap.md) contains the original implementation roadmap.
+- [`docs/plans/2026-05-16-complete-m5unified-examples.md`](docs/plans/2026-05-16-complete-m5unified-examples.md) tracks the full upstream-example parity plan.
+- [`docs/examples/upstream-examples.toml`](docs/examples/upstream-examples.toml) maps upstream examples to Rust bins.
+- [`docs/publishing.md`](docs/publishing.md) documents the crates.io release order for `m5unified-sys` and `m5unified`.

@@ -2,9 +2,19 @@
 name = "m5unified"
 version = "0.1.0"
 edition.workspace = true
+rust-version = "1.85"
 license.workspace = true
 repository.workspace = true
+readme = "../../README.md"
 description = "Safe Rust wrapper for M5Unified."
+keywords = ["m5stack", "m5unified", "esp32", "esp-idf", "embedded"]
+categories = ["embedded", "hardware-support", "api-bindings"]
+include = [
+    "Cargo.toml",
+    "src/**",
+    "../../README.md",
+    "../../LICENSE",
+]
 
 [lib]
 path = "src/lib.rs"
