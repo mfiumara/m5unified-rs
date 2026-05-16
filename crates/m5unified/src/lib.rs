@@ -457,25 +457,37 @@ pub fn sd_begin() -> bool {
     unsafe { m5unified_sys::m5u_sd_begin() }
 }
 
-
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct Color565(pub u16);
 
 impl Color565 {
-    pub const fn new(raw: u16) -> Self { Self(raw) }
+    pub const fn new(raw: u16) -> Self {
+        Self(raw)
+    }
     pub fn rgb888(r: u8, g: u8, b: u8) -> Self {
         Self(unsafe { m5unified_sys::m5u_display_color888(r, g, b) })
     }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub struct Point { pub x: i32, pub y: i32 }
+pub struct Point {
+    pub x: i32,
+    pub y: i32,
+}
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub struct Size { pub w: i32, pub h: i32 }
+pub struct Size {
+    pub w: i32,
+    pub h: i32,
+}
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub struct Rect { pub x: i32, pub y: i32, pub w: i32, pub h: i32 }
+pub struct Rect {
+    pub x: i32,
+    pub y: i32,
+    pub w: i32,
+    pub h: i32,
+}
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum TextDatum {
@@ -524,11 +536,17 @@ impl DisplayKind {
 }
 
 #[derive(Debug, Copy, Clone)]
-pub struct DisplayRef { index: i32 }
+pub struct DisplayRef {
+    index: i32,
+}
 
 impl DisplayRef {
-    pub fn width(&self) -> i32 { unsafe { m5unified_sys::m5u_display_width_at(self.index) as i32 } }
-    pub fn height(&self) -> i32 { unsafe { m5unified_sys::m5u_display_height_at(self.index) as i32 } }
+    pub fn width(&self) -> i32 {
+        unsafe { m5unified_sys::m5u_display_width_at(self.index) as i32 }
+    }
+    pub fn height(&self) -> i32 {
+        unsafe { m5unified_sys::m5u_display_height_at(self.index) as i32 }
+    }
     pub fn print(&mut self, text: &str) -> Result<(), Error> {
         let text = CString::new(text).map_err(|_| Error::InvalidString)?;
         unsafe { m5unified_sys::m5u_display_print_at(self.index, text.as_ptr()) }
@@ -545,7 +563,9 @@ impl M5Unified {
     }
 
     pub fn display(&self, index: usize) -> Option<DisplayRef> {
-        (index < self.display_count()).then_some(DisplayRef { index: index as i32 })
+        (index < self.display_count()).then_some(DisplayRef {
+            index: index as i32,
+        })
     }
 
     pub fn display_index(&self, kind: DisplayKind) -> Option<usize> {
@@ -555,49 +575,99 @@ impl M5Unified {
 }
 
 impl Display {
-    pub fn rotation(&self) -> i32 { unsafe { m5unified_sys::m5u_display_get_rotation() as i32 } }
-    pub fn set_brightness(&mut self, brightness: u8) { unsafe { m5unified_sys::m5u_display_set_brightness(brightness) } }
-    pub fn set_epd_fastest(&mut self) { unsafe { m5unified_sys::m5u_display_set_epd_fastest() } }
-    pub fn start_write(&mut self) { unsafe { m5unified_sys::m5u_display_start_write() } }
-    pub fn end_write(&mut self) { unsafe { m5unified_sys::m5u_display_end_write() } }
+    pub fn rotation(&self) -> i32 {
+        unsafe { m5unified_sys::m5u_display_get_rotation() as i32 }
+    }
+    pub fn set_brightness(&mut self, brightness: u8) {
+        unsafe { m5unified_sys::m5u_display_set_brightness(brightness) }
+    }
+    pub fn set_epd_fastest(&mut self) {
+        unsafe { m5unified_sys::m5u_display_set_epd_fastest() }
+    }
+    pub fn start_write(&mut self) {
+        unsafe { m5unified_sys::m5u_display_start_write() }
+    }
+    pub fn end_write(&mut self) {
+        unsafe { m5unified_sys::m5u_display_end_write() }
+    }
     pub fn transaction<R>(&mut self, f: impl FnOnce(&mut Display) -> R) -> R {
         self.start_write();
         let result = f(self);
         self.end_write();
         result
     }
-    pub fn display(&mut self) { unsafe { m5unified_sys::m5u_display_display() } }
-    pub fn display_busy(&self) -> bool { unsafe { m5unified_sys::m5u_display_display_busy() } }
-    pub fn wait_display(&self) { unsafe { m5unified_sys::m5u_display_wait_display() } }
-    pub fn cursor_y(&self) -> i32 { unsafe { m5unified_sys::m5u_display_get_cursor_y() as i32 } }
-    pub fn font_height(&self) -> i32 { unsafe { m5unified_sys::m5u_display_font_height() as i32 } }
-    pub fn base_color(&self) -> u16 { unsafe { m5unified_sys::m5u_display_get_base_color() } }
-    pub fn set_color(&mut self, color: u16) { unsafe { m5unified_sys::m5u_display_set_color(color) } }
-    pub fn set_text_wrap(&mut self, wrap_x: bool, wrap_y: bool) { unsafe { m5unified_sys::m5u_display_set_text_wrap(wrap_x, wrap_y) } }
-    pub fn set_text_datum(&mut self, datum: TextDatum) { unsafe { m5unified_sys::m5u_display_set_text_datum(datum as c_int) } }
+    pub fn display(&mut self) {
+        unsafe { m5unified_sys::m5u_display_display() }
+    }
+    pub fn display_busy(&self) -> bool {
+        unsafe { m5unified_sys::m5u_display_display_busy() }
+    }
+    pub fn wait_display(&self) {
+        unsafe { m5unified_sys::m5u_display_wait_display() }
+    }
+    pub fn cursor_y(&self) -> i32 {
+        unsafe { m5unified_sys::m5u_display_get_cursor_y() as i32 }
+    }
+    pub fn font_height(&self) -> i32 {
+        unsafe { m5unified_sys::m5u_display_font_height() as i32 }
+    }
+    pub fn base_color(&self) -> u16 {
+        unsafe { m5unified_sys::m5u_display_get_base_color() }
+    }
+    pub fn set_color(&mut self, color: u16) {
+        unsafe { m5unified_sys::m5u_display_set_color(color) }
+    }
+    pub fn set_text_wrap(&mut self, wrap_x: bool, wrap_y: bool) {
+        unsafe { m5unified_sys::m5u_display_set_text_wrap(wrap_x, wrap_y) }
+    }
+    pub fn set_text_datum(&mut self, datum: TextDatum) {
+        unsafe { m5unified_sys::m5u_display_set_text_datum(datum as c_int) }
+    }
     pub fn draw_string(&mut self, text: &str, x: i32, y: i32) -> Result<i32, Error> {
         let text = CString::new(text).map_err(|_| Error::InvalidString)?;
         Ok(unsafe { m5unified_sys::m5u_display_draw_string(text.as_ptr(), x, y) as i32 })
     }
-    pub fn write_pixel(&mut self, x: i32, y: i32, color: u16) { unsafe { m5unified_sys::m5u_display_write_pixel(x, y, color) } }
-    pub fn write_fast_vline(&mut self, x: i32, y: i32, h: i32, color: u16) { unsafe { m5unified_sys::m5u_display_write_fast_vline(x, y, h, color) } }
-    pub fn set_clip_rect(&mut self, rect: Rect) { unsafe { m5unified_sys::m5u_display_set_clip_rect(rect.x, rect.y, rect.w, rect.h) } }
-    pub fn clear_clip_rect(&mut self) { unsafe { m5unified_sys::m5u_display_clear_clip_rect() } }
-    pub fn color888(&self, r: u8, g: u8, b: u8) -> u16 { unsafe { m5unified_sys::m5u_display_color888(r, g, b) } }
+    pub fn write_pixel(&mut self, x: i32, y: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_write_pixel(x, y, color) }
+    }
+    pub fn write_fast_vline(&mut self, x: i32, y: i32, h: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_write_fast_vline(x, y, h, color) }
+    }
+    pub fn set_clip_rect(&mut self, rect: Rect) {
+        unsafe { m5unified_sys::m5u_display_set_clip_rect(rect.x, rect.y, rect.w, rect.h) }
+    }
+    pub fn clear_clip_rect(&mut self) {
+        unsafe { m5unified_sys::m5u_display_clear_clip_rect() }
+    }
+    pub fn color888(&self, r: u8, g: u8, b: u8) -> u16 {
+        unsafe { m5unified_sys::m5u_display_color888(r, g, b) }
+    }
 }
 
 #[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]
-pub struct MicConfig { pub noise_filter_level: i32 }
+pub struct MicConfig {
+    pub noise_filter_level: i32,
+}
 
 impl Mic {
-    pub fn is_enabled(&self) -> bool { unsafe { m5unified_sys::m5u_mic_is_enabled() } }
-    pub fn is_recording(&self) -> bool { unsafe { m5unified_sys::m5u_mic_is_recording() } }
-    pub fn end(&mut self) { unsafe { m5unified_sys::m5u_mic_end() } }
+    pub fn is_enabled(&self) -> bool {
+        unsafe { m5unified_sys::m5u_mic_is_enabled() }
+    }
+    pub fn is_recording(&self) -> bool {
+        unsafe { m5unified_sys::m5u_mic_is_recording() }
+    }
+    pub fn end(&mut self) {
+        unsafe { m5unified_sys::m5u_mic_end() }
+    }
     pub fn record_i16_at(&mut self, buffer: &mut [i16], sample_rate_hz: u32) -> bool {
-        unsafe { m5unified_sys::m5u_mic_record_i16_at(buffer.as_mut_ptr(), buffer.len(), sample_rate_hz) }
+        unsafe {
+            m5unified_sys::m5u_mic_record_i16_at(buffer.as_mut_ptr(), buffer.len(), sample_rate_hz)
+        }
     }
     pub fn config(&self) -> MicConfig {
-        MicConfig { noise_filter_level: unsafe { m5unified_sys::m5u_mic_get_noise_filter_level() as i32 } }
+        MicConfig {
+            noise_filter_level: unsafe { m5unified_sys::m5u_mic_get_noise_filter_level() as i32 },
+        }
     }
     pub fn set_config(&mut self, config: MicConfig) -> Result<(), Error> {
         unsafe { m5unified_sys::m5u_mic_set_noise_filter_level(config.noise_filter_level as c_int) }
@@ -607,14 +677,28 @@ impl Mic {
 }
 
 impl Speaker {
-    pub fn is_enabled(&self) -> bool { unsafe { m5unified_sys::m5u_speaker_is_enabled() } }
-    pub fn end(&mut self) { unsafe { m5unified_sys::m5u_speaker_end() } }
-    pub fn volume(&self) -> u8 { unsafe { m5unified_sys::m5u_speaker_get_volume() } }
+    pub fn is_enabled(&self) -> bool {
+        unsafe { m5unified_sys::m5u_speaker_is_enabled() }
+    }
+    pub fn end(&mut self) {
+        unsafe { m5unified_sys::m5u_speaker_end() }
+    }
+    pub fn volume(&self) -> u8 {
+        unsafe { m5unified_sys::m5u_speaker_get_volume() }
+    }
     pub fn tone_ex(&mut self, frequency_hz: f32, duration_ms: u32, channel: Option<u8>) -> bool {
-        unsafe { m5unified_sys::m5u_speaker_tone_ex(frequency_hz, duration_ms, channel.map(i32::from).unwrap_or(-1)) }
+        unsafe {
+            m5unified_sys::m5u_speaker_tone_ex(
+                frequency_hz,
+                duration_ms,
+                channel.map(i32::from).unwrap_or(-1),
+            )
+        }
     }
     pub fn play_u8(&mut self, samples: &[u8], sample_rate_hz: u32) -> bool {
-        unsafe { m5unified_sys::m5u_speaker_play_u8(samples.as_ptr(), samples.len(), sample_rate_hz) }
+        unsafe {
+            m5unified_sys::m5u_speaker_play_u8(samples.as_ptr(), samples.len(), sample_rate_hz)
+        }
     }
     pub fn play_wav(&mut self, data: &[u8]) -> bool {
         unsafe { m5unified_sys::m5u_speaker_play_wav(data.as_ptr(), data.len()) }
@@ -622,29 +706,61 @@ impl Speaker {
     pub fn is_playing(&self, channel: Option<u8>) -> bool {
         unsafe { m5unified_sys::m5u_speaker_is_playing(channel.map(i32::from).unwrap_or(-1)) }
     }
-    pub fn stop(&mut self, channel: Option<u8>) { unsafe { m5unified_sys::m5u_speaker_stop(channel.map(i32::from).unwrap_or(-1)) } }
-    pub fn channel_volume(&self, channel: u8) -> u8 { unsafe { m5unified_sys::m5u_speaker_get_channel_volume(i32::from(channel)) } }
-    pub fn set_channel_volume(&mut self, channel: u8, volume: u8) { unsafe { m5unified_sys::m5u_speaker_set_channel_volume(i32::from(channel), volume) } }
-    pub fn set_all_channel_volume(&mut self, volume: u8) { unsafe { m5unified_sys::m5u_speaker_set_all_channel_volume(volume) } }
+    pub fn stop(&mut self, channel: Option<u8>) {
+        unsafe { m5unified_sys::m5u_speaker_stop(channel.map(i32::from).unwrap_or(-1)) }
+    }
+    pub fn channel_volume(&self, channel: u8) -> u8 {
+        unsafe { m5unified_sys::m5u_speaker_get_channel_volume(i32::from(channel)) }
+    }
+    pub fn set_channel_volume(&mut self, channel: u8, volume: u8) {
+        unsafe { m5unified_sys::m5u_speaker_set_channel_volume(i32::from(channel), volume) }
+    }
+    pub fn set_all_channel_volume(&mut self, volume: u8) {
+        unsafe { m5unified_sys::m5u_speaker_set_all_channel_volume(volume) }
+    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub enum ImuKind { Unknown(i32) }
+pub enum ImuKind {
+    Unknown(i32),
+}
 
 #[derive(Debug, Copy, Clone, Default, PartialEq)]
-pub struct ImuData { pub accel: Vec3, pub gyro: Vec3, pub temperature_c: Option<f32> }
+pub struct ImuData {
+    pub accel: Vec3,
+    pub gyro: Vec3,
+    pub temperature_c: Option<f32>,
+}
 
 impl Imu {
-    pub fn is_enabled(&self) -> bool { unsafe { m5unified_sys::m5u_imu_is_enabled() } }
-    pub fn kind(&self) -> ImuKind { ImuKind::Unknown(unsafe { m5unified_sys::m5u_imu_get_type() as i32 }) }
-    pub fn update(&mut self) -> bool { unsafe { m5unified_sys::m5u_imu_update() } }
-    pub fn data(&self) -> Option<ImuData> {
-        Some(ImuData { accel: self.accel()?, gyro: self.gyro()?, temperature_c: self.temperature_c() })
+    pub fn is_enabled(&self) -> bool {
+        unsafe { m5unified_sys::m5u_imu_is_enabled() }
     }
-    pub fn load_offset_from_nvs(&mut self) -> bool { unsafe { m5unified_sys::m5u_imu_load_offset_from_nvs() } }
-    pub fn save_offset_to_nvs(&mut self) -> bool { unsafe { m5unified_sys::m5u_imu_save_offset_to_nvs() } }
-    pub fn offset_data(&self, index: i32) -> f32 { unsafe { m5unified_sys::m5u_imu_get_offset_data(index) } }
-    pub fn set_calibration(&mut self, x: f32, y: f32, z: f32) { unsafe { m5unified_sys::m5u_imu_set_calibration(x, y, z) } }
+    pub fn kind(&self) -> ImuKind {
+        ImuKind::Unknown(unsafe { m5unified_sys::m5u_imu_get_type() as i32 })
+    }
+    pub fn update(&mut self) -> bool {
+        unsafe { m5unified_sys::m5u_imu_update() }
+    }
+    pub fn data(&self) -> Option<ImuData> {
+        Some(ImuData {
+            accel: self.accel()?,
+            gyro: self.gyro()?,
+            temperature_c: self.temperature_c(),
+        })
+    }
+    pub fn load_offset_from_nvs(&mut self) -> bool {
+        unsafe { m5unified_sys::m5u_imu_load_offset_from_nvs() }
+    }
+    pub fn save_offset_to_nvs(&mut self) -> bool {
+        unsafe { m5unified_sys::m5u_imu_save_offset_to_nvs() }
+    }
+    pub fn offset_data(&self, index: i32) -> f32 {
+        unsafe { m5unified_sys::m5u_imu_get_offset_data(index) }
+    }
+    pub fn set_calibration(&mut self, x: f32, y: f32, z: f32) {
+        unsafe { m5unified_sys::m5u_imu_set_calibration(x, y, z) }
+    }
 }
 
 #[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]
@@ -663,7 +779,9 @@ pub struct TouchDetail {
 }
 
 impl TouchDetail {
-    pub fn delta(&self) -> (i32, i32) { (self.x - self.prev_x, self.y - self.prev_y) }
+    pub fn delta(&self) -> (i32, i32) {
+        (self.x - self.prev_x, self.y - self.prev_y)
+    }
 }
 
 impl Touch {
@@ -671,46 +789,82 @@ impl Touch {
         let mut raw = m5unified_sys::m5u_touch_detail_t::default();
         let ok = unsafe { m5unified_sys::m5u_touch_get_detail(index as c_int, &mut raw) };
         ok.then_some(TouchDetail {
-            x: raw.x, y: raw.y, prev_x: raw.prev_x, prev_y: raw.prev_y,
-            is_pressed: raw.is_pressed, was_pressed: raw.was_pressed,
-            was_released: raw.was_released, was_clicked: raw.was_clicked,
-            was_hold: raw.was_hold, is_holding: raw.is_holding,
+            x: raw.x,
+            y: raw.y,
+            prev_x: raw.prev_x,
+            prev_y: raw.prev_y,
+            is_pressed: raw.is_pressed,
+            was_pressed: raw.was_pressed,
+            was_released: raw.was_released,
+            was_clicked: raw.was_clicked,
+            was_hold: raw.was_hold,
+            is_holding: raw.is_holding,
             click_count: raw.click_count,
         })
     }
 }
 
 impl Rtc {
-    pub fn is_enabled(&self) -> bool { unsafe { m5unified_sys::m5u_rtc_is_enabled() } }
+    pub fn is_enabled(&self) -> bool {
+        unsafe { m5unified_sys::m5u_rtc_is_enabled() }
+    }
 }
 
 #[derive(Debug)]
 pub struct Axp2101;
 
 #[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]
-pub struct Axp2101IrqStatus { pub raw: u64 }
+pub struct Axp2101IrqStatus {
+    pub raw: u64,
+}
 
 impl Axp2101IrqStatus {
-    pub fn battery_charger_under_temperature(&self) -> bool { unsafe { m5unified_sys::m5u_power_axp2101_is_bat_charger_under_temperature_irq() } }
-    pub fn battery_charger_over_temperature(&self) -> bool { unsafe { m5unified_sys::m5u_power_axp2101_is_bat_charger_over_temperature_irq() } }
-    pub fn vbus_insert(&self) -> bool { unsafe { m5unified_sys::m5u_power_axp2101_is_vbus_insert_irq() } }
-    pub fn vbus_remove(&self) -> bool { unsafe { m5unified_sys::m5u_power_axp2101_is_vbus_remove_irq() } }
+    pub fn battery_charger_under_temperature(&self) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp2101_is_bat_charger_under_temperature_irq() }
+    }
+    pub fn battery_charger_over_temperature(&self) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp2101_is_bat_charger_over_temperature_irq() }
+    }
+    pub fn vbus_insert(&self) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp2101_is_vbus_insert_irq() }
+    }
+    pub fn vbus_remove(&self) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp2101_is_vbus_remove_irq() }
+    }
 }
 
 impl Power {
-    pub fn axp2101(&self) -> Axp2101 { Axp2101 }
+    pub fn axp2101(&self) -> Axp2101 {
+        Axp2101
+    }
 }
 
 impl Axp2101 {
     pub const IRQ_ALL: u64 = u64::MAX;
-    pub fn disable_irq(&self, mask: u64) -> bool { unsafe { m5unified_sys::m5u_power_axp2101_disable_irq(mask) } }
-    pub fn enable_irq(&self, mask: u64) -> bool { unsafe { m5unified_sys::m5u_power_axp2101_enable_irq(mask) } }
-    pub fn clear_irq_statuses(&self) -> bool { unsafe { m5unified_sys::m5u_power_axp2101_clear_irq_statuses() } }
-    pub fn irq_statuses(&self) -> Axp2101IrqStatus { Axp2101IrqStatus { raw: unsafe { m5unified_sys::m5u_power_axp2101_get_irq_statuses() } } }
+    pub fn disable_irq(&self, mask: u64) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp2101_disable_irq(mask) }
+    }
+    pub fn enable_irq(&self, mask: u64) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp2101_enable_irq(mask) }
+    }
+    pub fn clear_irq_statuses(&self) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp2101_clear_irq_statuses() }
+    }
+    pub fn irq_statuses(&self) -> Axp2101IrqStatus {
+        Axp2101IrqStatus {
+            raw: unsafe { m5unified_sys::m5u_power_axp2101_get_irq_statuses() },
+        }
+    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub enum LogLevel { Error = 1, Warn = 2, Info = 3, Debug = 4, Verbose = 5 }
+pub enum LogLevel {
+    Error = 1,
+    Warn = 2,
+    Info = 3,
+    Debug = 4,
+    Verbose = 5,
+}
 
 impl Log {
     pub fn print(&self, text: &str) -> Result<(), Error> {
