@@ -342,7 +342,8 @@ bool m5u_rtc_set_datetime(int year, int month, int day, int hour, int minute, in
     dt.time.hours = hour;
     dt.time.minutes = minute;
     dt.time.seconds = second;
-    return M5.Rtc.setDateTime(&dt);
+    M5.Rtc.setDateTime(&dt);
+    return true;
 #else
     (void)year; (void)month; (void)day; (void)hour; (void)minute; (void)second; return false;
 #endif
