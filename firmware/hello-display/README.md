@@ -16,11 +16,13 @@ The `components/m5unified-rs` ESP-IDF component references `crates/m5unified-sys
 Install the esp-rs toolchain first. If Cargo reports `custom toolchain 'esp' ... is not installed`, install it with `espup`:
 
 ```bash
-cargo install espup
+cargo +stable install espup
 espup install
 . ~/export-esp.sh
-cargo install espflash
+cargo +stable install espflash
 ```
+
+Run the install commands with `+stable` (or from outside this firmware directory) because this directory's `rust-toolchain.toml` intentionally selects the not-yet-installed `esp` toolchain.
 
 On macOS, if the ESP-IDF build later complains about missing host tools, install the common prerequisites:
 
