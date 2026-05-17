@@ -218,6 +218,28 @@ bool m5u_imu_get_gyro(float* x, float* y, float* z) {
     return M5.Imu.getGyro(x, y, z);
 }
 
+bool m5u_imu_get_mag(float* x, float* y, float* z) {
+    return M5.Imu.getMag(x, y, z);
+}
+
+bool m5u_imu_get_data(m5u_imu_data_t* out) {
+    if (!M5.Imu.isEnabled() || !out) {
+        return false;
+    }
+    auto data = M5.Imu.getImuData();
+    out->usec = data.usec;
+    out->accel_x = data.accel.x;
+    out->accel_y = data.accel.y;
+    out->accel_z = data.accel.z;
+    out->gyro_x = data.gyro.x;
+    out->gyro_y = data.gyro.y;
+    out->gyro_z = data.gyro.z;
+    out->mag_x = data.mag.x;
+    out->mag_y = data.mag.y;
+    out->mag_z = data.mag.z;
+    return true;
+}
+
 bool m5u_imu_get_temp_c(float* temp) {
     return M5.Imu.getTemp(temp);
 }

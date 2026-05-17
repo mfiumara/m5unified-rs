@@ -126,12 +126,27 @@ uint8_t m5u_speaker_get_channel_volume(int channel);
 void m5u_speaker_set_channel_volume(int channel, uint8_t volume);
 void m5u_speaker_set_all_channel_volume(uint8_t volume);
 
+typedef struct {
+    uint32_t usec;
+    float accel_x;
+    float accel_y;
+    float accel_z;
+    float gyro_x;
+    float gyro_y;
+    float gyro_z;
+    float mag_x;
+    float mag_y;
+    float mag_z;
+} m5u_imu_data_t;
+
 bool m5u_imu_begin(void);
 bool m5u_imu_is_enabled(void);
 int m5u_imu_get_type(void);
 bool m5u_imu_update(void);
 bool m5u_imu_get_accel(float* x, float* y, float* z);
 bool m5u_imu_get_gyro(float* x, float* y, float* z);
+bool m5u_imu_get_mag(float* x, float* y, float* z);
+bool m5u_imu_get_data(m5u_imu_data_t* out);
 bool m5u_imu_get_temp_c(float* temp);
 bool m5u_imu_load_offset_from_nvs(void);
 bool m5u_imu_save_offset_to_nvs(void);

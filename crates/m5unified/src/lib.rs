@@ -143,6 +143,17 @@ mod tests {
     }
 
     #[test]
+    fn imu_combined_data_uses_host_stub() {
+        let m5 = M5Unified::begin().expect("host stub begin should succeed");
+        let data = m5.imu.data().expect("host stub imu data should exist");
+        assert_eq!(data.usec, 0);
+        assert_eq!(data.accel.z, 1.0);
+        assert_eq!(data.gyro, Vec3::default());
+        assert_eq!(data.mag, Vec3::default());
+        assert_eq!(data.temperature_c, Some(25.0));
+    }
+
+    #[test]
     fn led_host_stub_reports_disabled() {
         let mut m5 = M5Unified::begin().expect("host stub begin should succeed");
         assert!(!m5.led.is_enabled());

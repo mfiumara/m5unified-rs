@@ -8,17 +8,20 @@ fn main() -> ExampleResult {
         m5.display.println("imu unavailable")?;
         return Ok(());
     }
-    if let Some(accel) = m5.imu.accel() {
+    if let Some(data) = m5.imu.data() {
+        let accel = data.accel;
         m5.display.println(&format!(
             "accel: {:.2}, {:.2}, {:.2}",
             accel.x, accel.y, accel.z
         ))?;
-    }
-    if let Some(gyro) = m5.imu.gyro() {
+        let gyro = data.gyro;
         m5.display.println(&format!(
             "gyro: {:.2}, {:.2}, {:.2}",
             gyro.x, gyro.y, gyro.z
         ))?;
+        let mag = data.mag;
+        m5.display
+            .println(&format!("mag: {:.2}, {:.2}, {:.2}", mag.x, mag.y, mag.z))?;
     }
     if let Some(temp) = m5.imu.temperature_c() {
         m5.display.println(&format!("temp: {temp:.1} C"))?;

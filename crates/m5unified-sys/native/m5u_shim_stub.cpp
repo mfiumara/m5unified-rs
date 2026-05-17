@@ -184,6 +184,14 @@ bool m5u_imu_get_gyro(float* x, float* y, float* z) {
     (void)x; (void)y; (void)z; return false;
 }
 
+bool m5u_imu_get_mag(float* x, float* y, float* z) {
+    (void)x; (void)y; (void)z; return false;
+}
+
+bool m5u_imu_get_data(m5u_imu_data_t* out) {
+    (void)out; return false;
+}
+
 bool m5u_imu_get_temp_c(float* temp) {
     (void)temp; return false;
 }

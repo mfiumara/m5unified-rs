@@ -76,6 +76,21 @@ pub struct m5u_touch_detail_t {
     pub click_count: c_int,
 }
 
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Default, PartialEq)]
+pub struct m5u_imu_data_t {
+    pub usec: u32,
+    pub accel_x: f32,
+    pub accel_y: f32,
+    pub accel_z: f32,
+    pub gyro_x: f32,
+    pub gyro_y: f32,
+    pub gyro_z: f32,
+    pub mag_x: f32,
+    pub mag_y: f32,
+    pub mag_z: f32,
+}
+
 #[cfg(target_os = "espidf")]
 extern "C" {
     pub fn m5u_begin() -> bool;
@@ -127,6 +142,8 @@ extern "C" {
     pub fn m5u_imu_begin() -> bool;
     pub fn m5u_imu_get_accel(x: *mut f32, y: *mut f32, z: *mut f32) -> bool;
     pub fn m5u_imu_get_gyro(x: *mut f32, y: *mut f32, z: *mut f32) -> bool;
+    pub fn m5u_imu_get_mag(x: *mut f32, y: *mut f32, z: *mut f32) -> bool;
+    pub fn m5u_imu_get_data(out: *mut m5u_imu_data_t) -> bool;
     pub fn m5u_imu_get_temp_c(temp: *mut f32) -> bool;
 
     pub fn m5u_touch_count() -> c_int;
@@ -389,6 +406,27 @@ mod host_stubs {
         }
         if !z.is_null() {
             *z = 0.0;
+        }
+        true
+    }
+    pub unsafe fn m5u_imu_get_mag(x: *mut f32, y: *mut f32, z: *mut f32) -> bool {
+        if !x.is_null() {
+            *x = 0.0;
+        }
+        if !y.is_null() {
+            *y = 0.0;
+        }
+        if !z.is_null() {
+            *z = 0.0;
+        }
+        true
+    }
+    pub unsafe fn m5u_imu_get_data(out: *mut m5u_imu_data_t) -> bool {
+        if !out.is_null() {
+            *out = m5u_imu_data_t {
+                accel_z: 1.0,
+                ..m5u_imu_data_t::default()
+            };
         }
         true
     }

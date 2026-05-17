@@ -25,6 +25,12 @@ impl Imu {
         ok.then_some(Vec3 { x, y, z })
     }
 
+    pub fn mag(&self) -> Option<Vec3> {
+        let (mut x, mut y, mut z) = (0.0, 0.0, 0.0);
+        let ok = unsafe { m5unified_sys::m5u_imu_get_mag(&mut x, &mut y, &mut z) };
+        ok.then_some(Vec3 { x, y, z })
+    }
+
     pub fn temperature_c(&self) -> Option<f32> {
         let mut temp = 0.0;
         let ok = unsafe { m5unified_sys::m5u_imu_get_temp_c(&mut temp) };
@@ -44,9 +50,25 @@ impl Imu {
     }
 
     pub fn data(&self) -> Option<ImuData> {
-        Some(ImuData {
-            accel: self.accel()?,
-            gyro: self.gyro()?,
+        let mut raw = m5unified_sys::m5u_imu_data_t::default();
+        let ok = unsafe { m5unified_sys::m5u_imu_get_data(&mut raw) };
+        ok.then(|| ImuData {
+            usec: raw.usec,
+            accel: Vec3 {
+                x: raw.accel_x,
+                y: raw.accel_y,
+                z: raw.accel_z,
+            },
+            gyro: Vec3 {
+                x: raw.gyro_x,
+                y: raw.gyro_y,
+                z: raw.gyro_z,
+            },
+            mag: Vec3 {
+                x: raw.mag_x,
+                y: raw.mag_y,
+                z: raw.mag_z,
+            },
             temperature_c: self.temperature_c(),
         })
     }
@@ -75,7 +97,9 @@ pub enum ImuKind {
 
 #[derive(Debug, Copy, Clone, Default, PartialEq)]
 pub struct ImuData {
+    pub usec: u32,
     pub accel: Vec3,
     pub gyro: Vec3,
+    pub mag: Vec3,
     pub temperature_c: Option<f32>,
 }
