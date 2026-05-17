@@ -18,6 +18,42 @@ void m5u_delay_ms(uint32_t ms) {
     M5.delay(ms);
 }
 
+int m5u_get_board(void) {
+    return (int)M5.getBoard();
+}
+
+int m5u_get_pin(int name) {
+    return M5.getPin((m5::pin_name_t)name);
+}
+
+bool m5u_set_primary_display_index(size_t index) {
+    return M5.setPrimaryDisplay(index);
+}
+
+bool m5u_set_primary_display_type(int kind) {
+    return M5.setPrimaryDisplayType((m5gfx::board_t)kind);
+}
+
+void m5u_set_log_display_index(size_t index) {
+    M5.setLogDisplayIndex(index);
+}
+
+void m5u_set_log_display_type(int kind) {
+    M5.setLogDisplayType((m5gfx::board_t)kind);
+}
+
+void m5u_set_touch_button_height(uint16_t pixel) {
+    M5.setTouchButtonHeight(pixel);
+}
+
+void m5u_set_touch_button_height_by_ratio(uint8_t ratio) {
+    M5.setTouchButtonHeightByRatio(ratio);
+}
+
+uint16_t m5u_get_touch_button_height(void) {
+    return M5.getTouchButtonHeight();
+}
+
 int m5u_display_width(void) {
     return M5.Display.width();
 }

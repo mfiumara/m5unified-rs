@@ -11,6 +11,15 @@ extern "C" {
 bool m5u_begin(void);
 void m5u_update(void);
 void m5u_delay_ms(uint32_t ms);
+int m5u_get_board(void);
+int m5u_get_pin(int name);
+bool m5u_set_primary_display_index(size_t index);
+bool m5u_set_primary_display_type(int kind);
+void m5u_set_log_display_index(size_t index);
+void m5u_set_log_display_type(int kind);
+void m5u_set_touch_button_height(uint16_t pixel);
+void m5u_set_touch_button_height_by_ratio(uint8_t ratio);
+uint16_t m5u_get_touch_button_height(void);
 
 int m5u_display_width(void);
 int m5u_display_height(void);

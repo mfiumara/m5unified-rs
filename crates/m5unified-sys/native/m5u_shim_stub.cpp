@@ -16,6 +16,42 @@ void m5u_delay_ms(uint32_t ms) {
     (void)ms;
 }
 
+int m5u_get_board(void) {
+    return 0;
+}
+
+int m5u_get_pin(int name) {
+    (void)name; return -1;
+}
+
+bool m5u_set_primary_display_index(size_t index) {
+    return index == 0;
+}
+
+bool m5u_set_primary_display_type(int kind) {
+    (void)kind; return false;
+}
+
+void m5u_set_log_display_index(size_t index) {
+    (void)index;
+}
+
+void m5u_set_log_display_type(int kind) {
+    (void)kind;
+}
+
+void m5u_set_touch_button_height(uint16_t pixel) {
+    (void)pixel;
+}
+
+void m5u_set_touch_button_height_by_ratio(uint8_t ratio) {
+    (void)ratio;
+}
+
+uint16_t m5u_get_touch_button_height(void) {
+    return 0;
+}
+
 int m5u_display_width(void) {
     return 0;
 }

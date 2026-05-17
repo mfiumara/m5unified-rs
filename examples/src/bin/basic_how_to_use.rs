@@ -1,4 +1,4 @@
-use m5unified::{colors, LedColor, M5Unified};
+use m5unified::{colors, DisplayKind, LedColor, M5Unified, PinName};
 use m5unified_examples::{banner, finite_loop, ExampleResult};
 
 fn main() -> ExampleResult {
@@ -6,6 +6,11 @@ fn main() -> ExampleResult {
     banner(&mut m5, "Basic/HowToUse")?;
     m5.display
         .println("Call M5Unified::begin(), update(), then use modules.")?;
+    m5.set_touch_button_height(32);
+    m5.set_log_display_index(0);
+    let _ = m5.set_primary_display_type(DisplayKind::ModuleDisplay);
+    let _board = m5.board();
+    let _port_a_sda = m5.get_pin(PinName::PORT_A_SDA);
     if m5.led.is_enabled() {
         m5.led.set_brightness(64);
         m5.led.set_all_color(LedColor::BLUE);

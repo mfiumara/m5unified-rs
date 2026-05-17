@@ -71,6 +71,7 @@ The current wrapper covers the API used by the translated upstream examples:
 - IMU acceleration, gyro, temperature, calibration, and NVS offsets
 - touch points and touch detail state
 - RTC date/time, power/battery, AXP2101 IRQ helpers, LED control, logging, and SD begin
+- board identity, pin lookup, primary/log display selection, and touch-button sizing
 
 This is not a complete M5Unified port yet. Missing APIs should be added through
 the C ABI shim first, then wrapped by `m5unified`.

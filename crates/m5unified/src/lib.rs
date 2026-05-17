@@ -36,6 +36,7 @@ mod led;
 mod log;
 mod power;
 mod rtc;
+mod system;
 mod touch;
 
 pub use audio::{Mic, MicConfig, Speaker};
@@ -49,6 +50,7 @@ pub use led::{Led, LedColor};
 pub use log::{Log, LogLevel};
 pub use power::{Axp2101, Axp2101IrqStatus, Power};
 pub use rtc::{DateTime, Rtc};
+pub use system::{Board, PinName};
 pub use touch::{Touch, TouchDetail, TouchPoint};
 
 /// Top-level handle for M5Unified-backed board features.
@@ -133,5 +135,16 @@ mod tests {
         assert!(!m5.led.is_enabled());
         assert_eq!(m5.led.count(), 0);
         m5.led.set_all_color(LedColor::RED);
+    }
+
+    #[test]
+    fn system_host_stub_reports_unknown_board_and_no_pins() {
+        let mut m5 = M5Unified::begin().expect("host stub begin should succeed");
+        assert_eq!(m5.board(), Board::Unknown);
+        assert_eq!(m5.get_pin(PinName::PORT_A_SDA), None);
+        assert!(m5.set_primary_display(0));
+        assert!(!m5.set_primary_display_type(DisplayKind::ModuleDisplay));
+        m5.set_touch_button_height(32);
+        assert_eq!(m5.touch_button_height(), 0);
     }
 }

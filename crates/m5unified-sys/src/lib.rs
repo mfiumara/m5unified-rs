@@ -39,6 +39,15 @@ extern "C" {
     pub fn m5u_begin() -> bool;
     pub fn m5u_update();
     pub fn m5u_delay_ms(ms: u32);
+    pub fn m5u_get_board() -> c_int;
+    pub fn m5u_get_pin(name: c_int) -> c_int;
+    pub fn m5u_set_primary_display_index(index: usize) -> bool;
+    pub fn m5u_set_primary_display_type(kind: c_int) -> bool;
+    pub fn m5u_set_log_display_index(index: usize);
+    pub fn m5u_set_log_display_type(kind: c_int);
+    pub fn m5u_set_touch_button_height(pixel: u16);
+    pub fn m5u_set_touch_button_height_by_ratio(ratio: u8);
+    pub fn m5u_get_touch_button_height() -> u16;
 
     pub fn m5u_display_width() -> c_int;
     pub fn m5u_display_height() -> c_int;
@@ -201,6 +210,25 @@ mod host_stubs {
     }
     pub unsafe fn m5u_update() {}
     pub unsafe fn m5u_delay_ms(_ms: u32) {}
+    pub unsafe fn m5u_get_board() -> c_int {
+        0
+    }
+    pub unsafe fn m5u_get_pin(_name: c_int) -> c_int {
+        -1
+    }
+    pub unsafe fn m5u_set_primary_display_index(index: usize) -> bool {
+        index == 0
+    }
+    pub unsafe fn m5u_set_primary_display_type(_kind: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_set_log_display_index(_index: usize) {}
+    pub unsafe fn m5u_set_log_display_type(_kind: c_int) {}
+    pub unsafe fn m5u_set_touch_button_height(_pixel: u16) {}
+    pub unsafe fn m5u_set_touch_button_height_by_ratio(_ratio: u8) {}
+    pub unsafe fn m5u_get_touch_button_height() -> u16 {
+        0
+    }
 
     pub unsafe fn m5u_display_width() -> c_int {
         320
