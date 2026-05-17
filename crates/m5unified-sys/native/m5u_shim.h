@@ -81,8 +81,16 @@ int m5u_display_count(void);
 int m5u_display_index_for_kind(int kind);
 int m5u_display_width_at(int index);
 int m5u_display_height_at(int index);
+void m5u_display_set_text_size_at(int index, int size);
+void m5u_display_start_write_at(int index);
+void m5u_display_end_write_at(int index);
 void m5u_display_print_at(int index, const char* text);
+void m5u_display_println_at(int index, const char* text);
+int m5u_display_draw_string_at(int index, const char* text, int x, int y);
+void m5u_display_fill_rect_at(int index, int x, int y, int w, int h, uint16_t color);
 void m5u_display_fill_circle_at(int index, int x, int y, int r, uint16_t color);
+void m5u_display_write_pixel_at(int index, int x, int y, uint16_t color);
+void m5u_display_draw_pixel_at(int index, int x, int y, uint16_t color);
 
 bool m5u_btn_a_is_pressed(void);
 bool m5u_btn_a_was_pressed(void);

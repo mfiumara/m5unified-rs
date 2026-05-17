@@ -326,14 +326,58 @@ impl DisplayRef {
         unsafe { m5unified_sys::m5u_display_height_at(self.index) as i32 }
     }
 
+    pub fn set_text_size(&mut self, size: i32) {
+        unsafe { m5unified_sys::m5u_display_set_text_size_at(self.index, size as c_int) }
+    }
+
+    pub fn start_write(&mut self) {
+        unsafe { m5unified_sys::m5u_display_start_write_at(self.index) }
+    }
+
+    pub fn end_write(&mut self) {
+        unsafe { m5unified_sys::m5u_display_end_write_at(self.index) }
+    }
+
+    pub fn transaction<R>(&mut self, f: impl FnOnce(&mut DisplayRef) -> R) -> R {
+        self.start_write();
+        let result = f(self);
+        self.end_write();
+        result
+    }
+
     pub fn print(&mut self, text: &str) -> Result<(), Error> {
         let text = CString::new(text).map_err(|_| Error::InvalidString)?;
         unsafe { m5unified_sys::m5u_display_print_at(self.index, text.as_ptr()) }
         Ok(())
     }
 
+    pub fn println(&mut self, text: &str) -> Result<(), Error> {
+        let text = CString::new(text).map_err(|_| Error::InvalidString)?;
+        unsafe { m5unified_sys::m5u_display_println_at(self.index, text.as_ptr()) }
+        Ok(())
+    }
+
+    pub fn draw_string(&mut self, text: &str, x: i32, y: i32) -> Result<i32, Error> {
+        let text = CString::new(text).map_err(|_| Error::InvalidString)?;
+        Ok(unsafe {
+            m5unified_sys::m5u_display_draw_string_at(self.index, text.as_ptr(), x, y) as i32
+        })
+    }
+
+    pub fn fill_rect(&mut self, x: i32, y: i32, w: i32, h: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_fill_rect_at(self.index, x, y, w, h, color) }
+    }
+
     pub fn fill_circle(&mut self, x: i32, y: i32, r: i32, color: u16) {
         unsafe { m5unified_sys::m5u_display_fill_circle_at(self.index, x, y, r, color) }
+    }
+
+    pub fn write_pixel(&mut self, x: i32, y: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_write_pixel_at(self.index, x, y, color) }
+    }
+
+    pub fn draw_pixel(&mut self, x: i32, y: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_draw_pixel_at(self.index, x, y, color) }
     }
 }
 

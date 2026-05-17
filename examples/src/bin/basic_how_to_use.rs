@@ -18,6 +18,15 @@ fn main() -> ExampleResult {
     m5.display.set_epd_mode(EpdMode::Fastest);
     let _board = m5.board();
     let _port_a_sda = m5.get_pin(PinName::PORT_A_SDA);
+    for index in 0..m5.display_count() {
+        if let Some(mut display) = m5.display(index) {
+            display.transaction(|display| {
+                display.write_pixel(0, 0, colors::WHITE);
+                display.draw_pixel(1, 1, colors::GREEN);
+            });
+            display.print(&format!("Display {index}\n"))?;
+        }
+    }
     if m5.led.is_enabled() {
         m5.led.set_brightness(64);
         m5.led.set_all_color(LedColor::BLUE);

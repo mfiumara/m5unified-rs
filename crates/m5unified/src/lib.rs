@@ -209,6 +209,17 @@ mod tests {
         m5.display.set_text_scroll(true);
         m5.display.set_epd_mode(EpdMode::Fastest);
         m5.rtc.set_system_time_from_rtc();
+
+        let mut display = m5.display(0).expect("host stub display should exist");
+        display.set_text_size(1);
+        assert_eq!(display.println("indexed display"), Ok(()));
+        assert_eq!(display.draw_string("indexed", 0, 0), Ok(0));
+        display.transaction(|display| {
+            display.write_pixel(0, 0, colors::WHITE);
+            display.draw_pixel(1, 1, colors::RED);
+            display.fill_rect(0, 0, 4, 4, colors::BLUE);
+            display.fill_circle(8, 8, 2, colors::GREEN);
+        });
     }
 
     #[test]

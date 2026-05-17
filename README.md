@@ -65,7 +65,7 @@ hardware simulation.
 The current wrapper covers the API used by the translated upstream examples:
 
 - startup configuration through `M5UnifiedConfig` and `M5Unified::begin_with_config`
-- display drawing, text, color, fonts, EPD modes, scrolling, transactions, and multi-display access
+- display drawing, text, color, fonts, EPD modes, scrolling, transactions, and indexed multi-display drawing
 - button press, release, hold, click, and click-count state
 - microphone recording, configuration helpers, and simple RMS calculation
 - speaker configuration, tone, PCM, WAV, channel, and volume controls

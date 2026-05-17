@@ -557,12 +557,44 @@ int m5u_display_height_at(int index) {
     return M5.Displays(index).height();
 }
 
+void m5u_display_set_text_size_at(int index, int size) {
+    M5.Displays(index).setTextSize(size);
+}
+
+void m5u_display_start_write_at(int index) {
+    M5.Displays(index).startWrite();
+}
+
+void m5u_display_end_write_at(int index) {
+    M5.Displays(index).endWrite();
+}
+
 void m5u_display_print_at(int index, const char* text) {
     M5.Displays(index).print(text);
 }
 
+void m5u_display_println_at(int index, const char* text) {
+    M5.Displays(index).println(text);
+}
+
+int m5u_display_draw_string_at(int index, const char* text, int x, int y) {
+    return M5.Displays(index).drawString(text, x, y);
+}
+
+void m5u_display_fill_rect_at(int index, int x, int y, int w, int h, uint16_t color) {
+    M5.Displays(index).fillRect(x, y, w, h, color);
+}
+
 void m5u_display_fill_circle_at(int index, int x, int y, int r, uint16_t color) {
     M5.Displays(index).fillCircle(x, y, r, color);
+}
+
+void m5u_display_write_pixel_at(int index, int x, int y, uint16_t color) {
+    M5.Displays(index).writePixel(x, y, color);
+}
+
+void m5u_display_draw_pixel_at(int index, int x, int y, uint16_t color) {
+    M5.Displays(index).drawPixel(x, y, color);
 }
 
 bool m5u_button_is_pressed(int button) { return m5u_button_state(button, 0); }

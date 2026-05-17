@@ -71,7 +71,7 @@ rust_bin = "basic_displays"
 status = "host_compiles"
 category = "basic"
 requires = ["display", "multi-display"]
-notes = "Indexed display access avoids exposing C++ display objects."
+notes = "Indexed display access wraps common per-display drawing without exposing C++ display objects."
 
 [[example]]
 upstream = "Basic/HowToUse/HowToUse.ino"

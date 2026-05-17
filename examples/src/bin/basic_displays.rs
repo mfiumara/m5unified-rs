@@ -12,5 +12,20 @@ fn main() -> ExampleResult {
     m5.display.fill_circle(w / 2, h / 2, 24, colors::BLUE);
     m5.display.set_cursor(8, h / 2 + 36);
     m5.display.println("Shapes through safe Rust API")?;
+
+    for index in 0..m5.display_count() {
+        if let Some(mut display) = m5.display(index) {
+            let text_size = (display.height() / 60).max(1);
+            display.set_text_size(text_size);
+            display.println(&format!("No.{index}"))?;
+            display.transaction(|display| {
+                display.write_pixel(0, 0, colors::WHITE);
+                display.draw_pixel(1, 1, colors::YELLOW);
+                display.fill_rect(2, 2, 8, 8, colors::DARK_GREY);
+                display.fill_circle(16, 16, 6, colors::CYAN);
+            });
+        }
+    }
+
     Ok(())
 }

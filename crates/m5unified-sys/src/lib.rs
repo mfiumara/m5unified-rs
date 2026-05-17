@@ -313,8 +313,28 @@ extern "C" {
     pub fn m5u_display_index_for_kind(kind: c_int) -> c_int;
     pub fn m5u_display_width_at(index: c_int) -> c_int;
     pub fn m5u_display_height_at(index: c_int) -> c_int;
+    pub fn m5u_display_set_text_size_at(index: c_int, size: c_int);
+    pub fn m5u_display_start_write_at(index: c_int);
+    pub fn m5u_display_end_write_at(index: c_int);
     pub fn m5u_display_print_at(index: c_int, text: *const c_char);
+    pub fn m5u_display_println_at(index: c_int, text: *const c_char);
+    pub fn m5u_display_draw_string_at(
+        index: c_int,
+        text: *const c_char,
+        x: c_int,
+        y: c_int,
+    ) -> c_int;
+    pub fn m5u_display_fill_rect_at(
+        index: c_int,
+        x: c_int,
+        y: c_int,
+        w: c_int,
+        h: c_int,
+        color: u16,
+    );
     pub fn m5u_display_fill_circle_at(index: c_int, x: c_int, y: c_int, r: c_int, color: u16);
+    pub fn m5u_display_write_pixel_at(index: c_int, x: c_int, y: c_int, color: u16);
+    pub fn m5u_display_draw_pixel_at(index: c_int, x: c_int, y: c_int, color: u16);
 
     pub fn m5u_button_is_pressed(button: c_int) -> bool;
     pub fn m5u_button_was_pressed(button: c_int) -> bool;
@@ -668,7 +688,28 @@ mod host_stubs {
     pub unsafe fn m5u_display_height_at(_index: c_int) -> c_int {
         240
     }
+    pub unsafe fn m5u_display_set_text_size_at(_index: c_int, _size: c_int) {}
+    pub unsafe fn m5u_display_start_write_at(_index: c_int) {}
+    pub unsafe fn m5u_display_end_write_at(_index: c_int) {}
     pub unsafe fn m5u_display_print_at(_index: c_int, _text: *const c_char) {}
+    pub unsafe fn m5u_display_println_at(_index: c_int, _text: *const c_char) {}
+    pub unsafe fn m5u_display_draw_string_at(
+        _index: c_int,
+        _text: *const c_char,
+        _x: c_int,
+        _y: c_int,
+    ) -> c_int {
+        0
+    }
+    pub unsafe fn m5u_display_fill_rect_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _h: c_int,
+        _color: u16,
+    ) {
+    }
     pub unsafe fn m5u_display_fill_circle_at(
         _index: c_int,
         _x: c_int,
@@ -677,6 +718,8 @@ mod host_stubs {
         _color: u16,
     ) {
     }
+    pub unsafe fn m5u_display_write_pixel_at(_index: c_int, _x: c_int, _y: c_int, _color: u16) {}
+    pub unsafe fn m5u_display_draw_pixel_at(_index: c_int, _x: c_int, _y: c_int, _color: u16) {}
 
     pub unsafe fn m5u_button_is_pressed(_button: c_int) -> bool {
         false
