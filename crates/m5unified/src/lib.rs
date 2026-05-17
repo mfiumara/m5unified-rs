@@ -186,6 +186,9 @@ mod tests {
         assert!(!m5.set_primary_display_type(DisplayKind::ModuleDisplay));
         m5.set_touch_button_height(32);
         assert_eq!(m5.touch_button_height(), 0);
+        assert_eq!(m5.millis(), 0);
+        assert_eq!(m5.micros(), 0);
+        assert_eq!(m5.update_msec(), 0);
     }
 
     #[test]

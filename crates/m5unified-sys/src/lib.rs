@@ -243,6 +243,9 @@ extern "C" {
     pub fn m5u_begin_with_config(config: *const m5u_config_t) -> bool;
     pub fn m5u_update();
     pub fn m5u_delay_ms(ms: u32);
+    pub fn m5u_millis() -> u32;
+    pub fn m5u_micros() -> u32;
+    pub fn m5u_get_update_msec() -> u32;
     pub fn m5u_get_board() -> c_int;
     pub fn m5u_get_pin(name: c_int) -> c_int;
     pub fn m5u_set_primary_display_index(index: usize) -> bool;
@@ -497,6 +500,15 @@ mod host_stubs {
     }
     pub unsafe fn m5u_update() {}
     pub unsafe fn m5u_delay_ms(_ms: u32) {}
+    pub unsafe fn m5u_millis() -> u32 {
+        0
+    }
+    pub unsafe fn m5u_micros() -> u32 {
+        0
+    }
+    pub unsafe fn m5u_get_update_msec() -> u32 {
+        0
+    }
     pub unsafe fn m5u_get_board() -> c_int {
         0
     }

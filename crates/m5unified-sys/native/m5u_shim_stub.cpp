@@ -20,6 +20,18 @@ void m5u_delay_ms(uint32_t ms) {
     (void)ms;
 }
 
+uint32_t m5u_millis(void) {
+    return 0;
+}
+
+uint32_t m5u_micros(void) {
+    return 0;
+}
+
+uint32_t m5u_get_update_msec(void) {
+    return 0;
+}
+
 int m5u_get_board(void) {
     return 0;
 }

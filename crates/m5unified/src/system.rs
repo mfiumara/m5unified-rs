@@ -39,6 +39,18 @@ impl M5Unified {
     pub fn touch_button_height(&self) -> u16 {
         unsafe { m5unified_sys::m5u_get_touch_button_height() }
     }
+
+    pub fn millis(&self) -> u32 {
+        unsafe { m5unified_sys::m5u_millis() }
+    }
+
+    pub fn micros(&self) -> u32 {
+        unsafe { m5unified_sys::m5u_micros() }
+    }
+
+    pub fn update_msec(&self) -> u32 {
+        unsafe { m5unified_sys::m5u_get_update_msec() }
+    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]

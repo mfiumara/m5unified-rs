@@ -72,6 +72,18 @@ void m5u_delay_ms(uint32_t ms) {
     M5.delay(ms);
 }
 
+uint32_t m5u_millis(void) {
+    return m5::M5Unified::millis();
+}
+
+uint32_t m5u_micros(void) {
+    return m5::M5Unified::micros();
+}
+
+uint32_t m5u_get_update_msec(void) {
+    return M5.getUpdateMsec();
+}
+
 int m5u_get_board(void) {
     return (int)M5.getBoard();
 }
