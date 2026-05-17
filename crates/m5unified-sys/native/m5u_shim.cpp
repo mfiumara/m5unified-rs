@@ -1,6 +1,9 @@
 #include "m5u_shim.h"
 
 #include <M5Unified.h>
+#include <string>
+
+static std::string s_m5u_log_suffixes[3];
 
 extern "C" {
 
@@ -629,6 +632,53 @@ void m5u_log_print(const char* text) {
 
 void m5u_log_level(int level, const char* text) {
     M5.Log((esp_log_level_t)level, "%s", text);
+}
+
+static bool m5u_log_valid_target(int target) {
+    return target >= m5::log_target_serial && target < m5::log_target_max;
+}
+
+static bool m5u_log_valid_level(int level) {
+    return level >= ESP_LOG_NONE && level <= ESP_LOG_VERBOSE;
+}
+
+bool m5u_log_set_enable_color(int target, bool enable) {
+    if (!m5u_log_valid_target(target)) {
+        return false;
+    }
+    M5.Log.setEnableColor((m5::log_target_t)target, enable);
+    return true;
+}
+
+bool m5u_log_get_enable_color(int target) {
+    if (!m5u_log_valid_target(target)) {
+        return false;
+    }
+    return M5.Log.getEnableColor((m5::log_target_t)target);
+}
+
+bool m5u_log_set_level(int target, int level) {
+    if (!m5u_log_valid_target(target) || !m5u_log_valid_level(level)) {
+        return false;
+    }
+    M5.Log.setLogLevel((m5::log_target_t)target, (esp_log_level_t)level);
+    return true;
+}
+
+int m5u_log_get_level(int target) {
+    if (!m5u_log_valid_target(target)) {
+        return -1;
+    }
+    return (int)M5.Log.getLogLevel((m5::log_target_t)target);
+}
+
+bool m5u_log_set_suffix(int target, const char* suffix) {
+    if (!m5u_log_valid_target(target) || !suffix) {
+        return false;
+    }
+    s_m5u_log_suffixes[target] = suffix;
+    M5.Log.setSuffix((m5::log_target_t)target, s_m5u_log_suffixes[target].c_str());
+    return true;
 }
 
 } // extern "C"

@@ -185,6 +185,11 @@ bool m5u_led_is_enabled(void);
 void m5u_log_print(const char* text);
 void m5u_log_println(const char* text);
 void m5u_log_level(int level, const char* text);
+bool m5u_log_set_enable_color(int target, bool enable);
+bool m5u_log_get_enable_color(int target);
+bool m5u_log_set_level(int target, int level);
+int m5u_log_get_level(int target);
+bool m5u_log_set_suffix(int target, const char* suffix);
 bool m5u_sd_begin(void);
 
 #ifdef __cplusplus

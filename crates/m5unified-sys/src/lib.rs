@@ -244,6 +244,11 @@ extern "C" {
     pub fn m5u_log_print(text: *const c_char);
     pub fn m5u_log_println(text: *const c_char);
     pub fn m5u_log_level(level: c_int, text: *const c_char);
+    pub fn m5u_log_set_enable_color(target: c_int, enable: bool) -> bool;
+    pub fn m5u_log_get_enable_color(target: c_int) -> bool;
+    pub fn m5u_log_set_level(target: c_int, level: c_int) -> bool;
+    pub fn m5u_log_get_level(target: c_int) -> c_int;
+    pub fn m5u_log_set_suffix(target: c_int, suffix: *const c_char) -> bool;
     pub fn m5u_sd_begin() -> bool;
 }
 
@@ -665,6 +670,25 @@ mod host_stubs {
     pub unsafe fn m5u_log_print(_text: *const c_char) {}
     pub unsafe fn m5u_log_println(_text: *const c_char) {}
     pub unsafe fn m5u_log_level(_level: c_int, _text: *const c_char) {}
+    pub unsafe fn m5u_log_set_enable_color(target: c_int, _enable: bool) -> bool {
+        (0..=2).contains(&target)
+    }
+    pub unsafe fn m5u_log_get_enable_color(target: c_int) -> bool {
+        (0..=2).contains(&target)
+    }
+    pub unsafe fn m5u_log_set_level(target: c_int, level: c_int) -> bool {
+        (0..=2).contains(&target) && (0..=5).contains(&level)
+    }
+    pub unsafe fn m5u_log_get_level(target: c_int) -> c_int {
+        if (0..=2).contains(&target) {
+            3
+        } else {
+            -1
+        }
+    }
+    pub unsafe fn m5u_log_set_suffix(target: c_int, suffix: *const c_char) -> bool {
+        (0..=2).contains(&target) && !suffix.is_null()
+    }
     pub unsafe fn m5u_sd_begin() -> bool {
         false
     }

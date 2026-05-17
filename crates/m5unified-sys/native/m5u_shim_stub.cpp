@@ -506,4 +506,24 @@ void m5u_log_level(int level, const char* text) {
     (void)level; (void)text;
 }
 
+bool m5u_log_set_enable_color(int target, bool enable) {
+    (void)enable; return target >= 0 && target <= 2;
+}
+
+bool m5u_log_get_enable_color(int target) {
+    return target >= 0 && target <= 2;
+}
+
+bool m5u_log_set_level(int target, int level) {
+    return target >= 0 && target <= 2 && level >= 0 && level <= 5;
+}
+
+int m5u_log_get_level(int target) {
+    return target >= 0 && target <= 2 ? 3 : -1;
+}
+
+bool m5u_log_set_suffix(int target, const char* suffix) {
+    return target >= 0 && target <= 2 && suffix != nullptr;
+}
+
 } // extern "C"

@@ -50,7 +50,7 @@ pub use display::{
 pub use error::Error;
 pub use imu::{Imu, ImuData, ImuKind, Vec3};
 pub use led::{Led, LedColor};
-pub use log::{Log, LogLevel};
+pub use log::{Log, LogLevel, LogTarget};
 pub use power::{Axp2101, Axp2101IrqStatus, Power};
 pub use rtc::{DateTime, Rtc};
 pub use system::{Board, PinName};
@@ -182,5 +182,15 @@ mod tests {
         m5.display.set_text_scroll(true);
         m5.display.set_epd_mode(EpdMode::Fastest);
         m5.rtc.set_system_time_from_rtc();
+    }
+
+    #[test]
+    fn log_configuration_helpers_compile_on_host() {
+        let m5 = M5Unified::begin().expect("host stub begin should succeed");
+        assert!(m5.log.set_enable_color(LogTarget::Serial, true));
+        assert!(m5.log.enable_color(LogTarget::Serial));
+        assert!(m5.log.set_log_level(LogTarget::Display, LogLevel::Debug));
+        assert!(m5.log.log_level(LogTarget::Display).is_some());
+        assert_eq!(m5.log.set_suffix(LogTarget::Callback, ""), Ok(true));
     }
 }
