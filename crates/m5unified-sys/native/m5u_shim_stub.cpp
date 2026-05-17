@@ -9,6 +9,10 @@ bool m5u_begin(void) {
     return false;
 }
 
+bool m5u_begin_with_config(const m5u_config_t* config) {
+    (void)config; return false;
+}
+
 void m5u_update(void) {
 }
 

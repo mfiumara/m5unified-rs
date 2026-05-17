@@ -8,7 +8,26 @@
 extern "C" {
 #endif
 
+typedef struct {
+    uint32_t serial_baudrate;
+    uint8_t external_speaker_value;
+    uint16_t external_display_value;
+    uint8_t clear_display;
+    uint8_t output_power;
+    uint8_t pmic_button;
+    uint8_t internal_imu;
+    uint8_t internal_rtc;
+    uint8_t internal_mic;
+    uint8_t internal_spk;
+    uint8_t external_imu;
+    uint8_t external_rtc;
+    uint8_t disable_rtc_irq;
+    uint8_t led_brightness;
+    int fallback_board;
+} m5u_config_t;
+
 bool m5u_begin(void);
+bool m5u_begin_with_config(const m5u_config_t* config);
 void m5u_update(void);
 void m5u_delay_ms(uint32_t ms);
 int m5u_get_board(void);

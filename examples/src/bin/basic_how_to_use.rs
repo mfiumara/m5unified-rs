@@ -1,8 +1,14 @@
-use m5unified::{colors, DisplayKind, LedColor, M5Unified, PinName};
+use m5unified::{colors, DisplayKind, LedColor, M5Unified, M5UnifiedConfig, PinName};
 use m5unified_examples::{banner, finite_loop, ExampleResult};
 
 fn main() -> ExampleResult {
-    let mut m5 = M5Unified::begin()?;
+    let cfg = M5UnifiedConfig {
+        led_brightness: 64,
+        external_imu: true,
+        external_rtc: true,
+        ..M5UnifiedConfig::default()
+    };
+    let mut m5 = M5Unified::begin_with_config(&cfg)?;
     banner(&mut m5, "Basic/HowToUse")?;
     m5.display
         .println("Call M5Unified::begin(), update(), then use modules.")?;

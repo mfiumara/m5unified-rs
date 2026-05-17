@@ -19,6 +19,48 @@
 use core::ffi::{c_char, c_float, c_int};
 
 #[repr(C)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct m5u_config_t {
+    pub serial_baudrate: u32,
+    pub external_speaker_value: u8,
+    pub external_display_value: u16,
+    pub clear_display: u8,
+    pub output_power: u8,
+    pub pmic_button: u8,
+    pub internal_imu: u8,
+    pub internal_rtc: u8,
+    pub internal_mic: u8,
+    pub internal_spk: u8,
+    pub external_imu: u8,
+    pub external_rtc: u8,
+    pub disable_rtc_irq: u8,
+    pub led_brightness: u8,
+    pub fallback_board: c_int,
+}
+
+impl Default for m5u_config_t {
+    fn default() -> Self {
+        Self {
+            serial_baudrate: 0,
+            external_speaker_value: 0x00,
+            external_display_value: 0xFFFF,
+            clear_display: 1,
+            output_power: 1,
+            pmic_button: 1,
+            internal_imu: 1,
+            internal_rtc: 1,
+            internal_mic: 1,
+            internal_spk: 1,
+            external_imu: 0,
+            external_rtc: 0,
+            disable_rtc_irq: 1,
+            led_brightness: 0,
+            fallback_board: -1,
+        }
+    }
+}
+
+#[repr(C)]
 #[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]
 pub struct m5u_touch_detail_t {
     pub x: c_int,
@@ -37,6 +79,7 @@ pub struct m5u_touch_detail_t {
 #[cfg(target_os = "espidf")]
 extern "C" {
     pub fn m5u_begin() -> bool;
+    pub fn m5u_begin_with_config(config: *const m5u_config_t) -> bool;
     pub fn m5u_update();
     pub fn m5u_delay_ms(ms: u32);
     pub fn m5u_get_board() -> c_int;
@@ -206,6 +249,9 @@ mod host_stubs {
     use core::ptr;
 
     pub unsafe fn m5u_begin() -> bool {
+        true
+    }
+    pub unsafe fn m5u_begin_with_config(_config: *const m5u_config_t) -> bool {
         true
     }
     pub unsafe fn m5u_update() {}

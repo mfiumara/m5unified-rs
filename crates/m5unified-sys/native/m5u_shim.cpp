@@ -4,8 +4,41 @@
 
 extern "C" {
 
-bool m5u_begin(void) {
+static auto m5u_apply_config(const m5u_config_t* src) {
     auto cfg = M5.config();
+    if (!src) {
+        return cfg;
+    }
+#if defined(ARDUINO)
+    cfg.serial_baudrate = src->serial_baudrate;
+#endif
+    cfg.external_speaker_value = src->external_speaker_value;
+    cfg.external_display_value = src->external_display_value;
+    cfg.clear_display = src->clear_display != 0;
+    cfg.output_power = src->output_power != 0;
+    cfg.pmic_button = src->pmic_button != 0;
+    cfg.internal_imu = src->internal_imu != 0;
+    cfg.internal_rtc = src->internal_rtc != 0;
+    cfg.internal_mic = src->internal_mic != 0;
+    cfg.internal_spk = src->internal_spk != 0;
+    cfg.external_imu = src->external_imu != 0;
+    cfg.external_rtc = src->external_rtc != 0;
+    cfg.disable_rtc_irq = src->disable_rtc_irq != 0;
+    cfg.led_brightness = src->led_brightness;
+    if (src->fallback_board >= 0) {
+        cfg.fallback_board = (m5::board_t)src->fallback_board;
+    }
+    return cfg;
+}
+
+bool m5u_begin(void) {
+    auto cfg = m5u_apply_config(nullptr);
+    M5.begin(cfg);
+    return true;
+}
+
+bool m5u_begin_with_config(const m5u_config_t* config) {
+    auto cfg = m5u_apply_config(config);
     M5.begin(cfg);
     return true;
 }

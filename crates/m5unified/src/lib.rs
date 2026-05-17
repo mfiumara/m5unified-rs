@@ -29,6 +29,7 @@
 
 mod audio;
 mod buttons;
+mod config;
 mod display;
 mod error;
 mod imu;
@@ -41,6 +42,7 @@ mod touch;
 
 pub use audio::{Mic, MicConfig, Speaker};
 pub use buttons::{Button, ButtonId, Buttons};
+pub use config::{ExternalDisplayConfig, ExternalSpeakerConfig, M5UnifiedConfig};
 pub use display::{
     colors, Color565, Display, DisplayKind, DisplayRef, Point, Rect, Size, TextDatum,
 };
@@ -72,6 +74,16 @@ impl M5Unified {
     /// Initialize M5Unified and return a board handle.
     pub fn begin() -> Result<Self, Error> {
         let ok = unsafe { m5unified_sys::m5u_begin() };
+        Self::from_begin_result(ok)
+    }
+
+    pub fn begin_with_config(config: &M5UnifiedConfig) -> Result<Self, Error> {
+        let raw = config.to_raw();
+        let ok = unsafe { m5unified_sys::m5u_begin_with_config(&raw) };
+        Self::from_begin_result(ok)
+    }
+
+    fn from_begin_result(ok: bool) -> Result<Self, Error> {
         if !ok {
             return Err(Error::BeginFailed);
         }
@@ -146,5 +158,17 @@ mod tests {
         assert!(!m5.set_primary_display_type(DisplayKind::ModuleDisplay));
         m5.set_touch_button_height(32);
         assert_eq!(m5.touch_button_height(), 0);
+    }
+
+    #[test]
+    fn begin_with_config_uses_host_stub() {
+        let config = M5UnifiedConfig {
+            led_brightness: 32,
+            external_imu: true,
+            external_rtc: true,
+            ..M5UnifiedConfig::default()
+        };
+        let m5 = M5Unified::begin_with_config(&config).expect("host stub begin should succeed");
+        assert_eq!(m5.display.width(), 320);
     }
 }
