@@ -248,7 +248,22 @@ bool m5u_log_get_enable_color(int target);
 bool m5u_log_set_level(int target, int level);
 int m5u_log_get_level(int target);
 bool m5u_log_set_suffix(int target, const char* suffix);
+
+typedef struct {
+    int pin_sclk;
+    int pin_mosi;
+    int pin_miso;
+    int pin_cs;
+    int host_id;
+    uint32_t frequency_khz;
+    int max_files;
+    uint8_t format_if_mount_failed;
+} m5u_sd_spi_config_t;
+
 bool m5u_sd_begin(void);
+bool m5u_sd_begin_spi(const m5u_sd_spi_config_t* config);
+bool m5u_sd_is_mounted(void);
+void m5u_sd_end(void);
 
 #ifdef __cplusplus
 }

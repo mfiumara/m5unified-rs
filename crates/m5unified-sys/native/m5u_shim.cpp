@@ -1,11 +1,21 @@
 #include "m5u_shim.h"
 
 #include <M5Unified.h>
+#include <driver/gpio.h>
+#include <driver/sdspi_host.h>
+#include <driver/spi_common.h>
+#include <esp_err.h>
+#include <esp_vfs_fat.h>
+#include <sdmmc_cmd.h>
 #include <string>
 
 static std::string s_m5u_log_suffixes[3];
 static m5u_log_callback_t s_m5u_log_callback = nullptr;
 static void* s_m5u_log_callback_user_data = nullptr;
+static constexpr const char* M5U_SD_MOUNT_POINT = "/sdcard";
+static sdmmc_card_t* s_m5u_sd_card = nullptr;
+static spi_host_device_t s_m5u_sd_host = SPI2_HOST;
+static bool s_m5u_sd_owns_bus = false;
 
 extern "C" {
 
@@ -302,10 +312,88 @@ void m5u_log_println(const char* text) {
 }
 
 bool m5u_sd_begin(void) {
-    // SD support needs an explicit ESP-IDF/Arduino SD component wiring step.
-    // Keep the shim target-buildable for display/button firmware until that
-    // component is added instead of referencing Arduino globals (SD, SPI) here.
-    return false;
+    m5u_sd_spi_config_t config = {};
+    config.pin_sclk = M5.getPin(m5::pin_name_t::sd_spi_sclk);
+    config.pin_mosi = M5.getPin(m5::pin_name_t::sd_spi_mosi);
+    config.pin_miso = M5.getPin(m5::pin_name_t::sd_spi_miso);
+    config.pin_cs = M5.getPin(m5::pin_name_t::sd_spi_cs);
+    config.host_id = -1;
+    config.frequency_khz = 20000;
+    config.max_files = 5;
+    config.format_if_mount_failed = 0;
+    return m5u_sd_begin_spi(&config);
+}
+
+bool m5u_sd_begin_spi(const m5u_sd_spi_config_t* config) {
+    if (s_m5u_sd_card) {
+        return true;
+    }
+    if (!config || config->pin_sclk < 0 || config->pin_mosi < 0 || config->pin_miso < 0 || config->pin_cs < 0) {
+        return false;
+    }
+
+    sdmmc_host_t host = SDSPI_HOST_DEFAULT();
+    if (config->host_id >= 0) {
+        host.slot = (spi_host_device_t)config->host_id;
+    }
+    if (config->frequency_khz > 0) {
+        host.max_freq_khz = config->frequency_khz;
+    }
+
+    spi_bus_config_t bus_config = {};
+    bus_config.mosi_io_num = config->pin_mosi;
+    bus_config.miso_io_num = config->pin_miso;
+    bus_config.sclk_io_num = config->pin_sclk;
+    bus_config.quadwp_io_num = GPIO_NUM_NC;
+    bus_config.quadhd_io_num = GPIO_NUM_NC;
+    bus_config.max_transfer_sz = 4000;
+
+    esp_err_t err = spi_bus_initialize(host.slot, &bus_config, SDSPI_DEFAULT_DMA);
+    bool owns_bus = false;
+    if (err == ESP_OK) {
+        owns_bus = true;
+    } else if (err != ESP_ERR_INVALID_STATE) {
+        return false;
+    }
+
+    sdspi_device_config_t slot_config = SDSPI_DEVICE_CONFIG_DEFAULT();
+    slot_config.gpio_cs = (gpio_num_t)config->pin_cs;
+    slot_config.host_id = host.slot;
+
+    esp_vfs_fat_mount_config_t mount_config = VFS_FAT_MOUNT_DEFAULT_CONFIG();
+    mount_config.format_if_mount_failed = config->format_if_mount_failed != 0;
+    if (config->max_files > 0) {
+        mount_config.max_files = config->max_files;
+    }
+
+    err = esp_vfs_fat_sdspi_mount(M5U_SD_MOUNT_POINT, &host, &slot_config, &mount_config, &s_m5u_sd_card);
+    if (err != ESP_OK) {
+        s_m5u_sd_card = nullptr;
+        if (owns_bus) {
+            spi_bus_free(host.slot);
+        }
+        return false;
+    }
+
+    s_m5u_sd_host = host.slot;
+    s_m5u_sd_owns_bus = owns_bus;
+    return true;
+}
+
+bool m5u_sd_is_mounted(void) {
+    return s_m5u_sd_card != nullptr;
+}
+
+void m5u_sd_end(void) {
+    if (!s_m5u_sd_card) {
+        return;
+    }
+    esp_vfs_fat_sdcard_unmount(M5U_SD_MOUNT_POINT, s_m5u_sd_card);
+    s_m5u_sd_card = nullptr;
+    if (s_m5u_sd_owns_bus) {
+        spi_bus_free(s_m5u_sd_host);
+    }
+    s_m5u_sd_owns_bus = false;
 }
 
 

@@ -37,6 +37,7 @@ mod led;
 mod log;
 mod power;
 mod rtc;
+mod sd;
 mod system;
 mod touch;
 
@@ -53,6 +54,7 @@ pub use led::{Led, LedColor};
 pub use log::{Log, LogLevel, LogTarget, RawLogCallback};
 pub use power::{Axp2101, Axp2101IrqStatus, Power};
 pub use rtc::{DateTime, Rtc};
+pub use sd::{sd_begin, sd_begin_with_config, sd_end, sd_is_mounted, SdSpiConfig, SD_MOUNT_PATH};
 pub use system::{Board, PinName};
 pub use touch::{Touch, TouchDetail, TouchPoint};
 
@@ -112,10 +114,6 @@ impl M5Unified {
     pub fn delay_ms(&self, ms: u32) {
         unsafe { m5unified_sys::m5u_delay_ms(ms) }
     }
-}
-
-pub fn sd_begin() -> bool {
-    unsafe { m5unified_sys::m5u_sd_begin() }
 }
 
 #[cfg(test)]
@@ -222,5 +220,21 @@ mod tests {
         assert!(m5.log.log_level(LogTarget::Display).is_some());
         assert_eq!(m5.log.set_suffix(LogTarget::Callback, ""), Ok(true));
         assert!(m5.log.clear_callback());
+    }
+
+    #[test]
+    fn sd_helpers_compile_on_host() {
+        let config = SdSpiConfig {
+            pin_sclk: 18,
+            pin_mosi: 23,
+            pin_miso: 19,
+            pin_cs: 4,
+            ..SdSpiConfig::default()
+        };
+        assert_eq!(SD_MOUNT_PATH, "/sdcard");
+        assert!(!sd_begin());
+        assert!(!sd_begin_with_config(&config));
+        assert!(!sd_is_mounted());
+        sd_end();
     }
 }

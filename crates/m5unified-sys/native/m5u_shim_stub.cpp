@@ -232,10 +232,19 @@ void m5u_log_println(const char* text) {
 }
 
 bool m5u_sd_begin(void) {
-    // SD support needs an explicit ESP-IDF/Arduino SD component wiring step.
-    // Keep the shim target-buildable for display/button firmware until that
-    // component is added instead of referencing Arduino globals (SD, SPI) here.
     return false;
+}
+
+bool m5u_sd_begin_spi(const m5u_sd_spi_config_t* config) {
+    (void)config;
+    return false;
+}
+
+bool m5u_sd_is_mounted(void) {
+    return false;
+}
+
+void m5u_sd_end(void) {
 }
 
 

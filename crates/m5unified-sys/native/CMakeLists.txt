@@ -16,7 +16,7 @@ if(M5UNIFIED_RS_USE_HOST_STUB)
     set(M5UNIFIED_RS_COMPONENT_REQUIRES "")
 else()
     set(M5UNIFIED_RS_SHIM_SRCS "m5u_shim.cpp")
-    set(M5UNIFIED_RS_COMPONENT_REQUIRES M5Unified M5GFX esp_timer driver)
+    set(M5UNIFIED_RS_COMPONENT_REQUIRES M5Unified M5GFX esp_timer driver fatfs sdmmc esp_driver_sdspi esp_driver_spi)
 endif()
 
 idf_component_register(

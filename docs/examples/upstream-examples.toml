@@ -39,7 +39,7 @@ rust_bin = "advanced_speaker_sd_wav_file"
 status = "host_compiles"
 category = "advanced"
 requires = ["speaker", "sd", "wav"]
-notes = "SD shim currently reports unavailable until ESP-IDF/Arduino SD wiring is selected."
+notes = "SD mount uses the ESP-IDF SDSPI helper; WAV file parsing/streaming remains application-level."
 
 [[example]]
 upstream = "Advanced/WebRadio_with_ESP8266Audio/WebRadio_with_ESP8266Audio.ino"

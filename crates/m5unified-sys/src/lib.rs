@@ -22,6 +22,34 @@ pub type m5u_log_callback_t = Option<unsafe extern "C" fn(c_int, bool, *const c_
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct m5u_sd_spi_config_t {
+    pub pin_sclk: c_int,
+    pub pin_mosi: c_int,
+    pub pin_miso: c_int,
+    pub pin_cs: c_int,
+    pub host_id: c_int,
+    pub frequency_khz: u32,
+    pub max_files: c_int,
+    pub format_if_mount_failed: u8,
+}
+
+impl Default for m5u_sd_spi_config_t {
+    fn default() -> Self {
+        Self {
+            pin_sclk: -1,
+            pin_mosi: -1,
+            pin_miso: -1,
+            pin_cs: -1,
+            host_id: -1,
+            frequency_khz: 20_000,
+            max_files: 5,
+            format_if_mount_failed: 0,
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct m5u_config_t {
     pub serial_baudrate: u32,
     pub external_speaker_value: u8,
@@ -360,6 +388,9 @@ extern "C" {
     pub fn m5u_log_get_level(target: c_int) -> c_int;
     pub fn m5u_log_set_suffix(target: c_int, suffix: *const c_char) -> bool;
     pub fn m5u_sd_begin() -> bool;
+    pub fn m5u_sd_begin_spi(config: *const m5u_sd_spi_config_t) -> bool;
+    pub fn m5u_sd_is_mounted() -> bool;
+    pub fn m5u_sd_end();
 }
 
 #[cfg(not(target_os = "espidf"))]
@@ -847,6 +878,13 @@ mod host_stubs {
     pub unsafe fn m5u_sd_begin() -> bool {
         false
     }
+    pub unsafe fn m5u_sd_begin_spi(_config: *const m5u_sd_spi_config_t) -> bool {
+        false
+    }
+    pub unsafe fn m5u_sd_is_mounted() -> bool {
+        false
+    }
+    pub unsafe fn m5u_sd_end() {}
 }
 
 #[cfg(not(target_os = "espidf"))]
