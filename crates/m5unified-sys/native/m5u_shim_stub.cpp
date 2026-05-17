@@ -339,7 +339,8 @@ void m5u_sd_end(void) {
 
 
 static bool m5u_button_state(int button, int query) {
-    (void)button; (void)query; return false;
+    (void)button;
+    return query == 10;
 }
 
 int m5u_display_get_rotation(void) {
@@ -491,7 +492,42 @@ bool m5u_button_was_clicked(int button) { return m5u_button_state(button, 3); }
 bool m5u_button_was_hold(int button) { return m5u_button_state(button, 4); }
 bool m5u_button_is_holding(int button) { return m5u_button_state(button, 5); }
 bool m5u_button_was_decide_click_count(int button) { return m5u_button_state(button, 6); }
+bool m5u_button_was_single_clicked(int button) { return m5u_button_state(button, 7); }
+bool m5u_button_was_double_clicked(int button) { return m5u_button_state(button, 8); }
+bool m5u_button_was_change_pressed(int button) { return m5u_button_state(button, 9); }
+bool m5u_button_is_released(int button) { return m5u_button_state(button, 10); }
+bool m5u_button_was_released_after_hold(int button) { return m5u_button_state(button, 11); }
 int m5u_button_get_click_count(int button) {
+    (void)button; return 0;
+}
+bool m5u_button_was_release_for(int button, uint32_t ms) {
+    (void)button; (void)ms; return false;
+}
+bool m5u_button_pressed_for(int button, uint32_t ms) {
+    (void)button; (void)ms; return false;
+}
+bool m5u_button_released_for(int button, uint32_t ms) {
+    (void)button; (void)ms; return true;
+}
+void m5u_button_set_debounce_thresh(int button, uint32_t ms) {
+    (void)button; (void)ms;
+}
+void m5u_button_set_hold_thresh(int button, uint32_t ms) {
+    (void)button; (void)ms;
+}
+uint8_t m5u_button_get_state(int button) {
+    (void)button; return 0;
+}
+uint32_t m5u_button_last_change(int button) {
+    (void)button; return 0;
+}
+uint32_t m5u_button_get_debounce_thresh(int button) {
+    (void)button; return 10;
+}
+uint32_t m5u_button_get_hold_thresh(int button) {
+    (void)button; return 500;
+}
+uint32_t m5u_button_get_update_msec(int button) {
     (void)button; return 0;
 }
 

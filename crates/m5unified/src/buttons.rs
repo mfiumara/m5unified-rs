@@ -9,6 +9,37 @@ pub enum ButtonId {
     Ext,
 }
 
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum ButtonState {
+    NoChange,
+    Clicked,
+    Hold,
+    DecideClickCount,
+    Raw(u8),
+}
+
+impl ButtonState {
+    pub fn from_raw(raw: u8) -> Self {
+        match raw {
+            0 => Self::NoChange,
+            1 => Self::Clicked,
+            2 => Self::Hold,
+            3 => Self::DecideClickCount,
+            raw => Self::Raw(raw),
+        }
+    }
+
+    pub fn raw(self) -> u8 {
+        match self {
+            Self::NoChange => 0,
+            Self::Clicked => 1,
+            Self::Hold => 2,
+            Self::DecideClickCount => 3,
+            Self::Raw(raw) => raw,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct Buttons;
 
@@ -66,6 +97,10 @@ impl Button {
         unsafe { m5unified_sys::m5u_button_is_pressed(self.raw_id()) }
     }
 
+    pub fn is_released(&self) -> bool {
+        unsafe { m5unified_sys::m5u_button_is_released(self.raw_id()) }
+    }
+
     pub fn was_pressed(&self) -> bool {
         unsafe { m5unified_sys::m5u_button_was_pressed(self.raw_id()) }
     }
@@ -74,8 +109,20 @@ impl Button {
         unsafe { m5unified_sys::m5u_button_was_released(self.raw_id()) }
     }
 
+    pub fn was_released_after_hold(&self) -> bool {
+        unsafe { m5unified_sys::m5u_button_was_released_after_hold(self.raw_id()) }
+    }
+
     pub fn was_clicked(&self) -> bool {
         unsafe { m5unified_sys::m5u_button_was_clicked(self.raw_id()) }
+    }
+
+    pub fn was_single_clicked(&self) -> bool {
+        unsafe { m5unified_sys::m5u_button_was_single_clicked(self.raw_id()) }
+    }
+
+    pub fn was_double_clicked(&self) -> bool {
+        unsafe { m5unified_sys::m5u_button_was_double_clicked(self.raw_id()) }
     }
 
     pub fn was_hold(&self) -> bool {
@@ -86,11 +133,55 @@ impl Button {
         unsafe { m5unified_sys::m5u_button_is_holding(self.raw_id()) }
     }
 
+    pub fn was_change_pressed(&self) -> bool {
+        unsafe { m5unified_sys::m5u_button_was_change_pressed(self.raw_id()) }
+    }
+
     pub fn was_decide_click_count(&self) -> bool {
         unsafe { m5unified_sys::m5u_button_was_decide_click_count(self.raw_id()) }
     }
 
     pub fn click_count(&self) -> i32 {
         unsafe { m5unified_sys::m5u_button_get_click_count(self.raw_id()) as i32 }
+    }
+
+    pub fn was_release_for_ms(&self, ms: u32) -> bool {
+        unsafe { m5unified_sys::m5u_button_was_release_for(self.raw_id(), ms) }
+    }
+
+    pub fn pressed_for_ms(&self, ms: u32) -> bool {
+        unsafe { m5unified_sys::m5u_button_pressed_for(self.raw_id(), ms) }
+    }
+
+    pub fn released_for_ms(&self, ms: u32) -> bool {
+        unsafe { m5unified_sys::m5u_button_released_for(self.raw_id(), ms) }
+    }
+
+    pub fn set_debounce_thresh_ms(&self, ms: u32) {
+        unsafe { m5unified_sys::m5u_button_set_debounce_thresh(self.raw_id(), ms) }
+    }
+
+    pub fn set_hold_thresh_ms(&self, ms: u32) {
+        unsafe { m5unified_sys::m5u_button_set_hold_thresh(self.raw_id(), ms) }
+    }
+
+    pub fn state(&self) -> ButtonState {
+        unsafe { ButtonState::from_raw(m5unified_sys::m5u_button_get_state(self.raw_id())) }
+    }
+
+    pub fn last_change_ms(&self) -> u32 {
+        unsafe { m5unified_sys::m5u_button_last_change(self.raw_id()) }
+    }
+
+    pub fn debounce_thresh_ms(&self) -> u32 {
+        unsafe { m5unified_sys::m5u_button_get_debounce_thresh(self.raw_id()) }
+    }
+
+    pub fn hold_thresh_ms(&self) -> u32 {
+        unsafe { m5unified_sys::m5u_button_get_hold_thresh(self.raw_id()) }
+    }
+
+    pub fn update_msec(&self) -> u32 {
+        unsafe { m5unified_sys::m5u_button_get_update_msec(self.raw_id()) }
     }
 }

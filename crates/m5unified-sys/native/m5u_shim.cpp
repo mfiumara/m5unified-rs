@@ -536,16 +536,23 @@ void m5u_sd_end(void) {
 }
 
 
-static bool m5u_button_state(int button, int query) {
-    m5::Button_Class* btn = nullptr;
+static m5::Button_Class* m5u_button_for_id(int button) {
     switch (button) {
-    case 0: btn = &M5.BtnA; break;
-    case 1: btn = &M5.BtnB; break;
-    case 2: btn = &M5.BtnC; break;
-    case 3: btn = &M5.BtnPWR; break;
-    case 4: btn = &M5.BtnEXT; break;
-    default: return false;
+    case 0: return &M5.BtnA;
+    case 1: return &M5.BtnB;
+    case 2: return &M5.BtnC;
+    case 3: return &M5.BtnPWR;
+    case 4: return &M5.BtnEXT;
+    default: return nullptr;
     }
+}
+
+static bool m5u_button_state(int button, int query) {
+    m5::Button_Class* btn = m5u_button_for_id(button);
+    if (!btn) {
+        return false;
+    }
+
     switch (query) {
     case 0: return btn->isPressed();
     case 1: return btn->wasPressed();
@@ -554,6 +561,11 @@ static bool m5u_button_state(int button, int query) {
     case 4: return btn->wasHold();
     case 5: return btn->isHolding();
     case 6: return btn->wasDecideClickCount();
+    case 7: return btn->wasSingleClicked();
+    case 8: return btn->wasDoubleClicked();
+    case 9: return btn->wasChangePressed();
+    case 10: return btn->isReleased();
+    case 11: return btn->wasReleasedAfterHold();
     default: return false;
     }
 }
@@ -737,15 +749,58 @@ bool m5u_button_was_clicked(int button) { return m5u_button_state(button, 3); }
 bool m5u_button_was_hold(int button) { return m5u_button_state(button, 4); }
 bool m5u_button_is_holding(int button) { return m5u_button_state(button, 5); }
 bool m5u_button_was_decide_click_count(int button) { return m5u_button_state(button, 6); }
+bool m5u_button_was_single_clicked(int button) { return m5u_button_state(button, 7); }
+bool m5u_button_was_double_clicked(int button) { return m5u_button_state(button, 8); }
+bool m5u_button_was_change_pressed(int button) { return m5u_button_state(button, 9); }
+bool m5u_button_is_released(int button) { return m5u_button_state(button, 10); }
+bool m5u_button_was_released_after_hold(int button) { return m5u_button_state(button, 11); }
 int m5u_button_get_click_count(int button) {
-    switch (button) {
-    case 0: return M5.BtnA.getClickCount();
-    case 1: return M5.BtnB.getClickCount();
-    case 2: return M5.BtnC.getClickCount();
-    case 3: return M5.BtnPWR.getClickCount();
-    case 4: return M5.BtnEXT.getClickCount();
-    default: return 0;
+    m5::Button_Class* btn = m5u_button_for_id(button);
+    return btn ? btn->getClickCount() : 0;
+}
+bool m5u_button_was_release_for(int button, uint32_t ms) {
+    m5::Button_Class* btn = m5u_button_for_id(button);
+    return btn ? btn->wasReleaseFor(ms) : false;
+}
+bool m5u_button_pressed_for(int button, uint32_t ms) {
+    m5::Button_Class* btn = m5u_button_for_id(button);
+    return btn ? btn->pressedFor(ms) : false;
+}
+bool m5u_button_released_for(int button, uint32_t ms) {
+    m5::Button_Class* btn = m5u_button_for_id(button);
+    return btn ? btn->releasedFor(ms) : false;
+}
+void m5u_button_set_debounce_thresh(int button, uint32_t ms) {
+    m5::Button_Class* btn = m5u_button_for_id(button);
+    if (btn) {
+        btn->setDebounceThresh(ms);
     }
+}
+void m5u_button_set_hold_thresh(int button, uint32_t ms) {
+    m5::Button_Class* btn = m5u_button_for_id(button);
+    if (btn) {
+        btn->setHoldThresh(ms);
+    }
+}
+uint8_t m5u_button_get_state(int button) {
+    m5::Button_Class* btn = m5u_button_for_id(button);
+    return btn ? static_cast<uint8_t>(btn->getState()) : 0;
+}
+uint32_t m5u_button_last_change(int button) {
+    m5::Button_Class* btn = m5u_button_for_id(button);
+    return btn ? btn->lastChange() : 0;
+}
+uint32_t m5u_button_get_debounce_thresh(int button) {
+    m5::Button_Class* btn = m5u_button_for_id(button);
+    return btn ? btn->getDebounceThresh() : 0;
+}
+uint32_t m5u_button_get_hold_thresh(int button) {
+    m5::Button_Class* btn = m5u_button_for_id(button);
+    return btn ? btn->getHoldThresh() : 0;
+}
+uint32_t m5u_button_get_update_msec(int button) {
+    m5::Button_Class* btn = m5u_button_for_id(button);
+    return btn ? btn->getUpdateMsec() : 0;
 }
 
 bool m5u_mic_is_enabled(void) {

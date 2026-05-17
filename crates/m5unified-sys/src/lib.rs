@@ -388,6 +388,21 @@ extern "C" {
     pub fn m5u_button_is_holding(button: c_int) -> bool;
     pub fn m5u_button_was_decide_click_count(button: c_int) -> bool;
     pub fn m5u_button_get_click_count(button: c_int) -> c_int;
+    pub fn m5u_button_was_single_clicked(button: c_int) -> bool;
+    pub fn m5u_button_was_double_clicked(button: c_int) -> bool;
+    pub fn m5u_button_was_change_pressed(button: c_int) -> bool;
+    pub fn m5u_button_is_released(button: c_int) -> bool;
+    pub fn m5u_button_was_released_after_hold(button: c_int) -> bool;
+    pub fn m5u_button_was_release_for(button: c_int, ms: u32) -> bool;
+    pub fn m5u_button_pressed_for(button: c_int, ms: u32) -> bool;
+    pub fn m5u_button_released_for(button: c_int, ms: u32) -> bool;
+    pub fn m5u_button_set_debounce_thresh(button: c_int, ms: u32);
+    pub fn m5u_button_set_hold_thresh(button: c_int, ms: u32);
+    pub fn m5u_button_get_state(button: c_int) -> u8;
+    pub fn m5u_button_last_change(button: c_int) -> u32;
+    pub fn m5u_button_get_debounce_thresh(button: c_int) -> u32;
+    pub fn m5u_button_get_hold_thresh(button: c_int) -> u32;
+    pub fn m5u_button_get_update_msec(button: c_int) -> u32;
 
     pub fn m5u_mic_is_enabled() -> bool;
     pub fn m5u_mic_is_recording() -> bool;
@@ -835,6 +850,47 @@ mod host_stubs {
         false
     }
     pub unsafe fn m5u_button_get_click_count(_button: c_int) -> c_int {
+        0
+    }
+    pub unsafe fn m5u_button_was_single_clicked(_button: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_button_was_double_clicked(_button: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_button_was_change_pressed(_button: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_button_is_released(_button: c_int) -> bool {
+        true
+    }
+    pub unsafe fn m5u_button_was_released_after_hold(_button: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_button_was_release_for(_button: c_int, _ms: u32) -> bool {
+        false
+    }
+    pub unsafe fn m5u_button_pressed_for(_button: c_int, _ms: u32) -> bool {
+        false
+    }
+    pub unsafe fn m5u_button_released_for(_button: c_int, _ms: u32) -> bool {
+        true
+    }
+    pub unsafe fn m5u_button_set_debounce_thresh(_button: c_int, _ms: u32) {}
+    pub unsafe fn m5u_button_set_hold_thresh(_button: c_int, _ms: u32) {}
+    pub unsafe fn m5u_button_get_state(_button: c_int) -> u8 {
+        0
+    }
+    pub unsafe fn m5u_button_last_change(_button: c_int) -> u32 {
+        0
+    }
+    pub unsafe fn m5u_button_get_debounce_thresh(_button: c_int) -> u32 {
+        10
+    }
+    pub unsafe fn m5u_button_get_hold_thresh(_button: c_int) -> u32 {
+        500
+    }
+    pub unsafe fn m5u_button_get_update_msec(_button: c_int) -> u32 {
         0
     }
 

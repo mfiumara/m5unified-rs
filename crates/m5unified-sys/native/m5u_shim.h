@@ -109,6 +109,21 @@ bool m5u_button_was_hold(int button);
 bool m5u_button_is_holding(int button);
 bool m5u_button_was_decide_click_count(int button);
 int m5u_button_get_click_count(int button);
+bool m5u_button_was_single_clicked(int button);
+bool m5u_button_was_double_clicked(int button);
+bool m5u_button_was_change_pressed(int button);
+bool m5u_button_is_released(int button);
+bool m5u_button_was_released_after_hold(int button);
+bool m5u_button_was_release_for(int button, uint32_t ms);
+bool m5u_button_pressed_for(int button, uint32_t ms);
+bool m5u_button_released_for(int button, uint32_t ms);
+void m5u_button_set_debounce_thresh(int button, uint32_t ms);
+void m5u_button_set_hold_thresh(int button, uint32_t ms);
+uint8_t m5u_button_get_state(int button);
+uint32_t m5u_button_last_change(int button);
+uint32_t m5u_button_get_debounce_thresh(int button);
+uint32_t m5u_button_get_hold_thresh(int button);
+uint32_t m5u_button_get_update_msec(int button);
 
 typedef struct {
     int pin_data_in;

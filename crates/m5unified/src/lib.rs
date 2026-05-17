@@ -42,7 +42,7 @@ mod system;
 mod touch;
 
 pub use audio::{Mic, MicConfig, Speaker, SpeakerConfig};
-pub use buttons::{Button, ButtonId, Buttons};
+pub use buttons::{Button, ButtonId, ButtonState, Buttons};
 pub use config::{ExternalDisplayConfig, ExternalSpeakerConfig, M5UnifiedConfig};
 pub use display::{
     colors, Color565, Display, DisplayFont, DisplayKind, DisplayRef, EpdMode, Point, Rect, Size,
@@ -198,6 +198,38 @@ mod tests {
         };
         let m5 = M5Unified::begin_with_config(&config).expect("host stub begin should succeed");
         assert_eq!(m5.display.width(), 320);
+    }
+
+    #[test]
+    fn button_state_helpers_compile_on_host() {
+        let m5 = M5Unified::begin().expect("host stub begin should succeed");
+        let button = m5.buttons.a();
+
+        assert_eq!(ButtonState::from_raw(0), ButtonState::NoChange);
+        assert_eq!(ButtonState::Raw(9).raw(), 9);
+        assert!(!button.is_pressed());
+        assert!(button.is_released());
+        assert!(!button.was_pressed());
+        assert!(!button.was_released());
+        assert!(!button.was_released_after_hold());
+        assert!(!button.was_clicked());
+        assert!(!button.was_single_clicked());
+        assert!(!button.was_double_clicked());
+        assert!(!button.was_hold());
+        assert!(!button.is_holding());
+        assert!(!button.was_change_pressed());
+        assert!(!button.was_decide_click_count());
+        assert_eq!(button.click_count(), 0);
+        assert!(!button.was_release_for_ms(10));
+        assert!(!button.pressed_for_ms(10));
+        assert!(button.released_for_ms(10));
+        button.set_debounce_thresh_ms(12);
+        button.set_hold_thresh_ms(600);
+        assert_eq!(button.state(), ButtonState::NoChange);
+        assert_eq!(button.last_change_ms(), 0);
+        assert_eq!(button.debounce_thresh_ms(), 10);
+        assert_eq!(button.hold_thresh_ms(), 500);
+        assert_eq!(button.update_msec(), 0);
     }
 
     #[test]
