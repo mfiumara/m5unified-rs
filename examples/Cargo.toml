@@ -8,3 +8,15 @@ default-run = "basic_how_to_use"
 
 [dependencies]
 m5unified = { path = "../crates/m5unified" }
+
+[target.'cfg(target_os = "espidf")'.dependencies]
+esp-idf-sys = { version = "0.37.2", default-features = false, features = ["std", "binstart"] }
+
+[build-dependencies]
+embuild = { version = "0.33", features = ["espidf"] }
+
+[package.metadata.esp-idf-sys]
+esp_idf_version = "v5.3.2"
+
+[[package.metadata.esp-idf-sys.extra_components]]
+component_dirs = ["components"]

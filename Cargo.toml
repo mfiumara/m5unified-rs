@@ -5,9 +5,6 @@ members = [
     "crates/m5unified",
     "examples",
 ]
-exclude = [
-    "firmware/hello-display",
-]
 
 [workspace.package]
 edition = "2021"
