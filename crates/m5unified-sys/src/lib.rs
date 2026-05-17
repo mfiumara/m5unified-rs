@@ -183,6 +183,10 @@ pub struct m5u_touch_detail_t {
     pub y: c_int,
     pub prev_x: c_int,
     pub prev_y: c_int,
+    pub base_x: c_int,
+    pub base_y: c_int,
+    pub base_msec: u32,
+    pub state: u8,
     pub is_pressed: bool,
     pub was_pressed: bool,
     pub was_released: bool,
@@ -436,6 +440,9 @@ extern "C" {
     pub fn m5u_imu_set_calibration(x: c_float, y: c_float, z: c_float);
 
     pub fn m5u_touch_get_detail(index: c_int, out: *mut m5u_touch_detail_t) -> bool;
+    pub fn m5u_touch_is_enabled() -> bool;
+    pub fn m5u_touch_set_hold_thresh(ms: u16);
+    pub fn m5u_touch_set_flick_thresh(distance: u16);
     pub fn m5u_rtc_set_system_time_from_rtc();
     pub fn m5u_rtc_set_timer_irq(timer_msec: u32) -> u32;
     pub fn m5u_rtc_set_alarm_irq_after_seconds(after_seconds: c_int) -> c_int;
@@ -993,6 +1000,11 @@ mod host_stubs {
         }
         false
     }
+    pub unsafe fn m5u_touch_is_enabled() -> bool {
+        false
+    }
+    pub unsafe fn m5u_touch_set_hold_thresh(_ms: u16) {}
+    pub unsafe fn m5u_touch_set_flick_thresh(_distance: u16) {}
     pub unsafe fn m5u_rtc_set_system_time_from_rtc() {}
     pub unsafe fn m5u_rtc_set_timer_irq(timer_msec: u32) -> u32 {
         timer_msec

@@ -222,6 +222,10 @@ typedef struct {
     int y;
     int prev_x;
     int prev_y;
+    int base_x;
+    int base_y;
+    uint32_t base_msec;
+    uint8_t state;
     bool is_pressed;
     bool was_pressed;
     bool was_released;
@@ -234,6 +238,9 @@ typedef struct {
 int m5u_touch_count(void);
 bool m5u_touch_get(int index, int* x, int* y);
 bool m5u_touch_get_detail(int index, m5u_touch_detail_t* out);
+bool m5u_touch_is_enabled(void);
+void m5u_touch_set_hold_thresh(uint16_t ms);
+void m5u_touch_set_flick_thresh(uint16_t distance);
 
 typedef struct {
     int year;

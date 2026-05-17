@@ -56,7 +56,7 @@ pub use power::{Axp2101, Axp2101IrqStatus, ChargeState, ExtPortMask, Power, Powe
 pub use rtc::{DateTime, Rtc};
 pub use sd::{sd_begin, sd_begin_with_config, sd_end, sd_is_mounted, SdSpiConfig, SD_MOUNT_PATH};
 pub use system::{Board, PinName};
-pub use touch::{Touch, TouchDetail, TouchPoint};
+pub use touch::{Touch, TouchDetail, TouchPoint, TouchState};
 
 /// Top-level handle for M5Unified-backed board features.
 #[derive(Debug)]
@@ -230,6 +230,50 @@ mod tests {
         assert_eq!(button.debounce_thresh_ms(), 10);
         assert_eq!(button.hold_thresh_ms(), 500);
         assert_eq!(button.update_msec(), 0);
+    }
+
+    #[test]
+    fn touch_state_helpers_compile_on_host() {
+        let mut m5 = M5Unified::begin().expect("host stub begin should succeed");
+        assert!(!m5.touch.is_enabled());
+        assert!(!m5.touch.is_pressed());
+        assert!(m5.touch.points().is_empty());
+        assert_eq!(m5.touch.detail(0), None);
+        m5.touch.set_hold_thresh_ms(500);
+        m5.touch.set_flick_thresh_px(8);
+
+        assert_eq!(TouchState::from_raw(0b1111), TouchState::DragBegin);
+        assert_eq!(TouchState::Raw(0x80).raw(), 0x80);
+        assert!(TouchState::TouchBegin.is_pressed());
+        assert!(TouchState::TouchEnd.was_released());
+        assert!(TouchState::TouchEnd.was_clicked());
+        assert!(TouchState::HoldBegin.is_holding());
+        assert!(TouchState::HoldBegin.was_hold());
+        assert!(TouchState::FlickBegin.was_flick_start());
+        assert!(TouchState::FlickBegin.is_flicking());
+        assert!(TouchState::FlickEnd.was_flicked());
+        assert!(TouchState::DragBegin.was_drag_start());
+        assert!(TouchState::DragBegin.is_dragging());
+        assert!(TouchState::DragEnd.was_dragged());
+
+        let detail = TouchDetail {
+            x: 12,
+            y: 15,
+            prev_x: 10,
+            prev_y: 11,
+            base_x: 4,
+            base_y: 5,
+            state: TouchState::DragBegin,
+            ..TouchDetail::default()
+        };
+        assert_eq!(detail.delta_x(), 2);
+        assert_eq!(detail.delta_y(), 4);
+        assert_eq!(detail.delta(), (2, 4));
+        assert_eq!(detail.distance_x(), 8);
+        assert_eq!(detail.distance_y(), 10);
+        assert_eq!(detail.distance(), (8, 10));
+        assert!(detail.was_drag_start());
+        assert!(detail.is_dragging());
     }
 
     #[test]

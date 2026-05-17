@@ -200,6 +200,18 @@ int m5u_touch_count(void) {
     return 0;
 }
 
+bool m5u_touch_is_enabled(void) {
+    return false;
+}
+
+void m5u_touch_set_hold_thresh(uint16_t ms) {
+    (void)ms;
+}
+
+void m5u_touch_set_flick_thresh(uint16_t distance) {
+    (void)distance;
+}
+
 bool m5u_touch_get(int index, int* x, int* y) {
     (void)index; (void)x; (void)y; return false;
 }
@@ -679,7 +691,11 @@ void m5u_imu_set_calibration(float x, float y, float z) {
 }
 
 bool m5u_touch_get_detail(int index, m5u_touch_detail_t* out) {
-    (void)index; (void)out; return false;
+    (void)index;
+    if (out) {
+        *out = {};
+    }
+    return false;
 }
 
 bool m5u_rtc_is_enabled(void) {

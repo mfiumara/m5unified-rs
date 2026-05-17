@@ -266,6 +266,18 @@ int m5u_touch_count(void) {
     return M5.Touch.getCount();
 }
 
+bool m5u_touch_is_enabled(void) {
+    return M5.Touch.isEnabled();
+}
+
+void m5u_touch_set_hold_thresh(uint16_t ms) {
+    M5.Touch.setHoldThresh(ms);
+}
+
+void m5u_touch_set_flick_thresh(uint16_t distance) {
+    M5.Touch.setFlickThresh(distance);
+}
+
 bool m5u_touch_get(int index, int* x, int* y) {
     auto detail = M5.Touch.getDetail(index);
     if (x) { *x = detail.x; }
@@ -1005,6 +1017,10 @@ bool m5u_touch_get_detail(int index, m5u_touch_detail_t* out) {
     out->y = d.y;
     out->prev_x = d.prev_x;
     out->prev_y = d.prev_y;
+    out->base_x = d.base_x;
+    out->base_y = d.base_y;
+    out->base_msec = d.base_msec;
+    out->state = static_cast<uint8_t>(d.state);
     out->is_pressed = d.isPressed();
     out->was_pressed = d.wasPressed();
     out->was_released = d.wasReleased();
