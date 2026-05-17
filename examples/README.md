@@ -27,6 +27,7 @@ They compile against the local `m5unified` Rust API. On non-ESP-IDF host targets
 - `examples/Advanced/Speak_with_AquesTalk` → `advanced_speak_with_aquestalk`
 - `examples/PlatformIO_SDL/src` → `platformio_sdl`
 - `examples/Test/build_test` → `test_build_test`
+- local M5StickS3 hardware smoke sample → `hello_display`
 
 ## Run/check
 
@@ -38,5 +39,13 @@ cargo run --bin basic_button
 ```
 
 From the workspace root, plain `cargo run` launches `basic_how_to_use` as the default host-checkable smoke example. Use `cargo run --bin <name>` for any specific translated upstream example listed above.
+
+To build and flash the M5StickS3 hello-display smoke sample:
+
+```bash
+cd examples
+cargo build --bin hello_display --target xtensa-esp32s3-espidf
+espflash flash --monitor ../target/xtensa-esp32s3-espidf/debug/hello_display
+```
 
 The advanced network/Bluetooth/codec examples currently define the Rust API boundary and compile-time sample shape. They intentionally leave codec/network stack selection to the application crate while routing display/speaker/control operations through `m5unified`.

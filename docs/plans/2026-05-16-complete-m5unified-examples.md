@@ -17,7 +17,7 @@ The workspace already has both layers:
 - `crates/m5unified-sys`: raw unsafe shim bindings plus host stubs.
 - `crates/m5unified`: a safe Rust wrapper crate with `M5Unified`, `Display`, `Buttons`, `Speaker`, `Mic`, `Imu`, `Touch`, `Rtc`, `Power`, and `Log` types.
 - `examples`: Rust sample binaries already named after the upstream examples.
-- `firmware/hello-display`: a proven ESP-IDF firmware scaffold outside the workspace.
+- `examples/src/bin/hello_display.rs`: a proven ESP-IDF smoke sample inside the examples package.
 
 So this repo is **not only `-sys` anymore**. It has a real Rust API crate, but that API is still thin and example-driven. It is good enough for early display/button/mic/speaker/IMU/touch/RTC/power demos, not yet complete enough to faithfully express all upstream examples.
 

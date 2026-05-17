@@ -84,7 +84,6 @@ crates/
   m5unified-sys/   raw bindings and native C/C++ shim
   m5unified/       safe Rust wrapper
 examples/          host-checkable Rust ports of upstream M5Unified examples
-firmware/          ESP-IDF Rust firmware package for hardware validation
 docs/              example mapping, project plans, and release notes
 ```
 
@@ -102,13 +101,13 @@ cargo run -p m5unified-examples --bin basic_displays
 See the repository docs for the upstream-to-Rust example mapping and firmware
 bring-up instructions.
 
-## Firmware Bring-Up
+## On-Device Hello Display
 
-The first ESP-IDF Rust firmware package lives at
-`firmware/hello-display` in the repository. It is excluded from the host
-workspace because it requires the esp-rs `xtensa-esp32s3-espidf` toolchain.
+The `examples` package includes `hello_display`, a M5StickS3 smoke sample that
+can be built for `xtensa-esp32s3-espidf` while the rest of the workspace remains
+host-checkable through stubs.
 
-Install the esp-rs tools before building firmware:
+Install the esp-rs tools before building for hardware:
 
 ```bash
 cargo +stable install espup
@@ -117,12 +116,12 @@ espup install
 cargo +stable install espflash
 ```
 
-Then build and flash the sample firmware:
+Then build and flash the sample:
 
 ```bash
-cd firmware/hello-display
-cargo build --target xtensa-esp32s3-espidf
-espflash flash --monitor target/xtensa-esp32s3-espidf/debug/m5unified-hello-display
+cd examples
+cargo build --bin hello_display --target xtensa-esp32s3-espidf
+espflash flash --monitor ../target/xtensa-esp32s3-espidf/debug/hello_display
 ```
 
 Expected hardware behavior: the display shows `hello from rust`; Button A/B
