@@ -1,204 +1,183 @@
 #include "m5u_shim.h"
 
-#include <M5Unified.h>
+// Optional no-op implementation for host-side C ABI checks. Firmware builds
+// should compile m5u_shim.cpp, which calls the real M5Unified C++ API.
 
 extern "C" {
 
 bool m5u_begin(void) {
-    auto cfg = M5.config();
-    M5.begin(cfg);
-    return true;
+    return false;
 }
 
 void m5u_update(void) {
-    M5.update();
 }
 
 void m5u_delay_ms(uint32_t ms) {
-    M5.delay(ms);
+    (void)ms;
 }
 
 int m5u_display_width(void) {
-    return M5.Display.width();
+    return 0;
 }
 
 int m5u_display_height(void) {
-    return M5.Display.height();
+    return 0;
 }
 
 void m5u_display_fill_screen(uint16_t color) {
-    M5.Display.fillScreen(color);
+    (void)color;
 }
 
 void m5u_display_set_cursor(int x, int y) {
-    M5.Display.setCursor(x, y);
+    (void)x; (void)y;
 }
 
 void m5u_display_set_text_size(int size) {
-    M5.Display.setTextSize(size);
+    (void)size;
 }
 
 void m5u_display_set_text_color(uint16_t fg, uint16_t bg) {
-    M5.Display.setTextColor(fg, bg);
+    (void)fg; (void)bg;
 }
 
 void m5u_display_print(const char* text) {
-    M5.Display.print(text);
+    (void)text;
 }
 
 void m5u_display_println(const char* text) {
-    M5.Display.println(text);
+    (void)text;
 }
 
 void m5u_display_draw_line(int x0, int y0, int x1, int y1, uint16_t color) {
-    M5.Display.drawLine(x0, y0, x1, y1, color);
+    (void)x0; (void)y0; (void)x1; (void)y1; (void)color;
 }
 
 void m5u_display_draw_rect(int x, int y, int w, int h, uint16_t color) {
-    M5.Display.drawRect(x, y, w, h, color);
+    (void)x; (void)y; (void)w; (void)h; (void)color;
 }
 
 void m5u_display_fill_rect(int x, int y, int w, int h, uint16_t color) {
-    M5.Display.fillRect(x, y, w, h, color);
+    (void)x; (void)y; (void)w; (void)h; (void)color;
 }
 
 void m5u_display_draw_circle(int x, int y, int r, uint16_t color) {
-    M5.Display.drawCircle(x, y, r, color);
+    (void)x; (void)y; (void)r; (void)color;
 }
 
 void m5u_display_fill_circle(int x, int y, int r, uint16_t color) {
-    M5.Display.fillCircle(x, y, r, color);
+    (void)x; (void)y; (void)r; (void)color;
 }
 
 void m5u_display_set_rotation(int rotation) {
-    M5.Display.setRotation(rotation);
+    (void)rotation;
 }
 
 bool m5u_btn_a_is_pressed(void) {
-    return M5.BtnA.isPressed();
+    return false;
 }
 
 bool m5u_btn_a_was_pressed(void) {
-    return M5.BtnA.wasPressed();
+    return false;
 }
 
 bool m5u_btn_a_was_released(void) {
-    return M5.BtnA.wasReleased();
+    return false;
 }
 
 bool m5u_btn_b_is_pressed(void) {
-    return M5.BtnB.isPressed();
+    return false;
 }
 
 bool m5u_btn_b_was_pressed(void) {
-    return M5.BtnB.wasPressed();
+    return false;
 }
 
 bool m5u_btn_b_was_released(void) {
-    return M5.BtnB.wasReleased();
+    return false;
 }
 
 bool m5u_btn_c_is_pressed(void) {
-    return M5.BtnC.isPressed();
+    return false;
 }
 
 bool m5u_btn_c_was_pressed(void) {
-    return M5.BtnC.wasPressed();
+    return false;
 }
 
 bool m5u_btn_c_was_released(void) {
-    return M5.BtnC.wasReleased();
+    return false;
 }
 
 bool m5u_mic_begin(void) {
-    return M5.Mic.begin();
+    return false;
 }
 
 bool m5u_mic_record_i16(int16_t* buffer, size_t samples) {
-    return M5.Mic.record(buffer, samples);
+    (void)buffer; (void)samples; return false;
 }
 
 bool m5u_speaker_begin(void) {
-    return M5.Speaker.begin();
+    return false;
 }
 
 void m5u_speaker_set_volume(uint8_t volume) {
-    M5.Speaker.setVolume(volume);
+    (void)volume;
 }
 
 bool m5u_speaker_tone(uint32_t frequency_hz, uint32_t duration_ms) {
-    return M5.Speaker.tone(frequency_hz, duration_ms);
+    (void)frequency_hz; (void)duration_ms; return false;
 }
 
 bool m5u_speaker_play_i16(const int16_t* samples, size_t len, uint32_t sample_rate_hz) {
-    return M5.Speaker.playRaw(samples, len, sample_rate_hz, false, 1, 0);
+    (void)samples; (void)len; (void)sample_rate_hz; return false;
 }
 
 bool m5u_imu_begin(void) {
-    return M5.Imu.begin();
+    return false;
 }
 
 bool m5u_imu_get_accel(float* x, float* y, float* z) {
-    return M5.Imu.getAccel(x, y, z);
+    (void)x; (void)y; (void)z; return false;
 }
 
 bool m5u_imu_get_gyro(float* x, float* y, float* z) {
-    return M5.Imu.getGyro(x, y, z);
+    (void)x; (void)y; (void)z; return false;
 }
 
 bool m5u_imu_get_temp_c(float* temp) {
-    return M5.Imu.getTemp(temp);
+    (void)temp; return false;
 }
 
 int m5u_touch_count(void) {
-    return M5.Touch.getCount();
+    return 0;
 }
 
 bool m5u_touch_get(int index, int* x, int* y) {
-    auto detail = M5.Touch.getDetail(index);
-    if (x) { *x = detail.x; }
-    if (y) { *y = detail.y; }
-    return detail.isPressed();
+    (void)index; (void)x; (void)y; return false;
 }
 
 bool m5u_rtc_get_datetime(int* year, int* month, int* day, int* hour, int* minute, int* second) {
-    m5::rtc_datetime_t dt;
-    if (!M5.Rtc.getDateTime(&dt)) { return false; }
-    if (year) { *year = dt.date.year; }
-    if (month) { *month = dt.date.month; }
-    if (day) { *day = dt.date.date; }
-    if (hour) { *hour = dt.time.hours; }
-    if (minute) { *minute = dt.time.minutes; }
-    if (second) { *second = dt.time.seconds; }
-    return true;
+    (void)year; (void)month; (void)day; (void)hour; (void)minute; (void)second; return false;
 }
 
 bool m5u_rtc_set_datetime(int year, int month, int day, int hour, int minute, int second) {
-    m5::rtc_datetime_t dt;
-    dt.date.year = year;
-    dt.date.month = month;
-    dt.date.date = day;
-    dt.time.hours = hour;
-    dt.time.minutes = minute;
-    dt.time.seconds = second;
-    M5.Rtc.setDateTime(&dt);
-    return true;
+    (void)year; (void)month; (void)day; (void)hour; (void)minute; (void)second; return false;
 }
 
 int m5u_battery_level(void) {
-    return M5.Power.getBatteryLevel();
+    return -1;
 }
 
 int m5u_battery_voltage_mv(void) {
-    return M5.Power.getBatteryVoltage();
+    return -1;
 }
 
 bool m5u_power_is_charging(void) {
-    return M5.Power.isCharging();
+    return false;
 }
 
 void m5u_log_println(const char* text) {
-    M5_LOGI("%s", text);
+    (void)text;
 }
 
 bool m5u_sd_begin(void) {
@@ -210,129 +189,105 @@ bool m5u_sd_begin(void) {
 
 
 static bool m5u_button_state(int button, int query) {
-    m5::Button_Class* btn = nullptr;
-    switch (button) {
-    case 0: btn = &M5.BtnA; break;
-    case 1: btn = &M5.BtnB; break;
-    case 2: btn = &M5.BtnC; break;
-    case 3: btn = &M5.BtnPWR; break;
-    case 4: btn = &M5.BtnEXT; break;
-    default: return false;
-    }
-    switch (query) {
-    case 0: return btn->isPressed();
-    case 1: return btn->wasPressed();
-    case 2: return btn->wasReleased();
-    case 3: return btn->wasClicked();
-    case 4: return btn->wasHold();
-    case 5: return btn->isHolding();
-    case 6: return btn->wasDecideClickCount();
-    default: return false;
-    }
+    (void)button; (void)query; return false;
 }
 
 int m5u_display_get_rotation(void) {
-    return M5.Display.getRotation();
+    return 0;
 }
 
 void m5u_display_set_brightness(uint8_t brightness) {
-    M5.Display.setBrightness(brightness);
+    (void)brightness;
 }
 
 void m5u_display_set_epd_fastest(void) {
-    M5.Display.setEpdMode(m5gfx::epd_fastest);
 }
 
 void m5u_display_start_write(void) {
-    M5.Display.startWrite();
 }
 
 void m5u_display_end_write(void) {
-    M5.Display.endWrite();
 }
 
 void m5u_display_display(void) {
-    M5.Display.display();
 }
 
 bool m5u_display_display_busy(void) {
-    return M5.Display.displayBusy();
+    return false;
 }
 
 void m5u_display_wait_display(void) {
-    M5.Display.waitDisplay();
 }
 
 int m5u_display_get_cursor_y(void) {
-    return M5.Display.getCursorY();
+    return 0;
 }
 
 int m5u_display_font_height(void) {
-    return M5.Display.fontHeight();
+    return 16;
 }
 
 uint16_t m5u_display_get_base_color(void) {
-    return M5.Display.getBaseColor();
+    return 0;
 }
 
 void m5u_display_set_color(uint16_t color) {
-    M5.Display.setColor(color);
+    (void)color;
 }
 
 void m5u_display_set_text_wrap(bool wrap_x, bool wrap_y) {
-    M5.Display.setTextWrap(wrap_x, wrap_y);
+    (void)wrap_x; (void)wrap_y;
 }
 
 void m5u_display_set_text_datum(int datum) {
-    M5.Display.setTextDatum((textdatum_t)datum);
+    (void)datum;
 }
 
 int m5u_display_draw_string(const char* text, int x, int y) {
-    return M5.Display.drawString(text, x, y);
+    (void)text; (void)x; (void)y; return 0;
 }
 
 void m5u_display_write_pixel(int x, int y, uint16_t color) {
-    M5.Display.writePixel(x, y, color);
+    (void)x; (void)y; (void)color;
 }
 
 void m5u_display_write_fast_vline(int x, int y, int h, uint16_t color) {
-    M5.Display.writeFastVLine(x, y, h, color);
+    (void)x; (void)y; (void)h; (void)color;
 }
 
 void m5u_display_set_clip_rect(int x, int y, int w, int h) {
-    M5.Display.setClipRect(x, y, w, h);
+    (void)x; (void)y; (void)w; (void)h;
 }
 
 void m5u_display_clear_clip_rect(void) {
-    M5.Display.clearClipRect();
 }
 
 uint16_t m5u_display_color888(uint8_t r, uint8_t g, uint8_t b) {
-    return M5.Display.color888(r, g, b);
+    return (uint16_t)((r & 0xF8) << 8 | (g & 0xFC) << 3 | (b >> 3));
 }
 
 int m5u_display_count(void) {
-    return M5.getDisplayCount();
+    return 1;
 }
 
 int m5u_display_index_for_kind(int kind) {
-    return M5.getDisplayIndex((m5::board_t)kind);
+    (void)kind; return -1;
 }
 
 int m5u_display_width_at(int index) {
-    return M5.Displays(index).width();
+    (void)index; return 320;
 }
 
 int m5u_display_height_at(int index) {
-    return M5.Displays(index).height();
+    (void)index; return 240;
 }
 
 void m5u_display_print_at(int index, const char* text) {
-    M5.Displays(index).print(text);
+    (void)index; (void)text;
 }
 
 void m5u_display_fill_circle_at(int index, int x, int y, int r, uint16_t color) {
-    M5.Displays(index).fillCircle(x, y, r, color);
+    (void)index; (void)x; (void)y; (void)r; (void)color;
 }
 
 bool m5u_button_is_pressed(int button) { return m5u_button_state(button, 0); }
@@ -343,134 +298,109 @@ bool m5u_button_was_hold(int button) { return m5u_button_state(button, 4); }
 bool m5u_button_is_holding(int button) { return m5u_button_state(button, 5); }
 bool m5u_button_was_decide_click_count(int button) { return m5u_button_state(button, 6); }
 int m5u_button_get_click_count(int button) {
-    switch (button) {
-    case 0: return M5.BtnA.getClickCount();
-    case 1: return M5.BtnB.getClickCount();
-    case 2: return M5.BtnC.getClickCount();
-    case 3: return M5.BtnPWR.getClickCount();
-    case 4: return M5.BtnEXT.getClickCount();
-    default: return 0;
-    }
+    (void)button; return 0;
 }
 
 bool m5u_mic_is_enabled(void) {
-    return M5.Mic.isEnabled();
+    return false;
 }
 
 bool m5u_mic_is_recording(void) {
-    return M5.Mic.isRecording();
+    return false;
 }
 
 void m5u_mic_end(void) {
-    M5.Mic.end();
 }
 
 bool m5u_mic_record_i16_at(int16_t* buffer, size_t samples, uint32_t sample_rate_hz) {
-    return M5.Mic.record(buffer, samples, sample_rate_hz);
+    (void)buffer; (void)samples; (void)sample_rate_hz; return false;
 }
 
 int m5u_mic_get_noise_filter_level(void) {
-    return M5.Mic.config().noise_filter_level;
+    return 0;
 }
 
 bool m5u_mic_set_noise_filter_level(int level) {
-    auto cfg = M5.Mic.config();
-    cfg.noise_filter_level = level;
-    M5.Mic.config(cfg);
-    return true;
+    (void)level; return false;
 }
 
 bool m5u_speaker_is_enabled(void) {
-    return M5.Speaker.isEnabled();
+    return false;
 }
 
 void m5u_speaker_end(void) {
-    M5.Speaker.end();
 }
 
 uint8_t m5u_speaker_get_volume(void) {
-    return M5.Speaker.getVolume();
+    return 0;
 }
 
 bool m5u_speaker_tone_ex(float frequency_hz, uint32_t duration_ms, int channel) {
-    return M5.Speaker.tone(frequency_hz, duration_ms, channel);
+    (void)frequency_hz; (void)duration_ms; (void)channel; return false;
 }
 
 bool m5u_speaker_play_u8(const uint8_t* samples, size_t len, uint32_t sample_rate_hz) {
-    return M5.Speaker.playRaw(samples, len, sample_rate_hz, false, 1, 0);
+    (void)samples; (void)len; (void)sample_rate_hz; return false;
 }
 
 bool m5u_speaker_play_wav(const uint8_t* data, size_t len) {
-    return M5.Speaker.playWav(data, len);
+    (void)data; (void)len; return false;
 }
 
 bool m5u_speaker_is_playing(int channel) {
-    return channel < 0 ? M5.Speaker.isPlaying() : M5.Speaker.isPlaying(channel);
+    (void)channel; return false;
 }
 
 void m5u_speaker_stop(int channel) {
-    if (channel < 0) { M5.Speaker.stop(); } else { M5.Speaker.stop(channel); }
+    (void)channel;
 }
 
 uint8_t m5u_speaker_get_channel_volume(int channel) {
-    return M5.Speaker.getChannelVolume(channel);
+    (void)channel; return 0;
 }
 
 void m5u_speaker_set_channel_volume(int channel, uint8_t volume) {
-    M5.Speaker.setChannelVolume(channel, volume);
+    (void)channel; (void)volume;
 }
 
 void m5u_speaker_set_all_channel_volume(uint8_t volume) {
-    M5.Speaker.setAllChannelVolume(volume);
+    (void)volume;
 }
 
 bool m5u_imu_is_enabled(void) {
-    return M5.Imu.isEnabled();
+    return false;
 }
 
 int m5u_imu_get_type(void) {
-    return (int)M5.Imu.getType();
+    return 0;
 }
 
 bool m5u_imu_update(void) {
-    return M5.Imu.update();
+    return false;
 }
 
 bool m5u_imu_load_offset_from_nvs(void) {
-    return M5.Imu.loadOffsetFromNVS();
+    return false;
 }
 
 bool m5u_imu_save_offset_to_nvs(void) {
-    return M5.Imu.saveOffsetToNVS();
+    return false;
 }
 
 float m5u_imu_get_offset_data(int index) {
-    return M5.Imu.getOffsetData(index);
+    (void)index; return 0.0f;
 }
 
 void m5u_imu_set_calibration(float x, float y, float z) {
-    M5.Imu.setCalibration(x, y, z);
+    (void)x; (void)y; (void)z;
 }
 
 bool m5u_touch_get_detail(int index, m5u_touch_detail_t* out) {
-    if (!out) { return false; }
-    auto d = M5.Touch.getDetail(index);
-    out->x = d.x;
-    out->y = d.y;
-    out->prev_x = d.prev_x;
-    out->prev_y = d.prev_y;
-    out->is_pressed = d.isPressed();
-    out->was_pressed = d.wasPressed();
-    out->was_released = d.wasReleased();
-    out->was_clicked = d.wasClicked();
-    out->was_hold = d.wasHold();
-    out->is_holding = d.isHolding();
-    out->click_count = d.getClickCount();
-    return true;
+    (void)index; (void)out; return false;
 }
 
 bool m5u_rtc_is_enabled(void) {
-    return M5.Rtc.isEnabled();
+    return false;
 }
 
 bool m5u_power_axp2101_disable_irq(uint64_t mask) { (void)mask; return false; }
@@ -483,11 +413,11 @@ bool m5u_power_axp2101_is_vbus_insert_irq(void) { return false; }
 bool m5u_power_axp2101_is_vbus_remove_irq(void) { return false; }
 
 void m5u_log_print(const char* text) {
-    M5.Log.print(text);
+    (void)text;
 }
 
 void m5u_log_level(int level, const char* text) {
-    M5.Log((esp_log_level_t)level, "%s", text);
+    (void)level; (void)text;
 }
 
 } // extern "C"

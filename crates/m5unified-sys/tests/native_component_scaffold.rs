@@ -12,6 +12,9 @@ fn native_component_cmake_registers_the_shim_and_m5unified_dependencies() {
         .unwrap_or_else(|err| panic!("failed to read {}: {err}", cmake_path.display()));
 
     assert!(cmake.contains("m5u_shim.cpp"));
+    assert!(cmake.contains("m5u_shim_stub.cpp"));
+    assert!(cmake.contains("M5UNIFIED_RS_USE_HOST_STUB"));
+    assert!(!cmake.contains("M5UNIFIED_RS_USE_REAL_M5UNIFIED"));
     assert!(cmake.contains("M5Unified"));
     assert!(cmake.contains("M5GFX"));
     assert!(cmake.contains("idf_component_register"));
