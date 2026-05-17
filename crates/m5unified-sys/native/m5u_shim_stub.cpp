@@ -257,8 +257,64 @@ int m5u_battery_voltage_mv(void) {
     return -1;
 }
 
+int m5u_power_get_type(void) {
+    return 0;
+}
+
+int m5u_power_get_charge_state(void) {
+    return 2;
+}
+
 bool m5u_power_is_charging(void) {
     return false;
+}
+
+void m5u_power_set_led(uint8_t brightness) {
+    (void)brightness;
+}
+
+void m5u_power_set_ext_output(bool enable, uint16_t port_mask) {
+    (void)enable; (void)port_mask;
+}
+
+bool m5u_power_get_ext_output(void) {
+    return false;
+}
+
+void m5u_power_set_usb_output(bool enable) {
+    (void)enable;
+}
+
+bool m5u_power_get_usb_output(void) {
+    return false;
+}
+
+void m5u_power_set_battery_charge(bool enable) {
+    (void)enable;
+}
+
+void m5u_power_set_charge_current(uint16_t max_ma) {
+    (void)max_ma;
+}
+
+void m5u_power_set_charge_voltage(uint16_t max_mv) {
+    (void)max_mv;
+}
+
+int m5u_power_get_vbus_voltage_mv(void) {
+    return -1;
+}
+
+int m5u_power_get_battery_current_ma(void) {
+    return 0;
+}
+
+uint8_t m5u_power_get_key_state(void) {
+    return 0;
+}
+
+void m5u_power_set_vibration(uint8_t level) {
+    (void)level;
 }
 
 void m5u_log_println(const char* text) {

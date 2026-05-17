@@ -314,7 +314,21 @@ extern "C" {
 
     pub fn m5u_battery_level() -> c_int;
     pub fn m5u_battery_voltage_mv() -> c_int;
+    pub fn m5u_power_get_type() -> c_int;
+    pub fn m5u_power_get_charge_state() -> c_int;
     pub fn m5u_power_is_charging() -> bool;
+    pub fn m5u_power_set_led(brightness: u8);
+    pub fn m5u_power_set_ext_output(enable: bool, port_mask: u16);
+    pub fn m5u_power_get_ext_output() -> bool;
+    pub fn m5u_power_set_usb_output(enable: bool);
+    pub fn m5u_power_get_usb_output() -> bool;
+    pub fn m5u_power_set_battery_charge(enable: bool);
+    pub fn m5u_power_set_charge_current(max_ma: u16);
+    pub fn m5u_power_set_charge_voltage(max_mv: u16);
+    pub fn m5u_power_get_vbus_voltage_mv() -> c_int;
+    pub fn m5u_power_get_battery_current_ma() -> c_int;
+    pub fn m5u_power_get_key_state() -> u8;
+    pub fn m5u_power_set_vibration(level: u8);
 
     pub fn m5u_display_get_rotation() -> c_int;
     pub fn m5u_display_set_brightness(brightness: u8);
@@ -683,9 +697,37 @@ mod host_stubs {
     pub unsafe fn m5u_battery_voltage_mv() -> c_int {
         4200
     }
+    pub unsafe fn m5u_power_get_type() -> c_int {
+        0
+    }
+    pub unsafe fn m5u_power_get_charge_state() -> c_int {
+        2
+    }
     pub unsafe fn m5u_power_is_charging() -> bool {
         false
     }
+    pub unsafe fn m5u_power_set_led(_brightness: u8) {}
+    pub unsafe fn m5u_power_set_ext_output(_enable: bool, _port_mask: u16) {}
+    pub unsafe fn m5u_power_get_ext_output() -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_set_usb_output(_enable: bool) {}
+    pub unsafe fn m5u_power_get_usb_output() -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_set_battery_charge(_enable: bool) {}
+    pub unsafe fn m5u_power_set_charge_current(_max_ma: u16) {}
+    pub unsafe fn m5u_power_set_charge_voltage(_max_mv: u16) {}
+    pub unsafe fn m5u_power_get_vbus_voltage_mv() -> c_int {
+        -1
+    }
+    pub unsafe fn m5u_power_get_battery_current_ma() -> c_int {
+        0
+    }
+    pub unsafe fn m5u_power_get_key_state() -> u8 {
+        0
+    }
+    pub unsafe fn m5u_power_set_vibration(_level: u8) {}
 
     pub unsafe fn m5u_display_get_rotation() -> c_int {
         0

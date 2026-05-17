@@ -79,7 +79,7 @@ rust_bin = "basic_how_to_use"
 status = "host_compiles"
 category = "basic"
 requires = ["display", "buttons", "speaker", "rtc", "imu", "power", "touch", "led"]
-notes = "Core integration sample; LED and top-level board/pin/display/touch helpers are modeled."
+notes = "Core integration sample; LED, power, and top-level board/pin/display/touch helpers are modeled."
 
 [[example]]
 upstream = "Basic/Imu/Imu.ino"
@@ -142,8 +142,8 @@ upstream = "Test/build_test/build_test.ino"
 rust_bin = "test_build_test"
 status = "host_compiles"
 category = "test"
-requires = []
-notes = "Compile-only smoke example."
+requires = ["display", "power"]
+notes = "Compile-only smoke example that exercises common power getters and output/charge controls."
 
 
 [[example]]

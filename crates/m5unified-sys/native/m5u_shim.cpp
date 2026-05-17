@@ -384,8 +384,64 @@ int m5u_battery_voltage_mv(void) {
     return M5.Power.getBatteryVoltage();
 }
 
+int m5u_power_get_type(void) {
+    return (int)M5.Power.getType();
+}
+
+int m5u_power_get_charge_state(void) {
+    return (int)M5.Power.isCharging();
+}
+
 bool m5u_power_is_charging(void) {
-    return M5.Power.isCharging();
+    return M5.Power.isCharging() == m5::Power_Class::is_charging_t::is_charging;
+}
+
+void m5u_power_set_led(uint8_t brightness) {
+    M5.Power.setLed(brightness);
+}
+
+void m5u_power_set_ext_output(bool enable, uint16_t port_mask) {
+    M5.Power.setExtOutput(enable, (m5::ext_port_mask_t)port_mask);
+}
+
+bool m5u_power_get_ext_output(void) {
+    return M5.Power.getExtOutput();
+}
+
+void m5u_power_set_usb_output(bool enable) {
+    M5.Power.setUsbOutput(enable);
+}
+
+bool m5u_power_get_usb_output(void) {
+    return M5.Power.getUsbOutput();
+}
+
+void m5u_power_set_battery_charge(bool enable) {
+    M5.Power.setBatteryCharge(enable);
+}
+
+void m5u_power_set_charge_current(uint16_t max_ma) {
+    M5.Power.setChargeCurrent(max_ma);
+}
+
+void m5u_power_set_charge_voltage(uint16_t max_mv) {
+    M5.Power.setChargeVoltage(max_mv);
+}
+
+int m5u_power_get_vbus_voltage_mv(void) {
+    return M5.Power.getVBUSVoltage();
+}
+
+int m5u_power_get_battery_current_ma(void) {
+    return M5.Power.getBatteryCurrent();
+}
+
+uint8_t m5u_power_get_key_state(void) {
+    return M5.Power.getKeyState();
+}
+
+void m5u_power_set_vibration(uint8_t level) {
+    M5.Power.setVibration(level);
 }
 
 void m5u_log_println(const char* text) {

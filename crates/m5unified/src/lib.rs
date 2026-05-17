@@ -52,7 +52,7 @@ pub use error::Error;
 pub use imu::{Imu, ImuData, ImuKind, Vec3};
 pub use led::{Led, LedColor};
 pub use log::{Log, LogLevel, LogTarget, RawLogCallback};
-pub use power::{Axp2101, Axp2101IrqStatus, Power};
+pub use power::{Axp2101, Axp2101IrqStatus, ChargeState, ExtPortMask, Power, PowerType};
 pub use rtc::{DateTime, Rtc};
 pub use sd::{sd_begin, sd_begin_with_config, sd_end, sd_is_mounted, SdSpiConfig, SD_MOUNT_PATH};
 pub use system::{Board, PinName};
@@ -257,7 +257,23 @@ mod tests {
 
     #[test]
     fn axp2101_irq_helpers_compile_on_host() {
-        let m5 = M5Unified::begin().expect("host stub begin should succeed");
+        let mut m5 = M5Unified::begin().expect("host stub begin should succeed");
+        assert_eq!(m5.power.pmic_type(), PowerType::Unknown);
+        assert_eq!(m5.power.charge_state(), ChargeState::Unknown);
+        assert_eq!(m5.power.vbus_voltage_mv(), None);
+        assert_eq!(m5.power.battery_current_ma(), 0);
+        assert_eq!(m5.power.key_state(), 0);
+        m5.power.set_led(32);
+        m5.power
+            .set_ext_output(true, ExtPortMask::PA | ExtPortMask::PB1);
+        m5.power.set_ext_power(true);
+        assert!(!m5.power.ext_output());
+        m5.power.set_usb_output(true);
+        assert!(!m5.power.usb_output());
+        m5.power.set_battery_charge(true);
+        m5.power.set_charge_current_ma(500);
+        m5.power.set_charge_voltage_mv(4_200);
+        m5.power.set_vibration(0);
         let axp = m5.power.axp2101();
         let mask = Axp2101::IRQ_BAT_CHG_UNDER_TEMP | Axp2101::IRQ_VBUS_INSERT;
         assert!(!axp.disable_irq(Axp2101::IRQ_ALL));
