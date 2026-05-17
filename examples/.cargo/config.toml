@@ -1,7 +1,6 @@
-[build]
-target = "xtensa-esp32s3-espidf"
-
 [env]
+ESP_IDF_SYS_ROOT_CRATE = "m5unified-examples"
+ESP_IDF_SDKCONFIG_DEFAULTS = { value = "sdkconfig.defaults", relative = true }
 PYTHONPATH = { value = "tools/python", relative = true }
 DYLD_LIBRARY_PATH = "/opt/homebrew/opt/expat/lib"
 

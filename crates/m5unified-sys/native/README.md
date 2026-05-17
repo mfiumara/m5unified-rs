@@ -12,15 +12,16 @@ This directory contains the C ABI shim that lets Rust call the real C++ M5Unifie
 
 ## Intended integration
 
-For the first on-device spike, copy or symlink this directory into an `esp-idf-sys` firmware project as a component, for example:
+For on-device builds, expose this directory through an `esp-idf-sys` component,
+as the repository's `examples` package does for `hello_display`:
 
 ```text
-firmware/
+examples/
   Cargo.toml
   build.rs
   sdkconfig.defaults
   components/
-    m5unified-rs-shim/
+    m5unified-rs/
       CMakeLists.txt
       idf_component.yml
       m5u_shim.cpp
@@ -34,4 +35,5 @@ For host-side C ABI checks that need a C++ object without M5Unified, configure t
 
 ## Current limitation
 
-This is a component scaffold, not a fully automated Cargo-to-ESP-IDF linkage path yet. The next step is an actual firmware package that vendors/symlinks this component and proves `basic_displays` or a smaller display/button sample on M5StickS3 hardware.
+This is a component scaffold. The `examples` package owns the current
+Cargo-to-ESP-IDF linkage for hardware smoke samples.

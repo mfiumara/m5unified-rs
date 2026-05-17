@@ -470,8 +470,10 @@ bool m5u_sd_begin_spi(const m5u_sd_spi_config_t* config) {
     }
 
     sdmmc_host_t host = SDSPI_HOST_DEFAULT();
+    spi_host_device_t spi_host = static_cast<spi_host_device_t>(host.slot);
     if (config->host_id >= 0) {
-        host.slot = (spi_host_device_t)config->host_id;
+        spi_host = static_cast<spi_host_device_t>(config->host_id);
+        host.slot = static_cast<int>(spi_host);
     }
     if (config->frequency_khz > 0) {
         host.max_freq_khz = config->frequency_khz;
@@ -485,7 +487,7 @@ bool m5u_sd_begin_spi(const m5u_sd_spi_config_t* config) {
     bus_config.quadhd_io_num = GPIO_NUM_NC;
     bus_config.max_transfer_sz = 4000;
 
-    esp_err_t err = spi_bus_initialize(host.slot, &bus_config, SDSPI_DEFAULT_DMA);
+    esp_err_t err = spi_bus_initialize(spi_host, &bus_config, SDSPI_DEFAULT_DMA);
     bool owns_bus = false;
     if (err == ESP_OK) {
         owns_bus = true;
@@ -495,7 +497,7 @@ bool m5u_sd_begin_spi(const m5u_sd_spi_config_t* config) {
 
     sdspi_device_config_t slot_config = SDSPI_DEVICE_CONFIG_DEFAULT();
     slot_config.gpio_cs = (gpio_num_t)config->pin_cs;
-    slot_config.host_id = host.slot;
+    slot_config.host_id = spi_host;
 
     esp_vfs_fat_mount_config_t mount_config = VFS_FAT_MOUNT_DEFAULT_CONFIG();
     mount_config.format_if_mount_failed = config->format_if_mount_failed != 0;
@@ -507,12 +509,12 @@ bool m5u_sd_begin_spi(const m5u_sd_spi_config_t* config) {
     if (err != ESP_OK) {
         s_m5u_sd_card = nullptr;
         if (owns_bus) {
-            spi_bus_free(host.slot);
+            spi_bus_free(spi_host);
         }
         return false;
     }
 
-    s_m5u_sd_host = host.slot;
+    s_m5u_sd_host = spi_host;
     s_m5u_sd_owns_bus = owns_bus;
     return true;
 }

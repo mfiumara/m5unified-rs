@@ -147,6 +147,15 @@ notes = "Compile-only smoke example that exercises common power getters and outp
 
 
 [[example]]
+upstream = "extra/hello_display"
+rust_bin = "hello_display"
+status = "host_compiles"
+category = "extra"
+requires = ["display", "buttons"]
+extra = true
+notes = "Repository-local ESP32-S3 smoke example that also host-compiles through platform guards."
+
+[[example]]
 upstream = "extra/platformio_sdl"
 rust_bin = "platformio_sdl"
 status = "host_compiles"
