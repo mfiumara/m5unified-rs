@@ -71,7 +71,7 @@ The current wrapper covers the API used by the translated upstream examples:
 - speaker configuration, tone, PCM, WAV, channel, and volume controls
 - IMU acceleration, gyro, temperature, calibration, and NVS offsets
 - touch points and touch detail state
-- RTC date/time and system-time sync, power/battery, AXP2101 IRQ helpers, LED control, logging configuration, and SD begin
+- RTC date/time and system-time sync, power/battery, AXP2101 IRQ helpers, LED control, logging configuration/callbacks, and SD begin
 - board identity, pin lookup, primary/log display selection, and touch-button sizing
 
 This is not a complete M5Unified port yet. Missing APIs should be added through

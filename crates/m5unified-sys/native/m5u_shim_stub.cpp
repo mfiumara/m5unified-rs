@@ -567,6 +567,10 @@ void m5u_log_level(int level, const char* text) {
     (void)level; (void)text;
 }
 
+bool m5u_log_set_callback(m5u_log_callback_t callback, void* user_data) {
+    (void)callback; (void)user_data; return true;
+}
+
 bool m5u_log_set_enable_color(int target, bool enable) {
     (void)enable; return target >= 0 && target <= 2;
 }

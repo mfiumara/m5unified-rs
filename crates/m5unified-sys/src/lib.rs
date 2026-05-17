@@ -16,7 +16,9 @@
 //! host stubs are compile-time conveniences only and do not simulate M5Stack
 //! hardware behavior.
 
-use core::ffi::{c_char, c_float, c_int};
+use core::ffi::{c_char, c_float, c_int, c_void};
+
+pub type m5u_log_callback_t = Option<unsafe extern "C" fn(c_int, bool, *const c_char, *mut c_void)>;
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -351,6 +353,7 @@ extern "C" {
     pub fn m5u_log_print(text: *const c_char);
     pub fn m5u_log_println(text: *const c_char);
     pub fn m5u_log_level(level: c_int, text: *const c_char);
+    pub fn m5u_log_set_callback(callback: m5u_log_callback_t, user_data: *mut c_void) -> bool;
     pub fn m5u_log_set_enable_color(target: c_int, enable: bool) -> bool;
     pub fn m5u_log_get_enable_color(target: c_int) -> bool;
     pub fn m5u_log_set_level(target: c_int, level: c_int) -> bool;
@@ -816,6 +819,12 @@ mod host_stubs {
     pub unsafe fn m5u_log_print(_text: *const c_char) {}
     pub unsafe fn m5u_log_println(_text: *const c_char) {}
     pub unsafe fn m5u_log_level(_level: c_int, _text: *const c_char) {}
+    pub unsafe fn m5u_log_set_callback(
+        _callback: m5u_log_callback_t,
+        _user_data: *mut c_void,
+    ) -> bool {
+        true
+    }
     pub unsafe fn m5u_log_set_enable_color(target: c_int, _enable: bool) -> bool {
         (0..=2).contains(&target)
     }

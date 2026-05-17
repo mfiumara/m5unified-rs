@@ -241,6 +241,8 @@ bool m5u_led_is_enabled(void);
 void m5u_log_print(const char* text);
 void m5u_log_println(const char* text);
 void m5u_log_level(int level, const char* text);
+typedef void (*m5u_log_callback_t)(int level, bool use_color, const char* text, void* user_data);
+bool m5u_log_set_callback(m5u_log_callback_t callback, void* user_data);
 bool m5u_log_set_enable_color(int target, bool enable);
 bool m5u_log_get_enable_color(int target);
 bool m5u_log_set_level(int target, int level);

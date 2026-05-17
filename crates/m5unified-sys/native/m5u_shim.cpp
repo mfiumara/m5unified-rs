@@ -4,6 +4,8 @@
 #include <string>
 
 static std::string s_m5u_log_suffixes[3];
+static m5u_log_callback_t s_m5u_log_callback = nullptr;
+static void* s_m5u_log_callback_user_data = nullptr;
 
 extern "C" {
 
@@ -750,6 +752,21 @@ void m5u_log_print(const char* text) {
 
 void m5u_log_level(int level, const char* text) {
     M5.Log((esp_log_level_t)level, "%s", text);
+}
+
+bool m5u_log_set_callback(m5u_log_callback_t callback, void* user_data) {
+    s_m5u_log_callback = callback;
+    s_m5u_log_callback_user_data = user_data;
+    if (!callback) {
+        M5.Log.setCallback(nullptr);
+        return true;
+    }
+    M5.Log.setCallback([](esp_log_level_t level, bool use_color, const char* text) {
+        if (s_m5u_log_callback) {
+            s_m5u_log_callback((int)level, use_color, text, s_m5u_log_callback_user_data);
+        }
+    });
+    return true;
 }
 
 static bool m5u_log_valid_target(int target) {

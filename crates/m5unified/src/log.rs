@@ -1,4 +1,4 @@
-use core::ffi::c_int;
+use core::ffi::{c_char, c_int, c_void};
 use std::ffi::CString;
 
 use crate::Error;
@@ -23,6 +23,24 @@ impl Log {
         let text = CString::new(text).map_err(|_| Error::InvalidString)?;
         unsafe { m5unified_sys::m5u_log_level(level as c_int, text.as_ptr()) }
         Ok(())
+    }
+
+    /// # Safety
+    ///
+    /// The callback is invoked by M5Unified's logging machinery with a borrowed
+    /// C string that is only valid for the duration of the call. `user_data`
+    /// must remain valid for as long as the callback is registered, and the
+    /// callback must be safe to call from the task/thread that emits the log.
+    pub unsafe fn set_raw_callback(
+        &self,
+        callback: Option<RawLogCallback>,
+        user_data: *mut c_void,
+    ) -> bool {
+        unsafe { m5unified_sys::m5u_log_set_callback(callback, user_data) }
+    }
+
+    pub fn clear_callback(&self) -> bool {
+        unsafe { m5unified_sys::m5u_log_set_callback(None, core::ptr::null_mut()) }
     }
 
     pub fn set_enable_color(&self, target: LogTarget, enable: bool) -> bool {
@@ -77,3 +95,10 @@ pub enum LogTarget {
     Display = 1,
     Callback = 2,
 }
+
+pub type RawLogCallback = unsafe extern "C" fn(
+    level: c_int,
+    use_color: bool,
+    text: *const c_char,
+    user_data: *mut c_void,
+);

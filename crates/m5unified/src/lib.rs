@@ -50,7 +50,7 @@ pub use display::{
 pub use error::Error;
 pub use imu::{Imu, ImuData, ImuKind, Vec3};
 pub use led::{Led, LedColor};
-pub use log::{Log, LogLevel, LogTarget};
+pub use log::{Log, LogLevel, LogTarget, RawLogCallback};
 pub use power::{Axp2101, Axp2101IrqStatus, Power};
 pub use rtc::{DateTime, Rtc};
 pub use system::{Board, PinName};
@@ -221,5 +221,6 @@ mod tests {
         assert!(m5.log.set_log_level(LogTarget::Display, LogLevel::Debug));
         assert!(m5.log.log_level(LogTarget::Display).is_some());
         assert_eq!(m5.log.set_suffix(LogTarget::Callback, ""), Ok(true));
+        assert!(m5.log.clear_callback());
     }
 }
