@@ -5,7 +5,8 @@ This directory contains the C ABI shim that lets Rust call the real C++ M5Unifie
 ## Files
 
 - `m5u_shim.h` — flat C ABI declarations consumed by `m5unified-sys`.
-- `m5u_shim.cpp` — C++ implementation that forwards to `M5Unified` when compiled with `M5UNIFIED_RS_USE_REAL_M5UNIFIED`.
+- `m5u_shim.cpp` — firmware C++ implementation that forwards to the real `M5Unified` API.
+- `m5u_shim_stub.cpp` — optional no-op implementation for host-side C ABI checks that intentionally do not link `M5Unified`.
 - `CMakeLists.txt` — ESP-IDF component wrapper for the shim.
 - `idf_component.yml` — ESP-IDF component-manager dependencies for M5Unified/M5GFX.
 
@@ -23,16 +24,13 @@ firmware/
       CMakeLists.txt
       idf_component.yml
       m5u_shim.cpp
+      m5u_shim_stub.cpp
       m5u_shim.h
 ```
 
-Then build the firmware for ESP32-S3 with the Rust ESP-IDF toolchain and set:
+Then build the firmware for ESP32-S3 with the Rust ESP-IDF toolchain. Firmware builds use `m5u_shim.cpp` by default and fail loudly if `M5Unified` or `M5GFX` are not wired into the ESP-IDF component graph.
 
-```bash
-export M5UNIFIED_RS_USE_REAL_M5UNIFIED=1
-```
-
-The `m5unified-sys` build script emits a `m5unified_rs_real_m5unified` cfg when that environment variable is present on an ESP-IDF target. The C++ component itself defines `M5UNIFIED_RS_USE_REAL_M5UNIFIED=1` for `m5u_shim.cpp`, causing the shim to include `<M5Unified.h>` and call real hardware APIs.
+For host-side C ABI checks that need a C++ object without M5Unified, configure the component with `M5UNIFIED_RS_USE_HOST_STUB=ON` so CMake selects `m5u_shim_stub.cpp` instead. The normal Rust host tests use Rust-side stubs and do not compile either C++ file.
 
 ## Current limitation
 

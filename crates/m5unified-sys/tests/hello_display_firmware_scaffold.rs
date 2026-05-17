@@ -36,7 +36,7 @@ fn hello_display_firmware_scaffold_consumes_native_component() {
         .expect("read firmware component cmake");
     assert!(cmake.contains("crates/m5unified-sys/native"));
     assert!(cmake.contains("m5u_shim.cpp"));
-    assert!(cmake.contains("M5UNIFIED_RS_USE_REAL_M5UNIFIED=1"));
+    assert!(!cmake.contains("M5UNIFIED_RS_USE_REAL_M5UNIFIED"));
 
     let main_rs = fs::read_to_string(firmware.join("src/main.rs")).expect("read firmware main");
     assert!(main_rs.contains("M5Unified::begin"));
