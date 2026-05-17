@@ -1,4 +1,4 @@
-use m5unified::{colors, M5Unified};
+use m5unified::{colors, LedColor, M5Unified};
 use m5unified_examples::{banner, finite_loop, ExampleResult};
 
 fn main() -> ExampleResult {
@@ -6,10 +6,22 @@ fn main() -> ExampleResult {
     banner(&mut m5, "Basic/HowToUse")?;
     m5.display
         .println("Call M5Unified::begin(), update(), then use modules.")?;
+    if m5.led.is_enabled() {
+        m5.led.set_brightness(64);
+        m5.led.set_all_color(LedColor::BLUE);
+    }
     finite_loop(&mut m5, 3, |m5, i| {
         m5.display.set_cursor(0, 48 + (i as i32 * 16));
         m5.display.set_text_color(colors::GREEN, colors::BLACK);
         m5.display.println(&format!("tick {i}"))?;
+        if m5.led.is_enabled() {
+            let color = match i % 3 {
+                0 => LedColor::RED,
+                1 => LedColor::GREEN,
+                _ => LedColor::BLUE,
+            };
+            m5.led.set_all_color(color);
+        }
         Ok(())
     })
 }

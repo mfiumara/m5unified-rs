@@ -141,6 +141,15 @@ bool m5u_power_axp2101_is_bat_charger_over_temperature_irq(void);
 bool m5u_power_axp2101_is_vbus_insert_irq(void);
 bool m5u_power_axp2101_is_vbus_remove_irq(void);
 
+bool m5u_led_begin(void);
+void m5u_led_display(void);
+void m5u_led_set_auto_display(bool enable);
+size_t m5u_led_count(void);
+void m5u_led_set_brightness(uint8_t brightness);
+void m5u_led_set_color_rgb(size_t index, uint8_t r, uint8_t g, uint8_t b);
+void m5u_led_set_all_color_rgb(uint8_t r, uint8_t g, uint8_t b);
+bool m5u_led_is_enabled(void);
+
 void m5u_log_print(const char* text);
 void m5u_log_println(const char* text);
 void m5u_log_level(int level, const char* text);

@@ -176,6 +176,15 @@ extern "C" {
     pub fn m5u_power_axp2101_is_vbus_insert_irq() -> bool;
     pub fn m5u_power_axp2101_is_vbus_remove_irq() -> bool;
 
+    pub fn m5u_led_begin() -> bool;
+    pub fn m5u_led_display();
+    pub fn m5u_led_set_auto_display(enable: bool);
+    pub fn m5u_led_count() -> usize;
+    pub fn m5u_led_set_brightness(brightness: u8);
+    pub fn m5u_led_set_color_rgb(index: usize, r: u8, g: u8, b: u8);
+    pub fn m5u_led_set_all_color_rgb(r: u8, g: u8, b: u8);
+    pub fn m5u_led_is_enabled() -> bool;
+
     pub fn m5u_log_print(text: *const c_char);
     pub fn m5u_log_println(text: *const c_char);
     pub fn m5u_log_level(level: c_int, text: *const c_char);
@@ -551,6 +560,21 @@ mod host_stubs {
         false
     }
     pub unsafe fn m5u_power_axp2101_is_vbus_remove_irq() -> bool {
+        false
+    }
+
+    pub unsafe fn m5u_led_begin() -> bool {
+        false
+    }
+    pub unsafe fn m5u_led_display() {}
+    pub unsafe fn m5u_led_set_auto_display(_enable: bool) {}
+    pub unsafe fn m5u_led_count() -> usize {
+        0
+    }
+    pub unsafe fn m5u_led_set_brightness(_brightness: u8) {}
+    pub unsafe fn m5u_led_set_color_rgb(_index: usize, _r: u8, _g: u8, _b: u8) {}
+    pub unsafe fn m5u_led_set_all_color_rgb(_r: u8, _g: u8, _b: u8) {}
+    pub unsafe fn m5u_led_is_enabled() -> bool {
         false
     }
 

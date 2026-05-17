@@ -32,6 +32,7 @@ mod buttons;
 mod display;
 mod error;
 mod imu;
+mod led;
 mod log;
 mod power;
 mod rtc;
@@ -44,6 +45,7 @@ pub use display::{
 };
 pub use error::Error;
 pub use imu::{Imu, ImuData, ImuKind, Vec3};
+pub use led::{Led, LedColor};
 pub use log::{Log, LogLevel};
 pub use power::{Axp2101, Axp2101IrqStatus, Power};
 pub use rtc::{DateTime, Rtc};
@@ -60,6 +62,7 @@ pub struct M5Unified {
     pub touch: Touch,
     pub rtc: Rtc,
     pub power: Power,
+    pub led: Led,
     pub log: Log,
 }
 
@@ -80,6 +83,7 @@ impl M5Unified {
             touch: Touch,
             rtc: Rtc,
             power: Power,
+            led: Led,
             log: Log,
         })
     }
@@ -121,5 +125,13 @@ mod tests {
         let mut m5 = M5Unified::begin().expect("host stub begin should succeed");
         let mut buffer = [0_i16; 8];
         assert_eq!(m5.mic.rms(&mut buffer), Some(0.0));
+    }
+
+    #[test]
+    fn led_host_stub_reports_disabled() {
+        let mut m5 = M5Unified::begin().expect("host stub begin should succeed");
+        assert!(!m5.led.is_enabled());
+        assert_eq!(m5.led.count(), 0);
+        m5.led.set_all_color(LedColor::RED);
     }
 }

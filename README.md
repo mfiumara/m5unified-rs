@@ -20,7 +20,7 @@ For applications, depend on the safe wrapper:
 
 ```toml
 [dependencies]
-m5unified = "0.1"
+m5unified = "0.2"
 ```
 
 Use `m5unified-sys` directly only when writing lower-level bindings or firmware
@@ -70,7 +70,7 @@ The current wrapper covers the API used by the translated upstream examples:
 - speaker tone, PCM, WAV, channel, and volume controls
 - IMU acceleration, gyro, temperature, calibration, and NVS offsets
 - touch points and touch detail state
-- RTC date/time, power/battery, AXP2101 IRQ helpers, logging, and SD begin
+- RTC date/time, power/battery, AXP2101 IRQ helpers, LED control, logging, and SD begin
 
 This is not a complete M5Unified port yet. Missing APIs should be added through
 the C ABI shim first, then wrapped by `m5unified`.

@@ -412,6 +412,37 @@ bool m5u_power_axp2101_is_bat_charger_over_temperature_irq(void) { return false;
 bool m5u_power_axp2101_is_vbus_insert_irq(void) { return false; }
 bool m5u_power_axp2101_is_vbus_remove_irq(void) { return false; }
 
+bool m5u_led_begin(void) {
+    return false;
+}
+
+void m5u_led_display(void) {
+}
+
+void m5u_led_set_auto_display(bool enable) {
+    (void)enable;
+}
+
+size_t m5u_led_count(void) {
+    return 0;
+}
+
+void m5u_led_set_brightness(uint8_t brightness) {
+    (void)brightness;
+}
+
+void m5u_led_set_color_rgb(size_t index, uint8_t r, uint8_t g, uint8_t b) {
+    (void)index; (void)r; (void)g; (void)b;
+}
+
+void m5u_led_set_all_color_rgb(uint8_t r, uint8_t g, uint8_t b) {
+    (void)r; (void)g; (void)b;
+}
+
+bool m5u_led_is_enabled(void) {
+    return false;
+}
+
 void m5u_log_print(const char* text) {
     (void)text;
 }

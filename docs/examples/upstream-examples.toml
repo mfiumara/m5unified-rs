@@ -79,7 +79,7 @@ rust_bin = "basic_how_to_use"
 status = "host_compiles"
 category = "basic"
 requires = ["display", "buttons", "speaker", "rtc", "imu", "power", "touch", "led"]
-notes = "Core integration sample; LED is not currently modeled as a separate API."
+notes = "Core integration sample; LED wrapper covers the M5.Led calls used here."
 
 [[example]]
 upstream = "Basic/Imu/Imu.ino"
