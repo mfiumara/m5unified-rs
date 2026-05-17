@@ -10,6 +10,11 @@
 //! Rust can call from the higher-level `m5unified` crate. On non-ESP-IDF host
 //! targets these functions are stubbed so the safe wrapper and translated
 //! samples can be checked in CI without hardware.
+//!
+//! Firmware projects targeting ESP-IDF must provide the native shim component
+//! from this crate's `native/` directory in their ESP-IDF component graph. The
+//! host stubs are compile-time conveniences only and do not simulate M5Stack
+//! hardware behavior.
 
 use core::ffi::{c_char, c_float, c_int};
 

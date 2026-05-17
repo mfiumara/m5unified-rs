@@ -1,64 +1,112 @@
 # m5unified-rs
 
-Rust bindings for [M5Unified](https://github.com/m5stack/M5Unified).
+Rust bindings for [M5Unified](https://github.com/m5stack/M5Unified), the
+board support library used across M5Stack ESP32 devices.
 
-This repository is planned as a Cargo workspace containing two crates:
+The project publishes two crates:
 
-- `m5unified-sys` — raw/unsafe Rust bindings to a tiny C ABI shim over the C++ M5Unified API.
-- `m5unified` — safe ergonomic Rust wrapper around `m5unified-sys`.
+- [`m5unified`](https://docs.rs/m5unified) - safe Rust API for common
+  M5Unified display, button, microphone, speaker, IMU, touch, RTC, power, log,
+  and SD-card operations.
+- [`m5unified-sys`](https://docs.rs/m5unified-sys) - raw FFI declarations plus
+  the C/C++ ESP-IDF component shim used by the safe crate.
 
-## Initial goal
+The binding strategy is intentionally narrow: Rust calls a plain `extern "C"`
+shim instead of trying to bind the full M5Unified C++ class surface directly.
 
-The first milestone is intentionally small:
+## Install
 
-1. Build M5Unified/M5GFX as ESP-IDF components inside a Rust ESP-IDF project.
-2. Call `M5.begin()` from Rust through a C shim.
-3. Draw basic text or fill the screen from Rust.
-4. Read M5StickS3 buttons from Rust.
-5. Add microphone recording after display/button are proven.
+For applications, depend on the safe wrapper:
 
-This is not intended to bind the full C++ API directly. The Rust side should bind plain `extern "C"` functions exposed by a small C++ shim.
+```toml
+[dependencies]
+m5unified = "0.1"
+```
 
-## Repository layout
+Use `m5unified-sys` directly only when writing lower-level bindings or firmware
+integration code that needs the raw C ABI.
+
+## Quick Start
+
+```rust
+use m5unified::{colors, M5Unified};
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let mut m5 = M5Unified::begin()?;
+
+    m5.display.fill_screen(colors::BLACK);
+    m5.display.set_text_size(2);
+    m5.display.println("hello from Rust")?;
+
+    loop {
+        m5.update();
+        if m5.buttons.a().was_pressed() {
+            m5.display.println("Button A")?;
+        }
+        m5.delay_ms(16);
+    }
+}
+```
+
+## Target Support
+
+On ESP-IDF targets, `m5unified-sys` declares the C ABI that is implemented by
+the native shim in this repository. Firmware projects should include that shim
+as an ESP-IDF component so the Rust crate links against the real M5Unified and
+M5GFX libraries.
+
+On non-ESP-IDF host targets, `m5unified-sys` provides no-op Rust stubs. This
+keeps the safe wrapper and translated examples buildable in CI and on developer
+machines without M5Stack hardware. Host stubs are for compile-time checking, not
+hardware simulation.
+
+## API Surface
+
+The current wrapper covers the API used by the translated upstream examples:
+
+- display drawing, text, color, brightness, transactions, and multi-display access
+- button press, release, hold, click, and click-count state
+- microphone recording helpers and simple RMS calculation
+- speaker tone, PCM, WAV, channel, and volume controls
+- IMU acceleration, gyro, temperature, calibration, and NVS offsets
+- touch points and touch detail state
+- RTC date/time, power/battery, AXP2101 IRQ helpers, logging, and SD begin
+
+This is not a complete M5Unified port yet. Missing APIs should be added through
+the C ABI shim first, then wrapped by `m5unified`.
+
+## Repository Layout
 
 ```text
 crates/
-  m5unified-sys/   raw bindings + native C/C++ shim
+  m5unified-sys/   raw bindings and native C/C++ shim
   m5unified/       safe Rust wrapper
 examples/          host-checkable Rust ports of upstream M5Unified examples
-firmware/          ESP-IDF Rust firmware spikes for real hardware validation
+firmware/          ESP-IDF Rust firmware package for hardware validation
+docs/              example mapping, project plans, and release notes
 ```
-
-## Status
-
-The workspace now has a host-checkable Rust API surface for the upstream example categories:
-
-- display drawing/text
-- buttons
-- microphone/speaker
-- IMU
-- touch
-- RTC
-- power/battery
-- logging
-- SD-card boundary
-
-The C++ shim declares the matching C ABI. Host builds use no-op stubs so examples compile without hardware. ESP-IDF builds now have a native component scaffold in [`crates/m5unified-sys/native`](crates/m5unified-sys/native), plus a first firmware package in [`firmware/hello-display`](firmware/hello-display) that consumes that shim as an ESP-IDF component for M5StickS3-class hardware validation.
 
 ## Examples
 
-Rust translations/smoke ports of every upstream M5Unified example directory live in the `examples` workspace package. See [`examples/README.md`](examples/README.md) for the upstream-to-Rust mapping.
+Rust translations and smoke ports of upstream M5Unified examples live in the
+repository's `examples` workspace package. They are intentionally not published
+as a crate.
 
 ```bash
 bash scripts/check-host.sh
 cargo run -p m5unified-examples --bin basic_displays
 ```
 
-## Firmware spike
+See the repository docs for the upstream-to-Rust example mapping and firmware
+bring-up instructions.
 
-The first ESP-IDF Rust firmware package lives in [`firmware/hello-display`](firmware/hello-display). It is excluded from the host workspace because it requires the esp-rs `xtensa-esp32s3-espidf` toolchain.
+## Firmware Bring-Up
 
-If Cargo reports `custom toolchain 'esp' ... is not installed`, install the esp-rs toolchain first:
+The first ESP-IDF Rust firmware package lives at
+`firmware/hello-display` in the repository. It is excluded from the host
+workspace because it requires the esp-rs `xtensa-esp32s3-espidf` toolchain.
+
+Install the esp-rs tools before building firmware:
 
 ```bash
 cargo +stable install espup
@@ -67,42 +115,7 @@ espup install
 cargo +stable install espflash
 ```
 
-Use `+stable` for the install commands, or run them outside `firmware/hello-display`, because that directory's `rust-toolchain.toml` selects the not-yet-installed `esp` toolchain.
-
-On macOS, if the ESP-IDF build later reports missing native build tools, install:
-
-```bash
-brew install cmake ninja dfu-util ccache
-```
-
-If the ESP-IDF install fails while creating an environment named like `idf5.3_py3.14_env`, Homebrew's `python3` is too new for this ESP-IDF version. Use Python 3.12 for the build:
-
-```bash
-brew install python@3.12
-export PATH="$(brew --prefix python@3.12)/libexec/bin:$PATH"
-python3 --version  # should print Python 3.12.x
-rm -rf firmware/hello-display/.embuild/espressif/python_env
-```
-
-If Python 3.12 then fails in `ensurepip` with a `pyexpat`/`libexpat` symbol error, repair Homebrew's expat linkage or use pyenv:
-
-```bash
-brew reinstall expat python@3.12
-export PATH="$(brew --prefix python@3.12)/libexec/bin:$PATH"
-export DYLD_LIBRARY_PATH="$(brew --prefix expat)/lib:${DYLD_LIBRARY_PATH:-}"
-python3 -c 'import pyexpat; print(pyexpat.EXPAT_VERSION)'
-rm -rf firmware/hello-display/.embuild/espressif/python_env
-```
-
-Fallback:
-
-```bash
-brew install pyenv
-pyenv install 3.11.9
-export PATH="$(pyenv root)/versions/3.11.9/bin:$PATH"
-python3 -c 'import pyexpat; print(pyexpat.EXPAT_VERSION)'
-rm -rf firmware/hello-display/.embuild/espressif/python_env
-```
+Then build and flash the sample firmware:
 
 ```bash
 cd firmware/hello-display
@@ -110,11 +123,24 @@ cargo build --target xtensa-esp32s3-espidf
 espflash flash --monitor target/xtensa-esp32s3-espidf/debug/m5unified-hello-display
 ```
 
-Expected hardware behavior: the display shows `hello from rust`; Button A/B presses change the screen.
+Expected hardware behavior: the display shows `hello from rust`; Button A/B
+presses change the screen.
 
-## Plans and publishing
+## Release Checks
 
-- [`docs/plans/2026-05-15-m5unified-rs-roadmap.md`](docs/plans/2026-05-15-m5unified-rs-roadmap.md) contains the original implementation roadmap.
-- [`docs/plans/2026-05-16-complete-m5unified-examples.md`](docs/plans/2026-05-16-complete-m5unified-examples.md) tracks the full upstream-example parity plan.
-- [`docs/examples/upstream-examples.toml`](docs/examples/upstream-examples.toml) maps upstream examples to Rust bins.
-- [`docs/publishing.md`](docs/publishing.md) documents the crates.io release order for `m5unified-sys` and `m5unified`.
+```bash
+python3 tools/check_examples_manifest.py
+python3 tools/check_no_sys_in_examples.py
+bash scripts/check-host.sh
+cargo package -p m5unified-sys
+cargo publish -p m5unified-sys --dry-run
+```
+
+Publish `m5unified-sys` before `m5unified`, because the safe crate depends on
+the exact sys crate version through crates.io. Package and dry-run `m5unified`
+after the sys crate upload has propagated. See `docs/publishing.md` in the
+repository for the full release checklist.
+
+## License
+
+Licensed under either MIT or Apache-2.0, at your option.

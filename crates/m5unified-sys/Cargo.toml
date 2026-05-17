@@ -6,6 +6,7 @@ rust-version = "1.85"
 license.workspace = true
 repository.workspace = true
 readme = "../../README.md"
+documentation = "https://docs.rs/m5unified-sys"
 description = "Raw Rust bindings for M5Unified via a C ABI shim."
 keywords = ["m5stack", "m5unified", "esp32", "esp-idf", "ffi"]
 categories = ["embedded", "external-ffi-bindings", "hardware-support"]

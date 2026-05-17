@@ -6,6 +6,7 @@ rust-version = "1.85"
 license.workspace = true
 repository.workspace = true
 readme = "../../README.md"
+documentation = "https://docs.rs/m5unified"
 description = "Safe Rust wrapper for M5Unified."
 keywords = ["m5stack", "m5unified", "esp32", "esp-idf", "embedded"]
 categories = ["embedded", "hardware-support", "api-bindings"]

@@ -4,6 +4,28 @@
 //! keeping Rust call sites safe and host-checkable. Hardware calls are provided
 //! by `m5unified-sys`; on non-ESP-IDF targets that crate supplies no-op stubs so
 //! examples compile in CI.
+//!
+//! # Example
+//!
+//! ```no_run
+//! use m5unified::{colors, M5Unified};
+//!
+//! fn main() -> Result<(), Box<dyn std::error::Error>> {
+//!     let mut m5 = M5Unified::begin()?;
+//!
+//!     m5.display.fill_screen(colors::BLACK);
+//!     m5.display.set_text_size(2);
+//!     m5.display.println("hello from Rust")?;
+//!
+//!     loop {
+//!         m5.update();
+//!         if m5.buttons.a().was_pressed() {
+//!             m5.display.println("Button A")?;
+//!         }
+//!         m5.delay_ms(16);
+//!     }
+//! }
+//! ```
 
 use core::ffi::c_int;
 use std::ffi::CString;
