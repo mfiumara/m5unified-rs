@@ -55,7 +55,7 @@ rust_bin = "basic_axp2101_irq"
 status = "host_compiles"
 category = "basic"
 requires = ["power", "axp2101", "display"]
-notes = "AXP2101 methods are represented; generic shim stubs unavailable on non-supported boards."
+notes = "AXP2101 IRQ methods call the real PMIC on supported boards; host and non-AXP2101 boards report unavailable."
 
 [[example]]
 upstream = "Basic/Button/Button.ino"

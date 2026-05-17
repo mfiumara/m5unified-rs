@@ -17,6 +17,12 @@ static sdmmc_card_t* s_m5u_sd_card = nullptr;
 static spi_host_device_t s_m5u_sd_host = SPI2_HOST;
 static bool s_m5u_sd_owns_bus = false;
 
+#if defined(CONFIG_IDF_TARGET_ESP32C3) || defined(CONFIG_IDF_TARGET_ESP32C6) || defined(CONFIG_IDF_TARGET_ESP32P4)
+#define M5U_HAS_AXP2101 0
+#else
+#define M5U_HAS_AXP2101 1
+#endif
+
 extern "C" {
 
 static auto m5u_apply_config(const m5u_config_t* src) {
@@ -793,14 +799,83 @@ bool m5u_rtc_is_enabled(void) {
     return M5.Rtc.isEnabled();
 }
 
-bool m5u_power_axp2101_disable_irq(uint64_t mask) { (void)mask; return false; }
-bool m5u_power_axp2101_enable_irq(uint64_t mask) { (void)mask; return false; }
-bool m5u_power_axp2101_clear_irq_statuses(void) { return false; }
-uint64_t m5u_power_axp2101_get_irq_statuses(void) { return 0; }
-bool m5u_power_axp2101_is_bat_charger_under_temperature_irq(void) { return false; }
-bool m5u_power_axp2101_is_bat_charger_over_temperature_irq(void) { return false; }
-bool m5u_power_axp2101_is_vbus_insert_irq(void) { return false; }
-bool m5u_power_axp2101_is_vbus_remove_irq(void) { return false; }
+static bool m5u_has_axp2101(void) {
+#if M5U_HAS_AXP2101
+    return M5.Power.getType() == m5::Power_Class::pmic_t::pmic_axp2101;
+#else
+    return false;
+#endif
+}
+
+bool m5u_power_axp2101_disable_irq(uint64_t mask) {
+#if M5U_HAS_AXP2101
+    return m5u_has_axp2101() && M5.Power.Axp2101.disableIRQ(mask);
+#else
+    (void)mask;
+    return false;
+#endif
+}
+
+bool m5u_power_axp2101_enable_irq(uint64_t mask) {
+#if M5U_HAS_AXP2101
+    return m5u_has_axp2101() && M5.Power.Axp2101.enableIRQ(mask);
+#else
+    (void)mask;
+    return false;
+#endif
+}
+
+bool m5u_power_axp2101_clear_irq_statuses(void) {
+#if M5U_HAS_AXP2101
+    if (!m5u_has_axp2101()) {
+        return false;
+    }
+    M5.Power.Axp2101.clearIRQStatuses();
+    return true;
+#else
+    return false;
+#endif
+}
+
+uint64_t m5u_power_axp2101_get_irq_statuses(void) {
+#if M5U_HAS_AXP2101
+    return m5u_has_axp2101() ? M5.Power.Axp2101.getIRQStatuses() : 0;
+#else
+    return 0;
+#endif
+}
+
+bool m5u_power_axp2101_is_bat_charger_under_temperature_irq(void) {
+#if M5U_HAS_AXP2101
+    return m5u_has_axp2101() && M5.Power.Axp2101.isBatChargerUnderTemperatureIrq();
+#else
+    return false;
+#endif
+}
+
+bool m5u_power_axp2101_is_bat_charger_over_temperature_irq(void) {
+#if M5U_HAS_AXP2101
+    return m5u_has_axp2101() && M5.Power.Axp2101.isBatChargerOverTemperatureIrq();
+#else
+    return false;
+#endif
+}
+
+bool m5u_power_axp2101_is_vbus_insert_irq(void) {
+#if M5U_HAS_AXP2101
+    return m5u_has_axp2101() && M5.Power.Axp2101.isVbusInsertIrq();
+#else
+    return false;
+#endif
+}
+
+bool m5u_power_axp2101_is_vbus_remove_irq(void) {
+#if M5U_HAS_AXP2101
+    return m5u_has_axp2101() && M5.Power.Axp2101.isVbusRemoveIrq();
+#else
+    return false;
+#endif
+}
 
 bool m5u_led_begin(void) {
     return M5.Led.begin();

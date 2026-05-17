@@ -237,4 +237,18 @@ mod tests {
         assert!(!sd_is_mounted());
         sd_end();
     }
+
+    #[test]
+    fn axp2101_irq_helpers_compile_on_host() {
+        let m5 = M5Unified::begin().expect("host stub begin should succeed");
+        let axp = m5.power.axp2101();
+        let mask = Axp2101::IRQ_BAT_CHG_UNDER_TEMP | Axp2101::IRQ_VBUS_INSERT;
+        assert!(!axp.disable_irq(Axp2101::IRQ_ALL));
+        assert!(!axp.enable_irq(mask));
+        assert!(!axp.clear_irq_statuses());
+        let status = axp.irq_statuses();
+        assert_eq!(status.raw, 0);
+        assert!(!status.battery_charger_under_temperature());
+        assert!(!status.vbus_insert());
+    }
 }

@@ -30,6 +30,10 @@ pub struct Axp2101;
 
 impl Axp2101 {
     pub const IRQ_ALL: u64 = u64::MAX;
+    pub const IRQ_BAT_CHG_UNDER_TEMP: u64 = 1 << 2;
+    pub const IRQ_BAT_CHG_OVER_TEMP: u64 = 1 << 3;
+    pub const IRQ_VBUS_REMOVE: u64 = 1 << 14;
+    pub const IRQ_VBUS_INSERT: u64 = 1 << 15;
 
     pub fn disable_irq(&self, mask: u64) -> bool {
         unsafe { m5unified_sys::m5u_power_axp2101_disable_irq(mask) }
