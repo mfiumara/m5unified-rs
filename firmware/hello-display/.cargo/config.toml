@@ -1,9 +1,13 @@
 [build]
 target = "xtensa-esp32s3-espidf"
 
+[env]
+PYTHONPATH = { value = "tools/python", relative = true }
+DYLD_LIBRARY_PATH = "/opt/homebrew/opt/expat/lib"
+
 [target.xtensa-esp32s3-espidf]
 linker = "ldproxy"
-runner = "espflash flash --monitor"
+runner = "espflash flash"
 
 [unstable]
 build-std = ["std", "panic_abort"]

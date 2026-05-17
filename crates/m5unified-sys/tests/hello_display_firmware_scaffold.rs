@@ -25,7 +25,7 @@ fn hello_display_firmware_scaffold_consumes_native_component() {
 
     let cargo = fs::read_to_string(firmware.join("Cargo.toml")).expect("read firmware manifest");
     assert!(cargo.contains("m5unified"));
-    assert!(cargo.contains("esp-idf-svc"));
+    assert!(cargo.contains("esp-idf-sys"));
 
     let config =
         fs::read_to_string(firmware.join(".cargo/config.toml")).expect("read cargo config");
