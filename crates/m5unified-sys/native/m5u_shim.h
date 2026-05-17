@@ -220,10 +220,29 @@ int m5u_touch_count(void);
 bool m5u_touch_get(int index, int* x, int* y);
 bool m5u_touch_get_detail(int index, m5u_touch_detail_t* out);
 
+typedef struct {
+    int year;
+    int month;
+    int day;
+    int weekday;
+    int hour;
+    int minute;
+    int second;
+} m5u_rtc_datetime_t;
+
 bool m5u_rtc_is_enabled(void);
+bool m5u_rtc_get_volt_low(void);
 bool m5u_rtc_get_datetime(int* year, int* month, int* day, int* hour, int* minute, int* second);
+bool m5u_rtc_get_datetime_detail(m5u_rtc_datetime_t* out);
 bool m5u_rtc_set_datetime(int year, int month, int day, int hour, int minute, int second);
+bool m5u_rtc_set_datetime_detail(const m5u_rtc_datetime_t* datetime);
 void m5u_rtc_set_system_time_from_rtc(void);
+uint32_t m5u_rtc_set_timer_irq(uint32_t timer_msec);
+int m5u_rtc_set_alarm_irq_after_seconds(int after_seconds);
+int m5u_rtc_set_alarm_irq_datetime(const m5u_rtc_datetime_t* datetime);
+bool m5u_rtc_get_irq_status(void);
+void m5u_rtc_clear_irq(void);
+void m5u_rtc_disable_irq(void);
 
 int m5u_battery_level(void);
 int m5u_battery_voltage_mv(void);

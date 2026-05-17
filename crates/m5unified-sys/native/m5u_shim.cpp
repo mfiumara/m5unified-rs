@@ -285,6 +285,40 @@ bool m5u_rtc_get_datetime(int* year, int* month, int* day, int* hour, int* minut
     return true;
 }
 
+static void m5u_rtc_to_raw(const m5::rtc_datetime_t& src, m5u_rtc_datetime_t* out) {
+    out->year = src.date.year;
+    out->month = src.date.month;
+    out->day = src.date.date;
+    out->weekday = src.date.weekDay;
+    out->hour = src.time.hours;
+    out->minute = src.time.minutes;
+    out->second = src.time.seconds;
+}
+
+static m5::rtc_datetime_t m5u_rtc_from_raw(const m5u_rtc_datetime_t* src) {
+    m5::rtc_datetime_t dt = {};
+    dt.date.year = src->year;
+    dt.date.month = src->month;
+    dt.date.date = src->day;
+    dt.date.weekDay = src->weekday;
+    dt.time.hours = src->hour;
+    dt.time.minutes = src->minute;
+    dt.time.seconds = src->second;
+    return dt;
+}
+
+bool m5u_rtc_get_datetime_detail(m5u_rtc_datetime_t* out) {
+    if (!out) {
+        return false;
+    }
+    m5::rtc_datetime_t dt;
+    if (!M5.Rtc.getDateTime(&dt)) {
+        return false;
+    }
+    m5u_rtc_to_raw(dt, out);
+    return true;
+}
+
 bool m5u_rtc_set_datetime(int year, int month, int day, int hour, int minute, int second) {
     m5::rtc_datetime_t dt;
     dt.date.year = year;
@@ -297,8 +331,49 @@ bool m5u_rtc_set_datetime(int year, int month, int day, int hour, int minute, in
     return true;
 }
 
+bool m5u_rtc_set_datetime_detail(const m5u_rtc_datetime_t* datetime) {
+    if (!datetime) {
+        return false;
+    }
+    auto dt = m5u_rtc_from_raw(datetime);
+    M5.Rtc.setDateTime(&dt);
+    return true;
+}
+
 void m5u_rtc_set_system_time_from_rtc(void) {
     M5.Rtc.setSystemTimeFromRtc();
+}
+
+bool m5u_rtc_get_volt_low(void) {
+    return M5.Rtc.getVoltLow();
+}
+
+uint32_t m5u_rtc_set_timer_irq(uint32_t timer_msec) {
+    return M5.Rtc.setTimerIRQ(timer_msec);
+}
+
+int m5u_rtc_set_alarm_irq_after_seconds(int after_seconds) {
+    return M5.Rtc.setAlarmIRQ(after_seconds);
+}
+
+int m5u_rtc_set_alarm_irq_datetime(const m5u_rtc_datetime_t* datetime) {
+    if (!datetime) {
+        return -1;
+    }
+    auto dt = m5u_rtc_from_raw(datetime);
+    return M5.Rtc.setAlarmIRQ(&dt.date, &dt.time);
+}
+
+bool m5u_rtc_get_irq_status(void) {
+    return M5.Rtc.getIRQstatus();
+}
+
+void m5u_rtc_clear_irq(void) {
+    M5.Rtc.clearIRQ();
+}
+
+void m5u_rtc_disable_irq(void) {
+    M5.Rtc.disableIRQ();
 }
 
 int m5u_battery_level(void) {

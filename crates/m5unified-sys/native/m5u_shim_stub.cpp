@@ -208,11 +208,45 @@ bool m5u_rtc_get_datetime(int* year, int* month, int* day, int* hour, int* minut
     (void)year; (void)month; (void)day; (void)hour; (void)minute; (void)second; return false;
 }
 
+bool m5u_rtc_get_datetime_detail(m5u_rtc_datetime_t* out) {
+    (void)out; return false;
+}
+
 bool m5u_rtc_set_datetime(int year, int month, int day, int hour, int minute, int second) {
     (void)year; (void)month; (void)day; (void)hour; (void)minute; (void)second; return false;
 }
 
+bool m5u_rtc_set_datetime_detail(const m5u_rtc_datetime_t* datetime) {
+    (void)datetime; return false;
+}
+
 void m5u_rtc_set_system_time_from_rtc(void) {
+}
+
+bool m5u_rtc_get_volt_low(void) {
+    return false;
+}
+
+uint32_t m5u_rtc_set_timer_irq(uint32_t timer_msec) {
+    (void)timer_msec; return 0;
+}
+
+int m5u_rtc_set_alarm_irq_after_seconds(int after_seconds) {
+    (void)after_seconds; return -1;
+}
+
+int m5u_rtc_set_alarm_irq_datetime(const m5u_rtc_datetime_t* datetime) {
+    (void)datetime; return -1;
+}
+
+bool m5u_rtc_get_irq_status(void) {
+    return false;
+}
+
+void m5u_rtc_clear_irq(void) {
+}
+
+void m5u_rtc_disable_irq(void) {
 }
 
 int m5u_battery_level(void) {

@@ -111,7 +111,7 @@ rust_bin = "basic_rtc"
 status = "host_compiles"
 category = "basic"
 requires = ["rtc", "log", "display"]
-notes = "NTP/WiFi behavior belongs in example-level ESP-IDF networking code."
+notes = "NTP/WiFi behavior belongs in example-level ESP-IDF networking code; RTC status and IRQ helpers are bridged."
 
 [[example]]
 upstream = "Basic/Speaker/Speaker.ino"

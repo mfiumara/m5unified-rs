@@ -193,6 +193,32 @@ pub struct m5u_touch_detail_t {
 }
 
 #[repr(C)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct m5u_rtc_datetime_t {
+    pub year: c_int,
+    pub month: c_int,
+    pub day: c_int,
+    pub weekday: c_int,
+    pub hour: c_int,
+    pub minute: c_int,
+    pub second: c_int,
+}
+
+impl Default for m5u_rtc_datetime_t {
+    fn default() -> Self {
+        Self {
+            year: 2026,
+            month: 1,
+            day: 1,
+            weekday: 4,
+            hour: 0,
+            minute: 0,
+            second: 0,
+        }
+    }
+}
+
+#[repr(C)]
 #[derive(Debug, Copy, Clone, Default, PartialEq)]
 pub struct m5u_imu_data_t {
     pub usec: u32,
@@ -265,6 +291,8 @@ extern "C" {
     pub fn m5u_touch_count() -> c_int;
     pub fn m5u_touch_get(index: c_int, x: *mut c_int, y: *mut c_int) -> bool;
 
+    pub fn m5u_rtc_is_enabled() -> bool;
+    pub fn m5u_rtc_get_volt_low() -> bool;
     pub fn m5u_rtc_get_datetime(
         year: *mut c_int,
         month: *mut c_int,
@@ -273,6 +301,7 @@ extern "C" {
         minute: *mut c_int,
         second: *mut c_int,
     ) -> bool;
+    pub fn m5u_rtc_get_datetime_detail(out: *mut m5u_rtc_datetime_t) -> bool;
     pub fn m5u_rtc_set_datetime(
         year: c_int,
         month: c_int,
@@ -281,6 +310,7 @@ extern "C" {
         minute: c_int,
         second: c_int,
     ) -> bool;
+    pub fn m5u_rtc_set_datetime_detail(datetime: *const m5u_rtc_datetime_t) -> bool;
 
     pub fn m5u_battery_level() -> c_int;
     pub fn m5u_battery_voltage_mv() -> c_int;
@@ -377,8 +407,13 @@ extern "C" {
     pub fn m5u_imu_set_calibration(x: c_float, y: c_float, z: c_float);
 
     pub fn m5u_touch_get_detail(index: c_int, out: *mut m5u_touch_detail_t) -> bool;
-    pub fn m5u_rtc_is_enabled() -> bool;
     pub fn m5u_rtc_set_system_time_from_rtc();
+    pub fn m5u_rtc_set_timer_irq(timer_msec: u32) -> u32;
+    pub fn m5u_rtc_set_alarm_irq_after_seconds(after_seconds: c_int) -> c_int;
+    pub fn m5u_rtc_set_alarm_irq_datetime(datetime: *const m5u_rtc_datetime_t) -> c_int;
+    pub fn m5u_rtc_get_irq_status() -> bool;
+    pub fn m5u_rtc_clear_irq();
+    pub fn m5u_rtc_disable_irq();
 
     pub fn m5u_power_axp2101_disable_irq(mask: u64) -> bool;
     pub fn m5u_power_axp2101_enable_irq(mask: u64) -> bool;
@@ -588,6 +623,12 @@ mod host_stubs {
         false
     }
 
+    pub unsafe fn m5u_rtc_is_enabled() -> bool {
+        true
+    }
+    pub unsafe fn m5u_rtc_get_volt_low() -> bool {
+        false
+    }
     pub unsafe fn m5u_rtc_get_datetime(
         year: *mut c_int,
         month: *mut c_int,
@@ -616,6 +657,12 @@ mod host_stubs {
         }
         true
     }
+    pub unsafe fn m5u_rtc_get_datetime_detail(out: *mut m5u_rtc_datetime_t) -> bool {
+        if !out.is_null() {
+            *out = m5u_rtc_datetime_t::default();
+        }
+        true
+    }
     pub unsafe fn m5u_rtc_set_datetime(
         _year: c_int,
         _month: c_int,
@@ -625,6 +672,9 @@ mod host_stubs {
         _second: c_int,
     ) -> bool {
         true
+    }
+    pub unsafe fn m5u_rtc_set_datetime_detail(datetime: *const m5u_rtc_datetime_t) -> bool {
+        !datetime.is_null()
     }
 
     pub unsafe fn m5u_battery_level() -> c_int {
@@ -845,10 +895,25 @@ mod host_stubs {
         }
         false
     }
-    pub unsafe fn m5u_rtc_is_enabled() -> bool {
-        true
-    }
     pub unsafe fn m5u_rtc_set_system_time_from_rtc() {}
+    pub unsafe fn m5u_rtc_set_timer_irq(timer_msec: u32) -> u32 {
+        timer_msec
+    }
+    pub unsafe fn m5u_rtc_set_alarm_irq_after_seconds(after_seconds: c_int) -> c_int {
+        after_seconds
+    }
+    pub unsafe fn m5u_rtc_set_alarm_irq_datetime(datetime: *const m5u_rtc_datetime_t) -> c_int {
+        if datetime.is_null() {
+            -1
+        } else {
+            0
+        }
+    }
+    pub unsafe fn m5u_rtc_get_irq_status() -> bool {
+        false
+    }
+    pub unsafe fn m5u_rtc_clear_irq() {}
+    pub unsafe fn m5u_rtc_disable_irq() {}
 
     pub unsafe fn m5u_power_axp2101_disable_irq(_mask: u64) -> bool {
         false

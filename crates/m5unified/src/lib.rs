@@ -209,6 +209,12 @@ mod tests {
         m5.display.set_text_scroll(true);
         m5.display.set_epd_mode(EpdMode::Fastest);
         m5.rtc.set_system_time_from_rtc();
+        assert!(!m5.rtc.volt_low());
+        assert_eq!(m5.rtc.set_timer_irq_ms(250), 250);
+        assert_eq!(m5.rtc.set_alarm_irq_after_seconds(2), 2);
+        assert!(!m5.rtc.irq_status());
+        m5.rtc.clear_irq();
+        m5.rtc.disable_irq();
 
         let mut display = m5.display(0).expect("host stub display should exist");
         display.set_text_size(1);
