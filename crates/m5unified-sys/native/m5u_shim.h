@@ -210,6 +210,13 @@ bool m5u_imu_begin(void);
 bool m5u_imu_is_enabled(void);
 int m5u_imu_get_type(void);
 bool m5u_imu_update(void);
+int m5u_imu_update_mask(void);
+bool m5u_imu_sleep(void);
+void m5u_imu_set_clock(uint32_t freq);
+bool m5u_imu_set_axis_order(int axis0, int axis1, int axis2);
+bool m5u_imu_set_axis_order_right_handed(int axis0, int axis1);
+bool m5u_imu_set_axis_order_left_handed(int axis0, int axis1);
+bool m5u_imu_set_int_pin_active_logic(bool level);
 bool m5u_imu_get_accel(float* x, float* y, float* z);
 bool m5u_imu_get_gyro(float* x, float* y, float* z);
 bool m5u_imu_get_mag(float* x, float* y, float* z);
@@ -219,6 +226,11 @@ bool m5u_imu_load_offset_from_nvs(void);
 bool m5u_imu_save_offset_to_nvs(void);
 float m5u_imu_get_offset_data(int index);
 void m5u_imu_set_calibration(float x, float y, float z);
+void m5u_imu_set_calibration_strength(uint8_t accel, uint8_t gyro, uint8_t mag);
+void m5u_imu_clear_offset_data(void);
+void m5u_imu_set_offset_data(size_t index, int32_t value);
+int32_t m5u_imu_get_offset_data_i32(size_t index);
+int16_t m5u_imu_get_raw_data(size_t index);
 
 typedef struct {
     int x;

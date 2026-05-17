@@ -69,7 +69,7 @@ The current wrapper covers the API used by the translated upstream examples:
 - button press, release, hold, click, click-count, timing, threshold, and state helpers
 - microphone recording, configuration helpers, and simple RMS calculation
 - speaker configuration, tone, PCM, WAV, channel, and volume controls
-- IMU acceleration, gyro, temperature, calibration, and NVS offsets
+- IMU acceleration, gyro, temperature, sensor masks, axis order, calibration, raw data, and NVS offsets
 - touch points, touch detail state, flick/drag state helpers, and touch thresholds
 - RTC date/time, low-voltage and IRQ helpers, system-time sync, power PMIC type, battery/VBUS readings, charging state, output/charge controls, AXP2101 IRQ helpers, LED control, logging configuration/callbacks, and SD SPI mount helpers
 - board identity, timing helpers, pin lookup, primary/log display selection, and touch-button sizing

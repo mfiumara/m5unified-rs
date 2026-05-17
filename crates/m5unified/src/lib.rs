@@ -49,7 +49,7 @@ pub use display::{
     TextDatum,
 };
 pub use error::Error;
-pub use imu::{Imu, ImuData, ImuKind, Vec3};
+pub use imu::{Imu, ImuAxis, ImuData, ImuKind, ImuSensorMask, Vec3};
 pub use led::{Led, LedColor};
 pub use log::{Log, LogLevel, LogTarget, RawLogCallback};
 pub use power::{Axp2101, Axp2101IrqStatus, ChargeState, ExtPortMask, Power, PowerType};
@@ -160,13 +160,39 @@ mod tests {
 
     #[test]
     fn imu_combined_data_uses_host_stub() {
-        let m5 = M5Unified::begin().expect("host stub begin should succeed");
+        let mut m5 = M5Unified::begin().expect("host stub begin should succeed");
+        assert_eq!(m5.imu.kind(), ImuKind::None);
+        assert!(m5.imu.update());
+        assert!(m5.imu.update_mask().is_empty());
         let data = m5.imu.data().expect("host stub imu data should exist");
         assert_eq!(data.usec, 0);
         assert_eq!(data.accel.z, 1.0);
         assert_eq!(data.gyro, Vec3::default());
         assert_eq!(data.mag, Vec3::default());
         assert_eq!(data.temperature_c, Some(25.0));
+        assert!(m5
+            .imu
+            .set_axis_order(ImuAxis::XPos, ImuAxis::YPos, ImuAxis::ZPos));
+        assert!(m5
+            .imu
+            .set_axis_order_right_handed(ImuAxis::XPos, ImuAxis::YPos));
+        assert!(m5
+            .imu
+            .set_axis_order_left_handed(ImuAxis::XPos, ImuAxis::YPos));
+        assert!(m5.imu.set_int_pin_active_logic(true));
+        m5.imu.set_clock_hz(400_000);
+        m5.imu.set_calibration_strength(1, 2, 3);
+        m5.imu.clear_offset_data();
+        m5.imu.set_offset_data(0, 123);
+        assert_eq!(m5.imu.offset_data_i32(0), 0);
+        assert_eq!(m5.imu.raw_data(0), 0);
+        assert!(m5.imu.sleep());
+
+        let mask = ImuSensorMask::from_raw(ImuSensorMask::ACCEL.raw() | ImuSensorMask::GYRO.raw());
+        assert!(mask.contains(ImuSensorMask::ACCEL));
+        assert!(mask.contains(ImuSensorMask::GYRO));
+        assert!(!mask.contains(ImuSensorMask::MAG));
+        assert_eq!(ImuKind::Bmi270.raw(), 6);
     }
 
     #[test]

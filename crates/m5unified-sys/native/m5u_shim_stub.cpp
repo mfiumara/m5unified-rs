@@ -686,6 +686,34 @@ bool m5u_imu_update(void) {
     return false;
 }
 
+int m5u_imu_update_mask(void) {
+    return 0;
+}
+
+bool m5u_imu_sleep(void) {
+    return true;
+}
+
+void m5u_imu_set_clock(uint32_t freq) {
+    (void)freq;
+}
+
+bool m5u_imu_set_axis_order(int axis0, int axis1, int axis2) {
+    (void)axis0; (void)axis1; (void)axis2; return true;
+}
+
+bool m5u_imu_set_axis_order_right_handed(int axis0, int axis1) {
+    (void)axis0; (void)axis1; return true;
+}
+
+bool m5u_imu_set_axis_order_left_handed(int axis0, int axis1) {
+    (void)axis0; (void)axis1; return true;
+}
+
+bool m5u_imu_set_int_pin_active_logic(bool level) {
+    (void)level; return true;
+}
+
 bool m5u_imu_load_offset_from_nvs(void) {
     return false;
 }
@@ -700,6 +728,25 @@ float m5u_imu_get_offset_data(int index) {
 
 void m5u_imu_set_calibration(float x, float y, float z) {
     (void)x; (void)y; (void)z;
+}
+
+void m5u_imu_set_calibration_strength(uint8_t accel, uint8_t gyro, uint8_t mag) {
+    (void)accel; (void)gyro; (void)mag;
+}
+
+void m5u_imu_clear_offset_data(void) {
+}
+
+void m5u_imu_set_offset_data(size_t index, int32_t value) {
+    (void)index; (void)value;
+}
+
+int32_t m5u_imu_get_offset_data_i32(size_t index) {
+    (void)index; return 0;
+}
+
+int16_t m5u_imu_get_raw_data(size_t index) {
+    (void)index; return 0;
 }
 
 bool m5u_touch_get_detail(int index, m5u_touch_detail_t* out) {

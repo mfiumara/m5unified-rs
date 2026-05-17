@@ -437,10 +437,22 @@ extern "C" {
     pub fn m5u_imu_is_enabled() -> bool;
     pub fn m5u_imu_get_type() -> c_int;
     pub fn m5u_imu_update() -> bool;
+    pub fn m5u_imu_update_mask() -> c_int;
+    pub fn m5u_imu_sleep() -> bool;
+    pub fn m5u_imu_set_clock(freq: u32);
+    pub fn m5u_imu_set_axis_order(axis0: c_int, axis1: c_int, axis2: c_int) -> bool;
+    pub fn m5u_imu_set_axis_order_right_handed(axis0: c_int, axis1: c_int) -> bool;
+    pub fn m5u_imu_set_axis_order_left_handed(axis0: c_int, axis1: c_int) -> bool;
+    pub fn m5u_imu_set_int_pin_active_logic(level: bool) -> bool;
     pub fn m5u_imu_load_offset_from_nvs() -> bool;
     pub fn m5u_imu_save_offset_to_nvs() -> bool;
     pub fn m5u_imu_get_offset_data(index: c_int) -> c_float;
     pub fn m5u_imu_set_calibration(x: c_float, y: c_float, z: c_float);
+    pub fn m5u_imu_set_calibration_strength(accel: u8, gyro: u8, mag: u8);
+    pub fn m5u_imu_clear_offset_data();
+    pub fn m5u_imu_set_offset_data(index: usize, value: i32);
+    pub fn m5u_imu_get_offset_data_i32(index: usize) -> i32;
+    pub fn m5u_imu_get_raw_data(index: usize) -> i16;
 
     pub fn m5u_touch_get_detail(index: c_int, out: *mut m5u_touch_detail_t) -> bool;
     pub fn m5u_touch_is_enabled() -> bool;
@@ -995,6 +1007,25 @@ mod host_stubs {
     pub unsafe fn m5u_imu_update() -> bool {
         true
     }
+    pub unsafe fn m5u_imu_update_mask() -> c_int {
+        0
+    }
+    pub unsafe fn m5u_imu_sleep() -> bool {
+        true
+    }
+    pub unsafe fn m5u_imu_set_clock(_freq: u32) {}
+    pub unsafe fn m5u_imu_set_axis_order(_axis0: c_int, _axis1: c_int, _axis2: c_int) -> bool {
+        true
+    }
+    pub unsafe fn m5u_imu_set_axis_order_right_handed(_axis0: c_int, _axis1: c_int) -> bool {
+        true
+    }
+    pub unsafe fn m5u_imu_set_axis_order_left_handed(_axis0: c_int, _axis1: c_int) -> bool {
+        true
+    }
+    pub unsafe fn m5u_imu_set_int_pin_active_logic(_level: bool) -> bool {
+        true
+    }
     pub unsafe fn m5u_imu_load_offset_from_nvs() -> bool {
         false
     }
@@ -1005,6 +1036,15 @@ mod host_stubs {
         0.0
     }
     pub unsafe fn m5u_imu_set_calibration(_x: c_float, _y: c_float, _z: c_float) {}
+    pub unsafe fn m5u_imu_set_calibration_strength(_accel: u8, _gyro: u8, _mag: u8) {}
+    pub unsafe fn m5u_imu_clear_offset_data() {}
+    pub unsafe fn m5u_imu_set_offset_data(_index: usize, _value: i32) {}
+    pub unsafe fn m5u_imu_get_offset_data_i32(_index: usize) -> i32 {
+        0
+    }
+    pub unsafe fn m5u_imu_get_raw_data(_index: usize) -> i16 {
+        0
+    }
 
     pub unsafe fn m5u_touch_get_detail(_index: c_int, out: *mut m5u_touch_detail_t) -> bool {
         if !out.is_null() {

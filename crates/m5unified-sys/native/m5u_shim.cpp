@@ -1006,6 +1006,41 @@ bool m5u_imu_update(void) {
     return M5.Imu.update();
 }
 
+int m5u_imu_update_mask(void) {
+    return (int)M5.Imu.update();
+}
+
+bool m5u_imu_sleep(void) {
+    return M5.Imu.sleep();
+}
+
+void m5u_imu_set_clock(uint32_t freq) {
+    M5.Imu.setClock(freq);
+}
+
+bool m5u_imu_set_axis_order(int axis0, int axis1, int axis2) {
+    return M5.Imu.setAxisOrder(
+        (m5::IMU_Class::axis_t)axis0,
+        (m5::IMU_Class::axis_t)axis1,
+        (m5::IMU_Class::axis_t)axis2);
+}
+
+bool m5u_imu_set_axis_order_right_handed(int axis0, int axis1) {
+    return M5.Imu.setAxisOrderRightHanded(
+        (m5::IMU_Class::axis_t)axis0,
+        (m5::IMU_Class::axis_t)axis1);
+}
+
+bool m5u_imu_set_axis_order_left_handed(int axis0, int axis1) {
+    return M5.Imu.setAxisOrderLeftHanded(
+        (m5::IMU_Class::axis_t)axis0,
+        (m5::IMU_Class::axis_t)axis1);
+}
+
+bool m5u_imu_set_int_pin_active_logic(bool level) {
+    return M5.Imu.setINTPinActiveLogic(level);
+}
+
 bool m5u_imu_load_offset_from_nvs(void) {
     return M5.Imu.loadOffsetFromNVS();
 }
@@ -1020,6 +1055,26 @@ float m5u_imu_get_offset_data(int index) {
 
 void m5u_imu_set_calibration(float x, float y, float z) {
     M5.Imu.setCalibration(x, y, z);
+}
+
+void m5u_imu_set_calibration_strength(uint8_t accel, uint8_t gyro, uint8_t mag) {
+    M5.Imu.setCalibration(accel, gyro, mag);
+}
+
+void m5u_imu_clear_offset_data(void) {
+    M5.Imu.clearOffsetData();
+}
+
+void m5u_imu_set_offset_data(size_t index, int32_t value) {
+    M5.Imu.setOffsetData(index, value);
+}
+
+int32_t m5u_imu_get_offset_data_i32(size_t index) {
+    return M5.Imu.getOffsetData(index);
+}
+
+int16_t m5u_imu_get_raw_data(size_t index) {
+    return M5.Imu.getRawData(index);
 }
 
 bool m5u_touch_get_detail(int index, m5u_touch_detail_t* out) {
