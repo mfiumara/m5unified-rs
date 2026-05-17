@@ -1,9 +1,11 @@
-use m5unified::M5Unified;
+use m5unified::{DisplayFont, EpdMode, M5Unified};
 use m5unified_examples::{banner, ExampleResult};
 
 fn main() -> ExampleResult {
     let mut m5 = M5Unified::begin()?;
     banner(&mut m5, "Basic/Speaker")?;
+    m5.display.set_font(DisplayFont::DejaVu18);
+    m5.display.set_epd_mode(EpdMode::Fastest);
     if m5.speaker.begin() {
         m5.speaker.set_volume(96);
         for note in [440, 494, 523, 587, 659] {

@@ -254,6 +254,10 @@ bool m5u_rtc_set_datetime(int year, int month, int day, int hour, int minute, in
     return true;
 }
 
+void m5u_rtc_set_system_time_from_rtc(void) {
+    M5.Rtc.setSystemTimeFromRtc();
+}
+
 int m5u_battery_level(void) {
     return M5.Power.getBatteryLevel();
 }
@@ -310,6 +314,42 @@ void m5u_display_set_brightness(uint8_t brightness) {
 
 void m5u_display_set_epd_fastest(void) {
     M5.Display.setEpdMode(m5gfx::epd_fastest);
+}
+
+void m5u_display_set_epd_mode(int mode) {
+    switch (mode) {
+    case m5gfx::epd_quality:
+    case m5gfx::epd_text:
+    case m5gfx::epd_fast:
+    case m5gfx::epd_fastest:
+        M5.Display.setEpdMode((m5gfx::epd_mode_t)mode);
+        break;
+    default:
+        break;
+    }
+}
+
+void m5u_display_set_text_scroll(bool scroll) {
+    M5.Display.setTextScroll(scroll);
+}
+
+bool m5u_display_set_font(int font) {
+    switch (font) {
+    case 0:
+        M5.Display.setFont(nullptr);
+        return true;
+    case 1:
+        M5.Display.setFont(&fonts::AsciiFont8x16);
+        return true;
+    case 2:
+        M5.Display.setFont(&fonts::lgfxJapanGothic_12);
+        return true;
+    case 3:
+        M5.Display.setFont(&fonts::DejaVu18);
+        return true;
+    default:
+        return false;
+    }
 }
 
 void m5u_display_start_write(void) {

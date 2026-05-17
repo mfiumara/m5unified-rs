@@ -57,6 +57,9 @@ void m5u_display_set_rotation(int rotation);
 int m5u_display_get_rotation(void);
 void m5u_display_set_brightness(uint8_t brightness);
 void m5u_display_set_epd_fastest(void);
+void m5u_display_set_epd_mode(int mode);
+void m5u_display_set_text_scroll(bool scroll);
+bool m5u_display_set_font(int font);
 void m5u_display_start_write(void);
 void m5u_display_end_write(void);
 void m5u_display_display(void);
@@ -156,6 +159,7 @@ bool m5u_touch_get_detail(int index, m5u_touch_detail_t* out);
 bool m5u_rtc_is_enabled(void);
 bool m5u_rtc_get_datetime(int* year, int* month, int* day, int* hour, int* minute, int* second);
 bool m5u_rtc_set_datetime(int year, int month, int day, int hour, int minute, int second);
+void m5u_rtc_set_system_time_from_rtc(void);
 
 int m5u_battery_level(void);
 int m5u_battery_voltage_mv(void);

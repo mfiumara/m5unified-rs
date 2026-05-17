@@ -12,6 +12,7 @@ fn main() -> ExampleResult {
         minute: 0,
         second: 0,
     });
+    m5.rtc.set_system_time_from_rtc();
     if let Some(dt) = m5.rtc.get_datetime() {
         m5.display.println(&format!(
             "{:04}-{:02}-{:02} {:02}:{:02}:{:02}",

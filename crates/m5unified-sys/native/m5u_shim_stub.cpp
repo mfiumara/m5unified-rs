@@ -204,6 +204,9 @@ bool m5u_rtc_set_datetime(int year, int month, int day, int hour, int minute, in
     (void)year; (void)month; (void)day; (void)hour; (void)minute; (void)second; return false;
 }
 
+void m5u_rtc_set_system_time_from_rtc(void) {
+}
+
 int m5u_battery_level(void) {
     return -1;
 }
@@ -241,6 +244,18 @@ void m5u_display_set_brightness(uint8_t brightness) {
 }
 
 void m5u_display_set_epd_fastest(void) {
+}
+
+void m5u_display_set_epd_mode(int mode) {
+    (void)mode;
+}
+
+void m5u_display_set_text_scroll(bool scroll) {
+    (void)scroll;
+}
+
+bool m5u_display_set_font(int font) {
+    return font >= 0 && font <= 3;
 }
 
 void m5u_display_start_write(void) {

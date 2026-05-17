@@ -103,7 +103,19 @@ impl Display {
     }
 
     pub fn set_epd_fastest(&mut self) {
-        unsafe { m5unified_sys::m5u_display_set_epd_fastest() }
+        self.set_epd_mode(EpdMode::Fastest);
+    }
+
+    pub fn set_epd_mode(&mut self, mode: EpdMode) {
+        unsafe { m5unified_sys::m5u_display_set_epd_mode(mode.raw() as c_int) }
+    }
+
+    pub fn set_text_scroll(&mut self, scroll: bool) {
+        unsafe { m5unified_sys::m5u_display_set_text_scroll(scroll) }
+    }
+
+    pub fn set_font(&mut self, font: DisplayFont) -> bool {
+        unsafe { m5unified_sys::m5u_display_set_font(font.raw() as c_int) }
     }
 
     pub fn start_write(&mut self) {
@@ -227,6 +239,44 @@ pub enum TextDatum {
     BottomLeft = 8,
     BottomCenter = 9,
     BottomRight = 10,
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum EpdMode {
+    Quality,
+    Text,
+    Fast,
+    Fastest,
+}
+
+impl EpdMode {
+    const fn raw(self) -> i32 {
+        match self {
+            Self::Quality => 1,
+            Self::Text => 2,
+            Self::Fast => 3,
+            Self::Fastest => 4,
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum DisplayFont {
+    Default,
+    Ascii8x16,
+    LgfxJapanGothic12,
+    DejaVu18,
+}
+
+impl DisplayFont {
+    const fn raw(self) -> i32 {
+        match self {
+            Self::Default => 0,
+            Self::Ascii8x16 => 1,
+            Self::LgfxJapanGothic12 => 2,
+            Self::DejaVu18 => 3,
+        }
+    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]

@@ -156,6 +156,9 @@ extern "C" {
     pub fn m5u_display_get_rotation() -> c_int;
     pub fn m5u_display_set_brightness(brightness: u8);
     pub fn m5u_display_set_epd_fastest();
+    pub fn m5u_display_set_epd_mode(mode: c_int);
+    pub fn m5u_display_set_text_scroll(scroll: bool);
+    pub fn m5u_display_set_font(font: c_int) -> bool;
     pub fn m5u_display_start_write();
     pub fn m5u_display_end_write();
     pub fn m5u_display_display();
@@ -218,6 +221,7 @@ extern "C" {
 
     pub fn m5u_touch_get_detail(index: c_int, out: *mut m5u_touch_detail_t) -> bool;
     pub fn m5u_rtc_is_enabled() -> bool;
+    pub fn m5u_rtc_set_system_time_from_rtc();
 
     pub fn m5u_power_axp2101_disable_irq(mask: u64) -> bool;
     pub fn m5u_power_axp2101_enable_irq(mask: u64) -> bool;
@@ -451,6 +455,11 @@ mod host_stubs {
     }
     pub unsafe fn m5u_display_set_brightness(_brightness: u8) {}
     pub unsafe fn m5u_display_set_epd_fastest() {}
+    pub unsafe fn m5u_display_set_epd_mode(_mode: c_int) {}
+    pub unsafe fn m5u_display_set_text_scroll(_scroll: bool) {}
+    pub unsafe fn m5u_display_set_font(font: c_int) -> bool {
+        (0..=3).contains(&font)
+    }
     pub unsafe fn m5u_display_start_write() {}
     pub unsafe fn m5u_display_end_write() {}
     pub unsafe fn m5u_display_display() {}
@@ -611,6 +620,7 @@ mod host_stubs {
     pub unsafe fn m5u_rtc_is_enabled() -> bool {
         true
     }
+    pub unsafe fn m5u_rtc_set_system_time_from_rtc() {}
 
     pub unsafe fn m5u_power_axp2101_disable_irq(_mask: u64) -> bool {
         false

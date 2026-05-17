@@ -1,4 +1,4 @@
-use m5unified::{colors, DisplayKind, LedColor, M5Unified, M5UnifiedConfig, PinName};
+use m5unified::{colors, DisplayKind, EpdMode, LedColor, M5Unified, M5UnifiedConfig, PinName};
 use m5unified_examples::{banner, finite_loop, ExampleResult};
 
 fn main() -> ExampleResult {
@@ -15,6 +15,7 @@ fn main() -> ExampleResult {
     m5.set_touch_button_height(32);
     m5.set_log_display_index(0);
     let _ = m5.set_primary_display_type(DisplayKind::ModuleDisplay);
+    m5.display.set_epd_mode(EpdMode::Fastest);
     let _board = m5.board();
     let _port_a_sda = m5.get_pin(PinName::PORT_A_SDA);
     if m5.led.is_enabled() {

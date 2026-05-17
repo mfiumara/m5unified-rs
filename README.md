@@ -65,13 +65,13 @@ hardware simulation.
 The current wrapper covers the API used by the translated upstream examples:
 
 - startup configuration through `M5UnifiedConfig` and `M5Unified::begin_with_config`
-- display drawing, text, color, brightness, transactions, and multi-display access
+- display drawing, text, color, fonts, EPD modes, scrolling, transactions, and multi-display access
 - button press, release, hold, click, and click-count state
 - microphone recording helpers and simple RMS calculation
 - speaker tone, PCM, WAV, channel, and volume controls
 - IMU acceleration, gyro, temperature, calibration, and NVS offsets
 - touch points and touch detail state
-- RTC date/time, power/battery, AXP2101 IRQ helpers, LED control, logging, and SD begin
+- RTC date/time and system-time sync, power/battery, AXP2101 IRQ helpers, LED control, logging, and SD begin
 - board identity, pin lookup, primary/log display selection, and touch-button sizing
 
 This is not a complete M5Unified port yet. Missing APIs should be added through

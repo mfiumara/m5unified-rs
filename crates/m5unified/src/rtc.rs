@@ -50,4 +50,8 @@ impl Rtc {
     pub fn is_enabled(&self) -> bool {
         unsafe { m5unified_sys::m5u_rtc_is_enabled() }
     }
+
+    pub fn set_system_time_from_rtc(&mut self) {
+        unsafe { m5unified_sys::m5u_rtc_set_system_time_from_rtc() }
+    }
 }

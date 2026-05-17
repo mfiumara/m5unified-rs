@@ -44,7 +44,8 @@ pub use audio::{Mic, MicConfig, Speaker};
 pub use buttons::{Button, ButtonId, Buttons};
 pub use config::{ExternalDisplayConfig, ExternalSpeakerConfig, M5UnifiedConfig};
 pub use display::{
-    colors, Color565, Display, DisplayKind, DisplayRef, Point, Rect, Size, TextDatum,
+    colors, Color565, Display, DisplayFont, DisplayKind, DisplayRef, EpdMode, Point, Rect, Size,
+    TextDatum,
 };
 pub use error::Error;
 pub use imu::{Imu, ImuData, ImuKind, Vec3};
@@ -170,5 +171,16 @@ mod tests {
         };
         let m5 = M5Unified::begin_with_config(&config).expect("host stub begin should succeed");
         assert_eq!(m5.display.width(), 320);
+    }
+
+    #[test]
+    fn display_and_rtc_example_helpers_compile_on_host() {
+        let mut m5 = M5Unified::begin().expect("host stub begin should succeed");
+        assert!(m5.display.set_font(DisplayFont::Ascii8x16));
+        assert!(m5.display.set_font(DisplayFont::LgfxJapanGothic12));
+        assert!(m5.display.set_font(DisplayFont::DejaVu18));
+        m5.display.set_text_scroll(true);
+        m5.display.set_epd_mode(EpdMode::Fastest);
+        m5.rtc.set_system_time_from_rtc();
     }
 }
