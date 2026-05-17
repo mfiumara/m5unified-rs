@@ -6,6 +6,12 @@ fn main() -> ExampleResult {
     banner(&mut m5, "Basic/Speaker")?;
     m5.display.set_font(DisplayFont::DejaVu18);
     m5.display.set_epd_mode(EpdMode::Fastest);
+    let mut cfg = m5.speaker.config();
+    if !cfg.use_dac && !cfg.buzzer {
+        cfg.sample_rate = 192_000;
+    }
+    cfg.magnification = 16;
+    m5.speaker.set_config(cfg)?;
     if m5.speaker.begin() {
         m5.speaker.set_volume(96);
         for note in [440, 494, 523, 587, 659] {

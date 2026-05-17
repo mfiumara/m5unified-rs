@@ -503,6 +503,55 @@ bool m5u_mic_record_i16_at(int16_t* buffer, size_t samples, uint32_t sample_rate
     return M5.Mic.record(buffer, samples, sample_rate_hz);
 }
 
+bool m5u_mic_get_config(m5u_mic_config_t* out) {
+    if (!out) {
+        return false;
+    }
+    auto cfg = M5.Mic.config();
+    out->pin_data_in = cfg.pin_data_in;
+    out->pin_bck = cfg.pin_bck;
+    out->pin_mck = cfg.pin_mck;
+    out->pin_ws = cfg.pin_ws;
+    out->sample_rate = cfg.sample_rate;
+    out->left_channel = cfg.left_channel;
+    out->stereo = cfg.stereo;
+    out->over_sampling = cfg.over_sampling;
+    out->magnification = cfg.magnification;
+    out->noise_filter_level = cfg.noise_filter_level;
+    out->use_adc = cfg.use_adc;
+    out->dma_buf_len = cfg.dma_buf_len;
+    out->dma_buf_count = cfg.dma_buf_count;
+    out->task_priority = cfg.task_priority;
+    out->task_pinned_core = cfg.task_pinned_core;
+    out->i2s_port = (int)cfg.i2s_port;
+    return true;
+}
+
+bool m5u_mic_set_config(const m5u_mic_config_t* config) {
+    if (!config) {
+        return false;
+    }
+    auto cfg = M5.Mic.config();
+    cfg.pin_data_in = config->pin_data_in;
+    cfg.pin_bck = config->pin_bck;
+    cfg.pin_mck = config->pin_mck;
+    cfg.pin_ws = config->pin_ws;
+    cfg.sample_rate = config->sample_rate;
+    cfg.left_channel = config->left_channel != 0;
+    cfg.stereo = config->stereo != 0;
+    cfg.over_sampling = config->over_sampling;
+    cfg.magnification = config->magnification;
+    cfg.noise_filter_level = config->noise_filter_level;
+    cfg.use_adc = config->use_adc != 0;
+    cfg.dma_buf_len = config->dma_buf_len;
+    cfg.dma_buf_count = config->dma_buf_count;
+    cfg.task_priority = config->task_priority;
+    cfg.task_pinned_core = config->task_pinned_core;
+    cfg.i2s_port = (i2s_port_t)config->i2s_port;
+    M5.Mic.config(cfg);
+    return true;
+}
+
 int m5u_mic_get_noise_filter_level(void) {
     return M5.Mic.config().noise_filter_level;
 }
@@ -524,6 +573,53 @@ void m5u_speaker_end(void) {
 
 uint8_t m5u_speaker_get_volume(void) {
     return M5.Speaker.getVolume();
+}
+
+bool m5u_speaker_get_config(m5u_speaker_config_t* out) {
+    if (!out) {
+        return false;
+    }
+    auto cfg = M5.Speaker.config();
+    out->pin_data_out = cfg.pin_data_out;
+    out->pin_bck = cfg.pin_bck;
+    out->pin_mck = cfg.pin_mck;
+    out->pin_ws = cfg.pin_ws;
+    out->sample_rate = cfg.sample_rate;
+    out->stereo = cfg.stereo;
+    out->buzzer = cfg.buzzer;
+    out->use_dac = cfg.use_dac;
+    out->dac_zero_level = cfg.dac_zero_level;
+    out->magnification = cfg.magnification;
+    out->dma_buf_len = cfg.dma_buf_len;
+    out->dma_buf_count = cfg.dma_buf_count;
+    out->task_priority = cfg.task_priority;
+    out->task_pinned_core = cfg.task_pinned_core;
+    out->i2s_port = (int)cfg.i2s_port;
+    return true;
+}
+
+bool m5u_speaker_set_config(const m5u_speaker_config_t* config) {
+    if (!config) {
+        return false;
+    }
+    auto cfg = M5.Speaker.config();
+    cfg.pin_data_out = config->pin_data_out;
+    cfg.pin_bck = config->pin_bck;
+    cfg.pin_mck = config->pin_mck;
+    cfg.pin_ws = config->pin_ws;
+    cfg.sample_rate = config->sample_rate;
+    cfg.stereo = config->stereo != 0;
+    cfg.buzzer = config->buzzer != 0;
+    cfg.use_dac = config->use_dac != 0;
+    cfg.dac_zero_level = config->dac_zero_level;
+    cfg.magnification = config->magnification;
+    cfg.dma_buf_len = config->dma_buf_len;
+    cfg.dma_buf_count = config->dma_buf_count;
+    cfg.task_priority = config->task_priority;
+    cfg.task_pinned_core = config->task_pinned_core;
+    cfg.i2s_port = (i2s_port_t)config->i2s_port;
+    M5.Speaker.config(cfg);
+    return true;
 }
 
 bool m5u_speaker_tone_ex(float frequency_hz, uint32_t duration_ms, int channel) {

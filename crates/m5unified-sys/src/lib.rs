@@ -61,6 +61,92 @@ impl Default for m5u_config_t {
 }
 
 #[repr(C)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct m5u_mic_config_t {
+    pub pin_data_in: c_int,
+    pub pin_bck: c_int,
+    pub pin_mck: c_int,
+    pub pin_ws: c_int,
+    pub sample_rate: u32,
+    pub left_channel: u8,
+    pub stereo: u8,
+    pub over_sampling: u8,
+    pub magnification: u8,
+    pub noise_filter_level: u8,
+    pub use_adc: u8,
+    pub dma_buf_len: usize,
+    pub dma_buf_count: usize,
+    pub task_priority: u8,
+    pub task_pinned_core: u8,
+    pub i2s_port: c_int,
+}
+
+impl Default for m5u_mic_config_t {
+    fn default() -> Self {
+        Self {
+            pin_data_in: -1,
+            pin_bck: -1,
+            pin_mck: -1,
+            pin_ws: -1,
+            sample_rate: 16_000,
+            left_channel: 0,
+            stereo: 0,
+            over_sampling: 2,
+            magnification: 16,
+            noise_filter_level: 0,
+            use_adc: 0,
+            dma_buf_len: 128,
+            dma_buf_count: 8,
+            task_priority: 2,
+            task_pinned_core: u8::MAX,
+            i2s_port: 0,
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct m5u_speaker_config_t {
+    pub pin_data_out: c_int,
+    pub pin_bck: c_int,
+    pub pin_mck: c_int,
+    pub pin_ws: c_int,
+    pub sample_rate: u32,
+    pub stereo: u8,
+    pub buzzer: u8,
+    pub use_dac: u8,
+    pub dac_zero_level: u8,
+    pub magnification: u8,
+    pub dma_buf_len: usize,
+    pub dma_buf_count: usize,
+    pub task_priority: u8,
+    pub task_pinned_core: u8,
+    pub i2s_port: c_int,
+}
+
+impl Default for m5u_speaker_config_t {
+    fn default() -> Self {
+        Self {
+            pin_data_out: -1,
+            pin_bck: -1,
+            pin_mck: -1,
+            pin_ws: -1,
+            sample_rate: 48_000,
+            stereo: 0,
+            buzzer: 0,
+            use_dac: 0,
+            dac_zero_level: 0,
+            magnification: 16,
+            dma_buf_len: 256,
+            dma_buf_count: 8,
+            task_priority: 2,
+            task_pinned_core: u8::MAX,
+            i2s_port: 0,
+        }
+    }
+}
+
+#[repr(C)]
 #[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]
 pub struct m5u_touch_detail_t {
     pub x: c_int,
@@ -213,12 +299,16 @@ extern "C" {
     pub fn m5u_mic_is_recording() -> bool;
     pub fn m5u_mic_end();
     pub fn m5u_mic_record_i16_at(buffer: *mut i16, samples: usize, sample_rate_hz: u32) -> bool;
+    pub fn m5u_mic_get_config(out: *mut m5u_mic_config_t) -> bool;
+    pub fn m5u_mic_set_config(config: *const m5u_mic_config_t) -> bool;
     pub fn m5u_mic_get_noise_filter_level() -> c_int;
     pub fn m5u_mic_set_noise_filter_level(level: c_int) -> bool;
 
     pub fn m5u_speaker_is_enabled() -> bool;
     pub fn m5u_speaker_end();
     pub fn m5u_speaker_get_volume() -> u8;
+    pub fn m5u_speaker_get_config(out: *mut m5u_speaker_config_t) -> bool;
+    pub fn m5u_speaker_set_config(config: *const m5u_speaker_config_t) -> bool;
     pub fn m5u_speaker_tone_ex(frequency_hz: c_float, duration_ms: u32, channel: c_int) -> bool;
     pub fn m5u_speaker_play_u8(samples: *const u8, len: usize, sample_rate_hz: u32) -> bool;
     pub fn m5u_speaker_play_wav(data: *const u8, len: usize) -> bool;
@@ -599,6 +689,15 @@ mod host_stubs {
     pub unsafe fn m5u_mic_set_noise_filter_level(_level: c_int) -> bool {
         true
     }
+    pub unsafe fn m5u_mic_get_config(out: *mut m5u_mic_config_t) -> bool {
+        if !out.is_null() {
+            *out = m5u_mic_config_t::default();
+        }
+        true
+    }
+    pub unsafe fn m5u_mic_set_config(config: *const m5u_mic_config_t) -> bool {
+        !config.is_null()
+    }
 
     pub unsafe fn m5u_speaker_is_enabled() -> bool {
         true
@@ -606,6 +705,15 @@ mod host_stubs {
     pub unsafe fn m5u_speaker_end() {}
     pub unsafe fn m5u_speaker_get_volume() -> u8 {
         64
+    }
+    pub unsafe fn m5u_speaker_get_config(out: *mut m5u_speaker_config_t) -> bool {
+        if !out.is_null() {
+            *out = m5u_speaker_config_t::default();
+        }
+        true
+    }
+    pub unsafe fn m5u_speaker_set_config(config: *const m5u_speaker_config_t) -> bool {
+        !config.is_null()
     }
     pub unsafe fn m5u_speaker_tone_ex(
         _frequency_hz: c_float,

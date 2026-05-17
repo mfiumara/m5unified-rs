@@ -6,6 +6,14 @@ fn main() -> ExampleResult {
     banner(&mut m5, "Advanced/Mic_FFT")?;
     m5.display.set_font(DisplayFont::Ascii8x16);
     m5.display.set_epd_mode(EpdMode::Fastest);
+    let mut cfg = m5.mic.config();
+    cfg.sample_rate = 16_000;
+    cfg.dma_buf_count = 3;
+    cfg.dma_buf_len = 256;
+    cfg.over_sampling = 1;
+    cfg.noise_filter_level = 0;
+    cfg.magnification = if cfg.use_adc { 16 } else { 1 };
+    m5.mic.set_config(cfg)?;
     let mut samples = [0_i16; 256];
     let rms = m5.mic.rms(&mut samples).unwrap_or_default();
     for bin in 0..16 {

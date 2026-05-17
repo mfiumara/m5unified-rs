@@ -1,5 +1,3 @@
-use core::ffi::c_int;
-
 use crate::Error;
 
 #[derive(Debug)]
@@ -41,21 +39,91 @@ impl Mic {
     }
 
     pub fn config(&self) -> MicConfig {
-        MicConfig {
-            noise_filter_level: unsafe { m5unified_sys::m5u_mic_get_noise_filter_level() as i32 },
+        let mut raw = m5unified_sys::m5u_mic_config_t::default();
+        let ok = unsafe { m5unified_sys::m5u_mic_get_config(&mut raw) };
+        if ok {
+            MicConfig::from_raw(raw)
+        } else {
+            MicConfig::default()
         }
     }
 
     pub fn set_config(&mut self, config: MicConfig) -> Result<(), Error> {
-        unsafe { m5unified_sys::m5u_mic_set_noise_filter_level(config.noise_filter_level as c_int) }
+        let raw = config.to_raw();
+        unsafe { m5unified_sys::m5u_mic_set_config(&raw) }
             .then_some(())
             .ok_or(Error::Unavailable("microphone config"))
     }
 }
 
-#[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct MicConfig {
-    pub noise_filter_level: i32,
+    pub pin_data_in: i32,
+    pub pin_bck: i32,
+    pub pin_mck: i32,
+    pub pin_ws: i32,
+    pub sample_rate: u32,
+    pub left_channel: bool,
+    pub stereo: bool,
+    pub over_sampling: u8,
+    pub magnification: u8,
+    pub noise_filter_level: u8,
+    pub use_adc: bool,
+    pub dma_buf_len: usize,
+    pub dma_buf_count: usize,
+    pub task_priority: u8,
+    pub task_pinned_core: u8,
+    pub i2s_port: i32,
+}
+
+impl MicConfig {
+    fn from_raw(raw: m5unified_sys::m5u_mic_config_t) -> Self {
+        Self {
+            pin_data_in: raw.pin_data_in,
+            pin_bck: raw.pin_bck,
+            pin_mck: raw.pin_mck,
+            pin_ws: raw.pin_ws,
+            sample_rate: raw.sample_rate,
+            left_channel: raw.left_channel != 0,
+            stereo: raw.stereo != 0,
+            over_sampling: raw.over_sampling,
+            magnification: raw.magnification,
+            noise_filter_level: raw.noise_filter_level,
+            use_adc: raw.use_adc != 0,
+            dma_buf_len: raw.dma_buf_len,
+            dma_buf_count: raw.dma_buf_count,
+            task_priority: raw.task_priority,
+            task_pinned_core: raw.task_pinned_core,
+            i2s_port: raw.i2s_port,
+        }
+    }
+
+    fn to_raw(self) -> m5unified_sys::m5u_mic_config_t {
+        m5unified_sys::m5u_mic_config_t {
+            pin_data_in: self.pin_data_in,
+            pin_bck: self.pin_bck,
+            pin_mck: self.pin_mck,
+            pin_ws: self.pin_ws,
+            sample_rate: self.sample_rate,
+            left_channel: u8::from(self.left_channel),
+            stereo: u8::from(self.stereo),
+            over_sampling: self.over_sampling,
+            magnification: self.magnification,
+            noise_filter_level: self.noise_filter_level,
+            use_adc: u8::from(self.use_adc),
+            dma_buf_len: self.dma_buf_len,
+            dma_buf_count: self.dma_buf_count,
+            task_priority: self.task_priority,
+            task_pinned_core: self.task_pinned_core,
+            i2s_port: self.i2s_port,
+        }
+    }
+}
+
+impl Default for MicConfig {
+    fn default() -> Self {
+        Self::from_raw(m5unified_sys::m5u_mic_config_t::default())
+    }
 }
 
 #[derive(Debug)]
@@ -90,6 +158,23 @@ impl Speaker {
 
     pub fn volume(&self) -> u8 {
         unsafe { m5unified_sys::m5u_speaker_get_volume() }
+    }
+
+    pub fn config(&self) -> SpeakerConfig {
+        let mut raw = m5unified_sys::m5u_speaker_config_t::default();
+        let ok = unsafe { m5unified_sys::m5u_speaker_get_config(&mut raw) };
+        if ok {
+            SpeakerConfig::from_raw(raw)
+        } else {
+            SpeakerConfig::default()
+        }
+    }
+
+    pub fn set_config(&mut self, config: SpeakerConfig) -> Result<(), Error> {
+        let raw = config.to_raw();
+        unsafe { m5unified_sys::m5u_speaker_set_config(&raw) }
+            .then_some(())
+            .ok_or(Error::Unavailable("speaker config"))
     }
 
     pub fn tone_ex(&mut self, frequency_hz: f32, duration_ms: u32, channel: Option<u8>) -> bool {
@@ -130,5 +215,72 @@ impl Speaker {
 
     pub fn set_all_channel_volume(&mut self, volume: u8) {
         unsafe { m5unified_sys::m5u_speaker_set_all_channel_volume(volume) }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct SpeakerConfig {
+    pub pin_data_out: i32,
+    pub pin_bck: i32,
+    pub pin_mck: i32,
+    pub pin_ws: i32,
+    pub sample_rate: u32,
+    pub stereo: bool,
+    pub buzzer: bool,
+    pub use_dac: bool,
+    pub dac_zero_level: u8,
+    pub magnification: u8,
+    pub dma_buf_len: usize,
+    pub dma_buf_count: usize,
+    pub task_priority: u8,
+    pub task_pinned_core: u8,
+    pub i2s_port: i32,
+}
+
+impl SpeakerConfig {
+    fn from_raw(raw: m5unified_sys::m5u_speaker_config_t) -> Self {
+        Self {
+            pin_data_out: raw.pin_data_out,
+            pin_bck: raw.pin_bck,
+            pin_mck: raw.pin_mck,
+            pin_ws: raw.pin_ws,
+            sample_rate: raw.sample_rate,
+            stereo: raw.stereo != 0,
+            buzzer: raw.buzzer != 0,
+            use_dac: raw.use_dac != 0,
+            dac_zero_level: raw.dac_zero_level,
+            magnification: raw.magnification,
+            dma_buf_len: raw.dma_buf_len,
+            dma_buf_count: raw.dma_buf_count,
+            task_priority: raw.task_priority,
+            task_pinned_core: raw.task_pinned_core,
+            i2s_port: raw.i2s_port,
+        }
+    }
+
+    fn to_raw(self) -> m5unified_sys::m5u_speaker_config_t {
+        m5unified_sys::m5u_speaker_config_t {
+            pin_data_out: self.pin_data_out,
+            pin_bck: self.pin_bck,
+            pin_mck: self.pin_mck,
+            pin_ws: self.pin_ws,
+            sample_rate: self.sample_rate,
+            stereo: u8::from(self.stereo),
+            buzzer: u8::from(self.buzzer),
+            use_dac: u8::from(self.use_dac),
+            dac_zero_level: self.dac_zero_level,
+            magnification: self.magnification,
+            dma_buf_len: self.dma_buf_len,
+            dma_buf_count: self.dma_buf_count,
+            task_priority: self.task_priority,
+            task_pinned_core: self.task_pinned_core,
+            i2s_port: self.i2s_port,
+        }
+    }
+}
+
+impl Default for SpeakerConfig {
+    fn default() -> Self {
+        Self::from_raw(m5unified_sys::m5u_speaker_config_t::default())
     }
 }

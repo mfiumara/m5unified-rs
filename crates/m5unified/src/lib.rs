@@ -40,7 +40,7 @@ mod rtc;
 mod system;
 mod touch;
 
-pub use audio::{Mic, MicConfig, Speaker};
+pub use audio::{Mic, MicConfig, Speaker, SpeakerConfig};
 pub use buttons::{Button, ButtonId, Buttons};
 pub use config::{ExternalDisplayConfig, ExternalSpeakerConfig, M5UnifiedConfig};
 pub use display::{
@@ -140,6 +140,24 @@ mod tests {
         let mut m5 = M5Unified::begin().expect("host stub begin should succeed");
         let mut buffer = [0_i16; 8];
         assert_eq!(m5.mic.rms(&mut buffer), Some(0.0));
+    }
+
+    #[test]
+    fn audio_config_helpers_compile_on_host() {
+        let mut m5 = M5Unified::begin().expect("host stub begin should succeed");
+
+        let mut mic = m5.mic.config();
+        assert_eq!(mic.sample_rate, 16_000);
+        mic.dma_buf_count = 3;
+        mic.dma_buf_len = 256;
+        mic.noise_filter_level = 8;
+        assert_eq!(m5.mic.set_config(mic), Ok(()));
+
+        let mut speaker = m5.speaker.config();
+        assert_eq!(speaker.sample_rate, 48_000);
+        speaker.sample_rate = 96_000;
+        speaker.dma_buf_count = 20;
+        assert_eq!(m5.speaker.set_config(speaker), Ok(()));
     }
 
     #[test]

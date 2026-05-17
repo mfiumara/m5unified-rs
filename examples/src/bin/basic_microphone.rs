@@ -4,6 +4,10 @@ use m5unified_examples::{banner, finite_loop, ExampleResult};
 fn main() -> ExampleResult {
     let mut m5 = M5Unified::begin()?;
     banner(&mut m5, "Basic/Microphone")?;
+    let mut cfg = m5.mic.config();
+    cfg.noise_filter_level = cfg.noise_filter_level.wrapping_add(8);
+    cfg.sample_rate = 16_000;
+    m5.mic.set_config(cfg)?;
     if !m5.mic.begin() {
         m5.display.println("mic unavailable")?;
         return Ok(());

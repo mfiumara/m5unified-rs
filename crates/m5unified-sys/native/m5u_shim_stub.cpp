@@ -379,6 +379,33 @@ bool m5u_mic_record_i16_at(int16_t* buffer, size_t samples, uint32_t sample_rate
     (void)buffer; (void)samples; (void)sample_rate_hz; return false;
 }
 
+bool m5u_mic_get_config(m5u_mic_config_t* out) {
+    if (!out) {
+        return false;
+    }
+    out->pin_data_in = -1;
+    out->pin_bck = -1;
+    out->pin_mck = -1;
+    out->pin_ws = -1;
+    out->sample_rate = 16000;
+    out->left_channel = 0;
+    out->stereo = 0;
+    out->over_sampling = 2;
+    out->magnification = 16;
+    out->noise_filter_level = 0;
+    out->use_adc = 0;
+    out->dma_buf_len = 128;
+    out->dma_buf_count = 8;
+    out->task_priority = 2;
+    out->task_pinned_core = 255;
+    out->i2s_port = 0;
+    return true;
+}
+
+bool m5u_mic_set_config(const m5u_mic_config_t* config) {
+    return config != nullptr;
+}
+
 int m5u_mic_get_noise_filter_level(void) {
     return 0;
 }
@@ -396,6 +423,32 @@ void m5u_speaker_end(void) {
 
 uint8_t m5u_speaker_get_volume(void) {
     return 0;
+}
+
+bool m5u_speaker_get_config(m5u_speaker_config_t* out) {
+    if (!out) {
+        return false;
+    }
+    out->pin_data_out = -1;
+    out->pin_bck = -1;
+    out->pin_mck = -1;
+    out->pin_ws = -1;
+    out->sample_rate = 48000;
+    out->stereo = 0;
+    out->buzzer = 0;
+    out->use_dac = 0;
+    out->dac_zero_level = 0;
+    out->magnification = 16;
+    out->dma_buf_len = 256;
+    out->dma_buf_count = 8;
+    out->task_priority = 2;
+    out->task_pinned_core = 255;
+    out->i2s_port = 0;
+    return true;
+}
+
+bool m5u_speaker_set_config(const m5u_speaker_config_t* config) {
+    return config != nullptr;
 }
 
 bool m5u_speaker_tone_ex(float frequency_hz, uint32_t duration_ms, int channel) {
