@@ -6,6 +6,7 @@ Behavior:
 
 - initializes `M5Unified` through the Rust `m5unified` crate;
 - draws `hello from rust` through the C ABI shim;
+- prints boot and heartbeat lines over the USB serial/JTAG console;
 - polls `M5.update()`;
 - changes the display when Button A or Button B is pressed.
 
@@ -19,7 +20,7 @@ Install the esp-rs toolchain first. If Cargo reports `custom toolchain 'esp' ...
 cargo +stable install espup
 espup install
 . ~/export-esp.sh
-cargo +stable install espflash
+cargo +stable install ldproxy espflash
 ```
 
 Run the install commands with `+stable` (or from outside this firmware directory) because this directory's `rust-toolchain.toml` intentionally selects the not-yet-installed `esp` toolchain.
@@ -71,7 +72,15 @@ cargo build --target xtensa-esp32s3-espidf
 ## Flash
 
 ```bash
-espflash flash --monitor target/xtensa-esp32s3-espidf/debug/m5unified-hello-display
+espflash flash --port /dev/cu.usbmodem1101 target/xtensa-esp32s3-espidf/debug/m5unified-hello-display
+```
+
+Open the USB serial/JTAG console at 115200 baud with a serial terminal that does not force the device into download mode. Expected serial output includes:
+
+```text
+hello-display boot: before M5Unified::begin
+M5Unified started: display=135x240, rotation=...
+heartbeat 1: display=135x240
 ```
 
 Expected hardware result on M5StickS3-class hardware: the screen shows `hello from rust`; pressing Button A or B changes the screen text/background.

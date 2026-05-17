@@ -2,5 +2,7 @@
 **/target/
 **/.embuild/
 **/*.rs.bk
+__pycache__/
+*.py[cod]
 .DS_Store
 .env
