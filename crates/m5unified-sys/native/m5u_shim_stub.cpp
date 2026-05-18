@@ -301,6 +301,10 @@ bool m5u_imu_begin(void) {
     return false;
 }
 
+bool m5u_imu_begin_for_board(int board) {
+    (void)board; return false;
+}
+
 bool m5u_imu_get_accel(float* x, float* y, float* z) {
     (void)x; (void)y; (void)z; return false;
 }

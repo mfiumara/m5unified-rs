@@ -400,6 +400,10 @@ bool m5u_imu_begin(void) {
     return M5.Imu.begin();
 }
 
+bool m5u_imu_begin_for_board(int board) {
+    return M5.Imu.begin(nullptr, (m5::board_t)board);
+}
+
 bool m5u_imu_get_accel(float* x, float* y, float* z) {
     return M5.Imu.getAccel(x, y, z);
 }

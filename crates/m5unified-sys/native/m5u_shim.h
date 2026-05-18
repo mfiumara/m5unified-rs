@@ -250,6 +250,7 @@ typedef struct {
 } m5u_imu_data_t;
 
 bool m5u_imu_begin(void);
+bool m5u_imu_begin_for_board(int board);
 bool m5u_imu_is_enabled(void);
 int m5u_imu_get_type(void);
 bool m5u_imu_update(void);

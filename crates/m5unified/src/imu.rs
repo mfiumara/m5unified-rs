@@ -1,3 +1,5 @@
+use crate::system::Board;
+
 #[derive(Debug, Copy, Clone, Default, PartialEq)]
 pub struct Vec3 {
     pub x: f32,
@@ -64,10 +66,26 @@ impl Imu {
         unsafe { m5unified_sys::m5u_imu_begin() }
     }
 
+    pub fn begin_for_board(&mut self, board: Board) -> bool {
+        unsafe { m5unified_sys::m5u_imu_begin_for_board(board.raw()) }
+    }
+
+    pub fn init(&mut self) -> bool {
+        self.begin()
+    }
+
+    pub fn init_for_board(&mut self, board: Board) -> bool {
+        self.begin_for_board(board)
+    }
+
     pub fn accel(&self) -> Option<Vec3> {
         let (mut x, mut y, mut z) = (0.0, 0.0, 0.0);
         let ok = unsafe { m5unified_sys::m5u_imu_get_accel(&mut x, &mut y, &mut z) };
         ok.then_some(Vec3 { x, y, z })
+    }
+
+    pub fn accel_data(&self) -> Option<Vec3> {
+        self.accel()
     }
 
     pub fn gyro(&self) -> Option<Vec3> {
@@ -76,10 +94,18 @@ impl Imu {
         ok.then_some(Vec3 { x, y, z })
     }
 
+    pub fn gyro_data(&self) -> Option<Vec3> {
+        self.gyro()
+    }
+
     pub fn mag(&self) -> Option<Vec3> {
         let (mut x, mut y, mut z) = (0.0, 0.0, 0.0);
         let ok = unsafe { m5unified_sys::m5u_imu_get_mag(&mut x, &mut y, &mut z) };
         ok.then_some(Vec3 { x, y, z })
+    }
+
+    pub fn gyro_mag(&self) -> Option<Vec3> {
+        self.mag()
     }
 
     pub fn temperature_c(&self) -> Option<f32> {

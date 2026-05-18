@@ -362,6 +362,7 @@ extern "C" {
     pub fn m5u_speaker_play_i16(samples: *const i16, len: usize, sample_rate_hz: u32) -> bool;
 
     pub fn m5u_imu_begin() -> bool;
+    pub fn m5u_imu_begin_for_board(board: c_int) -> bool;
     pub fn m5u_imu_get_accel(x: *mut f32, y: *mut f32, z: *mut f32) -> bool;
     pub fn m5u_imu_get_gyro(x: *mut f32, y: *mut f32, z: *mut f32) -> bool;
     pub fn m5u_imu_get_mag(x: *mut f32, y: *mut f32, z: *mut f32) -> bool;
@@ -929,6 +930,9 @@ mod host_stubs {
 
     pub unsafe fn m5u_imu_begin() -> bool {
         true
+    }
+    pub unsafe fn m5u_imu_begin_for_board(_board: c_int) -> bool {
+        false
     }
     pub unsafe fn m5u_imu_get_accel(x: *mut f32, y: *mut f32, z: *mut f32) -> bool {
         if !x.is_null() {

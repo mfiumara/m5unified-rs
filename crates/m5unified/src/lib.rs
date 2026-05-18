@@ -247,6 +247,9 @@ mod tests {
     fn imu_combined_data_uses_host_stub() {
         let mut m5 = M5Unified::begin().expect("host stub begin should succeed");
         assert_eq!(m5.imu.kind(), ImuKind::None);
+        assert!(m5.imu.init());
+        assert!(!m5.imu.begin_for_board(Board::M5Stack));
+        assert!(!m5.imu.init_for_board(Board::M5Stack));
         assert!(m5.imu.update());
         assert!(m5.imu.update_mask().is_empty());
         let data = m5.imu.data().expect("host stub imu data should exist");
@@ -255,6 +258,9 @@ mod tests {
         assert_eq!(data.gyro, Vec3::default());
         assert_eq!(data.mag, Vec3::default());
         assert_eq!(data.temperature_c, Some(25.0));
+        assert_eq!(m5.imu.accel_data().unwrap().z, 1.0);
+        assert_eq!(m5.imu.gyro_data(), Some(Vec3::default()));
+        assert_eq!(m5.imu.gyro_mag(), Some(Vec3::default()));
         assert!(m5
             .imu
             .set_axis_order(ImuAxis::XPos, ImuAxis::YPos, ImuAxis::ZPos));
