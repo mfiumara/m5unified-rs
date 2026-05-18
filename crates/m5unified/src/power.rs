@@ -391,9 +391,9 @@ impl Axp2101 {
     }
 
     pub fn irq_statuses(&self) -> Axp2101IrqStatus {
-        Axp2101IrqStatus {
-            raw: unsafe { m5unified_sys::m5u_power_axp2101_get_irq_statuses() },
-        }
+        Axp2101IrqStatus::from_status_register_order(unsafe {
+            m5unified_sys::m5u_power_axp2101_get_irq_statuses()
+        })
     }
 }
 
@@ -403,6 +403,12 @@ pub struct Axp2101IrqStatus {
 }
 
 impl Axp2101IrqStatus {
+    fn from_status_register_order(raw: u64) -> Self {
+        Self {
+            raw: ((raw >> 16) & 0xFF) | (raw & 0xFF00) | ((raw & 0xFF) << 16),
+        }
+    }
+
     pub fn contains(&self, mask: u64) -> bool {
         self.raw & mask != 0
     }
@@ -505,5 +511,22 @@ impl Axp2101IrqStatus {
 
     pub fn watchdog_expired(&self) -> bool {
         self.contains(Axp2101::IRQ_WDT_EXPIRE)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn axp2101_status_register_order_is_normalized_to_irq_masks() {
+        let upstream_raw = (0b0000_0101_u64 << 16) | (0b1000_0000_u64 << 8) | 0b0100_0000_u64;
+        let status = Axp2101IrqStatus::from_status_register_order(upstream_raw);
+
+        assert!(status.battery_work_under_temperature());
+        assert!(status.battery_charger_under_temperature());
+        assert!(status.vbus_insert());
+        assert!(status.ldo_over_current());
+        assert!(!status.battery_work_over_temperature());
     }
 }
