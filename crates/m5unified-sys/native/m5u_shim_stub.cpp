@@ -497,6 +497,14 @@ void m5u_power_timer_sleep_seconds(int seconds) {
     (void)seconds;
 }
 
+void m5u_power_timer_sleep_time(const m5u_rtc_datetime_t* time) {
+    (void)time;
+}
+
+void m5u_power_timer_sleep_date_time(const m5u_rtc_datetime_t* date, const m5u_rtc_datetime_t* time) {
+    (void)date; (void)time;
+}
+
 void m5u_power_deep_sleep_us(uint64_t micro_seconds, bool touch_wakeup) {
     (void)micro_seconds; (void)touch_wakeup;
 }

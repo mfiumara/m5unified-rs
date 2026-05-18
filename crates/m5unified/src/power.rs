@@ -1,3 +1,5 @@
+use crate::{Date, Time};
+
 #[derive(Debug)]
 pub struct Power;
 
@@ -139,6 +141,24 @@ impl Power {
     /// Enter timer sleep and wake after the given number of seconds.
     pub fn timer_sleep_seconds(&mut self, seconds: i32) {
         unsafe { m5unified_sys::m5u_power_timer_sleep_seconds(seconds) }
+    }
+
+    /// Enter timer sleep and wake at the given RTC time.
+    ///
+    /// As in M5Unified, seconds are ignored by the underlying implementation.
+    pub fn timer_sleep_time(&mut self, time: Time) {
+        let raw = time.to_raw();
+        unsafe { m5unified_sys::m5u_power_timer_sleep_time(&raw) }
+    }
+
+    /// Enter timer sleep and wake at the given RTC date and time.
+    ///
+    /// As in M5Unified, the year, month, and seconds fields are ignored by the
+    /// underlying implementation.
+    pub fn timer_sleep_date_time(&mut self, date: Date, time: Time) {
+        let date = date.to_raw();
+        let time = time.to_raw();
+        unsafe { m5unified_sys::m5u_power_timer_sleep_date_time(&date, &time) }
     }
 
     /// Enter ESP32 deep sleep, optionally enabling touch wakeup.

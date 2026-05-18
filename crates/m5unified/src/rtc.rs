@@ -16,7 +16,7 @@ impl Date {
         }
     }
 
-    fn to_raw(self) -> m5unified_sys::m5u_rtc_datetime_t {
+    pub(crate) fn to_raw(self) -> m5unified_sys::m5u_rtc_datetime_t {
         m5unified_sys::m5u_rtc_datetime_t {
             year: self.year,
             month: self.month,
@@ -43,7 +43,7 @@ impl Time {
         }
     }
 
-    fn to_raw(self) -> m5unified_sys::m5u_rtc_datetime_t {
+    pub(crate) fn to_raw(self) -> m5unified_sys::m5u_rtc_datetime_t {
         m5unified_sys::m5u_rtc_datetime_t {
             hour: self.hour,
             minute: self.minute,

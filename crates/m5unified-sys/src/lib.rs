@@ -419,6 +419,11 @@ extern "C" {
     pub fn m5u_power_set_vibration(level: u8);
     pub fn m5u_power_power_off();
     pub fn m5u_power_timer_sleep_seconds(seconds: c_int);
+    pub fn m5u_power_timer_sleep_time(time: *const m5u_rtc_datetime_t);
+    pub fn m5u_power_timer_sleep_date_time(
+        date: *const m5u_rtc_datetime_t,
+        time: *const m5u_rtc_datetime_t,
+    );
     pub fn m5u_power_deep_sleep_us(micro_seconds: u64, touch_wakeup: bool);
     pub fn m5u_power_light_sleep_us(micro_seconds: u64, touch_wakeup: bool);
 
@@ -1098,6 +1103,12 @@ mod host_stubs {
     pub unsafe fn m5u_power_set_vibration(_level: u8) {}
     pub unsafe fn m5u_power_power_off() {}
     pub unsafe fn m5u_power_timer_sleep_seconds(_seconds: c_int) {}
+    pub unsafe fn m5u_power_timer_sleep_time(_time: *const m5u_rtc_datetime_t) {}
+    pub unsafe fn m5u_power_timer_sleep_date_time(
+        _date: *const m5u_rtc_datetime_t,
+        _time: *const m5u_rtc_datetime_t,
+    ) {
+    }
     pub unsafe fn m5u_power_deep_sleep_us(_micro_seconds: u64, _touch_wakeup: bool) {}
     pub unsafe fn m5u_power_light_sleep_us(_micro_seconds: u64, _touch_wakeup: bool) {}
 

@@ -564,6 +564,24 @@ mod tests {
             direction_output: true,
         });
         m5.power.timer_sleep_seconds(0);
+        m5.power.timer_sleep_time(Time {
+            hour: 6,
+            minute: 30,
+            second: 0,
+        });
+        m5.power.timer_sleep_date_time(
+            Date {
+                year: 2026,
+                month: 5,
+                day: 18,
+                weekday: Some(1),
+            },
+            Time {
+                hour: 6,
+                minute: 30,
+                second: 0,
+            },
+        );
         m5.power.deep_sleep_us(0, false);
         m5.power.light_sleep_us(0, false);
         m5.power.power_off();

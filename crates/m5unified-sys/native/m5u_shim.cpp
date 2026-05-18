@@ -747,6 +747,23 @@ void m5u_power_timer_sleep_seconds(int seconds) {
     M5.Power.timerSleep(seconds);
 }
 
+void m5u_power_timer_sleep_time(const m5u_rtc_datetime_t* time) {
+    if (!time) {
+        return;
+    }
+    auto raw = m5u_rtc_time_from_raw(time);
+    M5.Power.timerSleep(raw);
+}
+
+void m5u_power_timer_sleep_date_time(const m5u_rtc_datetime_t* date, const m5u_rtc_datetime_t* time) {
+    if (!date || !time) {
+        return;
+    }
+    auto raw_date = m5u_rtc_date_from_raw(date);
+    auto raw_time = m5u_rtc_time_from_raw(time);
+    M5.Power.timerSleep(raw_date, raw_time);
+}
+
 void m5u_power_deep_sleep_us(uint64_t micro_seconds, bool touch_wakeup) {
     M5.Power.deepSleep(micro_seconds, touch_wakeup);
 }

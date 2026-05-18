@@ -358,6 +358,8 @@ void m5u_power_set_ext_port_bus_config(const m5u_power_ext_port_bus_t* config);
 void m5u_power_set_vibration(uint8_t level);
 void m5u_power_power_off(void);
 void m5u_power_timer_sleep_seconds(int seconds);
+void m5u_power_timer_sleep_time(const m5u_rtc_datetime_t* time);
+void m5u_power_timer_sleep_date_time(const m5u_rtc_datetime_t* date, const m5u_rtc_datetime_t* time);
 void m5u_power_deep_sleep_us(uint64_t micro_seconds, bool touch_wakeup);
 void m5u_power_light_sleep_us(uint64_t micro_seconds, bool touch_wakeup);
 bool m5u_power_axp2101_disable_irq(uint64_t mask);
