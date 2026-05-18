@@ -6,8 +6,9 @@ pub struct TouchPoint {
     pub y: i32,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]
 pub enum TouchState {
+    #[default]
     None,
     Touch,
     TouchEnd,
@@ -121,12 +122,6 @@ impl TouchState {
 
     pub fn was_dragged(self) -> bool {
         self == Self::DragEnd
-    }
-}
-
-impl Default for TouchState {
-    fn default() -> Self {
-        Self::None
     }
 }
 
