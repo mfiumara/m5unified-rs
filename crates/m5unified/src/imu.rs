@@ -1,3 +1,8 @@
+//! IMU data, calibration, and axis-order helpers.
+//!
+//! This module wraps M5Unified's IMU class with typed vectors, sensor masks,
+//! sensor kind detection, and safe accessors for combined IMU data.
+
 use crate::system::Board;
 
 #[derive(Debug, Copy, Clone, Default, PartialEq)]

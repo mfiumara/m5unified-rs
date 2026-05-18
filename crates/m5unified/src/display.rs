@@ -1,3 +1,9 @@
+//! Display drawing and multi-display helpers.
+//!
+//! The primary [`Display`] wrapper covers text, primitives, colors, EPD modes,
+//! and transaction helpers. [`DisplayRef`] exposes indexed display access
+//! without leaking M5Unified's C++ display objects.
+
 use core::ffi::c_int;
 use std::ffi::CString;
 

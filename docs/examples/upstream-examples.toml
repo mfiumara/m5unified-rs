@@ -95,7 +95,7 @@ rust_bin = "basic_log_output"
 status = "host_compiles"
 category = "basic"
 requires = ["log", "display", "buttons"]
-notes = "Callback/color/suffix logging are intentionally simplified for now."
+notes = "Safe API includes log levels, display/serial/callback targets, color toggles, suffixes, dumps, and raw callbacks."
 
 [[example]]
 upstream = "Basic/Microphone/Microphone.ino"
@@ -103,7 +103,7 @@ rust_bin = "basic_microphone"
 status = "host_compiles"
 category = "basic"
 requires = ["microphone", "speaker", "display", "buttons", "touch"]
-notes = "Mic config currently exposes noise filter; pin config can be added when needed."
+notes = "Mic config exposes pin, I2S, DMA, sample-rate, oversampling, magnification, and noise-filter fields."
 
 [[example]]
 upstream = "Basic/Rtc/Rtc.ino"

@@ -1,3 +1,8 @@
+//! Power-management, PMIC, sleep, and AXP2101 helpers.
+//!
+//! The safe wrapper exposes battery and VBUS readings, output controls, sleep
+//! timers, vibration, external-port power, and a focused AXP2101 IRQ surface.
+
 use crate::{Date, Time};
 
 #[derive(Debug)]

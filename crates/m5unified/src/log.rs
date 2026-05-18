@@ -1,3 +1,8 @@
+//! M5Unified logging helpers.
+//!
+//! The logger supports string output, log levels, targets, suffixes, color
+//! toggles, byte dumps, and raw callbacks.
+
 use core::ffi::{c_char, c_int, c_void};
 use std::ffi::{CStr, CString};
 

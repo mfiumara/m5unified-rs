@@ -1,3 +1,8 @@
+//! Button handles and event state helpers.
+//!
+//! The indexed wrapper covers the upstream A/B/C/EXT/PWR buttons and common
+//! press, release, click, hold, and timing predicates.
+
 use core::ffi::c_int;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]

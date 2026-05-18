@@ -1,3 +1,8 @@
+//! RGB LED helpers.
+//!
+//! The LED wrapper exposes the count, type, brightness, auto-display behavior,
+//! and per-pixel or bulk color setters for boards with controllable LEDs.
+
 #[derive(Debug)]
 pub struct Led;
 

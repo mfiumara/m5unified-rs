@@ -1,3 +1,8 @@
+//! Startup configuration for [`crate::M5Unified`].
+//!
+//! These types mirror the practical subset of M5Unified's board, display,
+//! speaker, RTC, IMU, and peripheral configuration knobs used by examples.
+
 use crate::Board;
 
 #[derive(Debug, Clone, PartialEq, Eq)]

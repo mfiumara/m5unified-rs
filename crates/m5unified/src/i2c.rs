@@ -1,3 +1,9 @@
+//! I2C bus and device helpers.
+//!
+//! The bus wrapper exposes M5Unified's internal and external I2C buses. The
+//! device wrapper stores address, bus, and clock configuration for register
+//! reads/writes.
+
 use core::ffi::c_int;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]

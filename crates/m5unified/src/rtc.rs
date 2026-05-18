@@ -1,3 +1,8 @@
+//! RTC date/time and alarm helpers.
+//!
+//! This module provides typed date, time, and date-time structs plus wrappers
+//! for RTC status, setters, system-time sync, timer IRQs, and alarm IRQs.
+
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct Date {
     pub year: i32,

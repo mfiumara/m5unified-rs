@@ -1,3 +1,9 @@
+//! Touch point and gesture helpers.
+//!
+//! The touch wrapper exposes point lists, raw points, detailed touch state,
+//! threshold configuration, and convenience predicates for click, hold, flick,
+//! and drag gestures.
+
 use core::ffi::c_int;
 
 #[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]

@@ -1,3 +1,5 @@
+//! Error types returned by the safe wrapper.
+
 use std::fmt;
 
 /// Errors returned by the high-level wrapper.

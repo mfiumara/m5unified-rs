@@ -1,3 +1,8 @@
+//! Microphone and speaker wrappers.
+//!
+//! This module exposes M5Unified audio capture, playback, queue state, and
+//! device configuration through safe Rust buffer APIs.
+
 use crate::Error;
 
 fn channel_to_raw(channel: Option<u8>) -> i32 {

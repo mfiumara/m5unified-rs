@@ -1,3 +1,9 @@
+//! SD-card mounting and file helpers.
+//!
+//! The native shim mounts an SD card into ESP-IDF's FAT VFS. [`SdCard`] offers
+//! a small RAII wrapper for mount/unmount and file reads through standard Rust
+//! filesystem APIs.
+
 use core::ffi::c_int;
 use std::path::{Path, PathBuf};
 

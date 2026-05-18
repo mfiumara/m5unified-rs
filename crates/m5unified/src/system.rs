@@ -1,3 +1,9 @@
+//! Board-level helpers for pins, display selection, timing, and identity.
+//!
+//! These methods live on [`crate::M5Unified`] and model top-level M5Unified
+//! functions such as board detection, pin lookup, display selection, and touch
+//! button sizing.
+
 use core::ffi::c_int;
 
 use crate::{DisplayKind, M5Unified};
