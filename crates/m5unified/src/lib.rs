@@ -356,6 +356,8 @@ mod tests {
         assert!(button.released_for_ms(10));
         button.set_debounce_thresh_ms(12);
         button.set_hold_thresh_ms(600);
+        button.set_raw_state(20, true);
+        button.set_state_at(30, ButtonState::Clicked);
         assert_eq!(button.state(), ButtonState::NoChange);
         assert_eq!(button.last_change_ms(), 0);
         assert_eq!(button.debounce_thresh_ms(), 10);

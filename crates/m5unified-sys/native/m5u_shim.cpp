@@ -1068,6 +1068,18 @@ void m5u_button_set_hold_thresh(int button, uint32_t ms) {
         btn->setHoldThresh(ms);
     }
 }
+void m5u_button_set_raw_state(int button, uint32_t msec, bool press) {
+    m5::Button_Class* btn = m5u_button_for_id(button);
+    if (btn) {
+        btn->setRawState(msec, press);
+    }
+}
+void m5u_button_set_state(int button, uint32_t msec, uint8_t state) {
+    m5::Button_Class* btn = m5u_button_for_id(button);
+    if (btn) {
+        btn->setState(msec, static_cast<m5::Button_Class::button_state_t>(state));
+    }
+}
 uint8_t m5u_button_get_state(int button) {
     m5::Button_Class* btn = m5u_button_for_id(button);
     return btn ? static_cast<uint8_t>(btn->getState()) : 0;

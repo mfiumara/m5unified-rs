@@ -698,6 +698,12 @@ void m5u_button_set_debounce_thresh(int button, uint32_t ms) {
 void m5u_button_set_hold_thresh(int button, uint32_t ms) {
     (void)button; (void)ms;
 }
+void m5u_button_set_raw_state(int button, uint32_t msec, bool press) {
+    (void)button; (void)msec; (void)press;
+}
+void m5u_button_set_state(int button, uint32_t msec, uint8_t state) {
+    (void)button; (void)msec; (void)state;
+}
 uint8_t m5u_button_get_state(int button) {
     (void)button; return 0;
 }

@@ -145,6 +145,8 @@ bool m5u_button_pressed_for(int button, uint32_t ms);
 bool m5u_button_released_for(int button, uint32_t ms);
 void m5u_button_set_debounce_thresh(int button, uint32_t ms);
 void m5u_button_set_hold_thresh(int button, uint32_t ms);
+void m5u_button_set_raw_state(int button, uint32_t msec, bool press);
+void m5u_button_set_state(int button, uint32_t msec, uint8_t state);
 uint8_t m5u_button_get_state(int button);
 uint32_t m5u_button_last_change(int button);
 uint32_t m5u_button_get_debounce_thresh(int button);

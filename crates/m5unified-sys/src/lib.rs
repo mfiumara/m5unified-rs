@@ -488,6 +488,8 @@ extern "C" {
     pub fn m5u_button_released_for(button: c_int, ms: u32) -> bool;
     pub fn m5u_button_set_debounce_thresh(button: c_int, ms: u32);
     pub fn m5u_button_set_hold_thresh(button: c_int, ms: u32);
+    pub fn m5u_button_set_raw_state(button: c_int, msec: u32, press: bool);
+    pub fn m5u_button_set_state(button: c_int, msec: u32, state: u8);
     pub fn m5u_button_get_state(button: c_int) -> u8;
     pub fn m5u_button_last_change(button: c_int) -> u32;
     pub fn m5u_button_get_debounce_thresh(button: c_int) -> u32;
@@ -1226,6 +1228,8 @@ mod host_stubs {
     }
     pub unsafe fn m5u_button_set_debounce_thresh(_button: c_int, _ms: u32) {}
     pub unsafe fn m5u_button_set_hold_thresh(_button: c_int, _ms: u32) {}
+    pub unsafe fn m5u_button_set_raw_state(_button: c_int, _msec: u32, _press: bool) {}
+    pub unsafe fn m5u_button_set_state(_button: c_int, _msec: u32, _state: u8) {}
     pub unsafe fn m5u_button_get_state(_button: c_int) -> u8 {
         0
     }

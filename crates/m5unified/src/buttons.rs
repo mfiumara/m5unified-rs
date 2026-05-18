@@ -165,6 +165,14 @@ impl Button {
         unsafe { m5unified_sys::m5u_button_set_hold_thresh(self.raw_id(), ms) }
     }
 
+    pub fn set_raw_state(&self, msec: u32, pressed: bool) {
+        unsafe { m5unified_sys::m5u_button_set_raw_state(self.raw_id(), msec, pressed) }
+    }
+
+    pub fn set_state_at(&self, msec: u32, state: ButtonState) {
+        unsafe { m5unified_sys::m5u_button_set_state(self.raw_id(), msec, state.raw()) }
+    }
+
     pub fn state(&self) -> ButtonState {
         unsafe { ButtonState::from_raw(m5unified_sys::m5u_button_get_state(self.raw_id())) }
     }
