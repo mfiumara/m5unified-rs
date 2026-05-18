@@ -353,10 +353,30 @@ pub struct Axp2101;
 
 impl Axp2101 {
     pub const IRQ_ALL: u64 = u64::MAX;
+    pub const IRQ_BAT_WORK_UNDER_TEMP: u64 = 1 << 0;
+    pub const IRQ_BAT_WORK_OVER_TEMP: u64 = 1 << 1;
     pub const IRQ_BAT_CHG_UNDER_TEMP: u64 = 1 << 2;
     pub const IRQ_BAT_CHG_OVER_TEMP: u64 = 1 << 3;
+    pub const IRQ_GAUGE_NEW_SOC: u64 = 1 << 4;
+    pub const IRQ_GAUGE_WDT_TIMEOUT: u64 = 1 << 5;
+    pub const IRQ_WARNING_LEVEL1: u64 = 1 << 6;
+    pub const IRQ_WARNING_LEVEL2: u64 = 1 << 7;
+    pub const IRQ_PKEY_POSITIVE_EDGE: u64 = 1 << 8;
+    pub const IRQ_PKEY_NEGATIVE_EDGE: u64 = 1 << 9;
+    pub const IRQ_PKEY_LONG_PRESS: u64 = 1 << 10;
+    pub const IRQ_PKEY_SHORT_PRESS: u64 = 1 << 11;
+    pub const IRQ_BAT_REMOVE: u64 = 1 << 12;
+    pub const IRQ_BAT_INSERT: u64 = 1 << 13;
     pub const IRQ_VBUS_REMOVE: u64 = 1 << 14;
     pub const IRQ_VBUS_INSERT: u64 = 1 << 15;
+    pub const IRQ_BAT_OVER_VOLTAGE: u64 = 1 << 16;
+    pub const IRQ_CHARGER_TIMER: u64 = 1 << 17;
+    pub const IRQ_DIE_OVER_TEMP: u64 = 1 << 18;
+    pub const IRQ_BAT_CHG_START: u64 = 1 << 19;
+    pub const IRQ_BAT_CHG_DONE: u64 = 1 << 20;
+    pub const IRQ_BATFET_OVER_CURR: u64 = 1 << 21;
+    pub const IRQ_LDO_OVER_CURR: u64 = 1 << 22;
+    pub const IRQ_WDT_EXPIRE: u64 = 1 << 23;
 
     pub fn disable_irq(&self, mask: u64) -> bool {
         unsafe { m5unified_sys::m5u_power_axp2101_disable_irq(mask) }
@@ -383,19 +403,107 @@ pub struct Axp2101IrqStatus {
 }
 
 impl Axp2101IrqStatus {
+    pub fn contains(&self, mask: u64) -> bool {
+        self.raw & mask != 0
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.raw == 0
+    }
+
+    pub fn battery_work_under_temperature(&self) -> bool {
+        self.contains(Axp2101::IRQ_BAT_WORK_UNDER_TEMP)
+    }
+
+    pub fn battery_work_over_temperature(&self) -> bool {
+        self.contains(Axp2101::IRQ_BAT_WORK_OVER_TEMP)
+    }
+
     pub fn battery_charger_under_temperature(&self) -> bool {
-        unsafe { m5unified_sys::m5u_power_axp2101_is_bat_charger_under_temperature_irq() }
+        self.contains(Axp2101::IRQ_BAT_CHG_UNDER_TEMP)
     }
 
     pub fn battery_charger_over_temperature(&self) -> bool {
-        unsafe { m5unified_sys::m5u_power_axp2101_is_bat_charger_over_temperature_irq() }
+        self.contains(Axp2101::IRQ_BAT_CHG_OVER_TEMP)
+    }
+
+    pub fn gauge_new_soc(&self) -> bool {
+        self.contains(Axp2101::IRQ_GAUGE_NEW_SOC)
+    }
+
+    pub fn gauge_watchdog_timeout(&self) -> bool {
+        self.contains(Axp2101::IRQ_GAUGE_WDT_TIMEOUT)
+    }
+
+    pub fn warning_level1(&self) -> bool {
+        self.contains(Axp2101::IRQ_WARNING_LEVEL1)
+    }
+
+    pub fn warning_level2(&self) -> bool {
+        self.contains(Axp2101::IRQ_WARNING_LEVEL2)
+    }
+
+    pub fn pkey_positive_edge(&self) -> bool {
+        self.contains(Axp2101::IRQ_PKEY_POSITIVE_EDGE)
+    }
+
+    pub fn pkey_negative_edge(&self) -> bool {
+        self.contains(Axp2101::IRQ_PKEY_NEGATIVE_EDGE)
+    }
+
+    pub fn pkey_long_press(&self) -> bool {
+        self.contains(Axp2101::IRQ_PKEY_LONG_PRESS)
+    }
+
+    pub fn pkey_short_press(&self) -> bool {
+        self.contains(Axp2101::IRQ_PKEY_SHORT_PRESS)
+    }
+
+    pub fn battery_remove(&self) -> bool {
+        self.contains(Axp2101::IRQ_BAT_REMOVE)
+    }
+
+    pub fn battery_insert(&self) -> bool {
+        self.contains(Axp2101::IRQ_BAT_INSERT)
     }
 
     pub fn vbus_insert(&self) -> bool {
-        unsafe { m5unified_sys::m5u_power_axp2101_is_vbus_insert_irq() }
+        self.contains(Axp2101::IRQ_VBUS_INSERT)
     }
 
     pub fn vbus_remove(&self) -> bool {
-        unsafe { m5unified_sys::m5u_power_axp2101_is_vbus_remove_irq() }
+        self.contains(Axp2101::IRQ_VBUS_REMOVE)
+    }
+
+    pub fn battery_over_voltage(&self) -> bool {
+        self.contains(Axp2101::IRQ_BAT_OVER_VOLTAGE)
+    }
+
+    pub fn charger_timer_expired(&self) -> bool {
+        self.contains(Axp2101::IRQ_CHARGER_TIMER)
+    }
+
+    pub fn die_over_temperature(&self) -> bool {
+        self.contains(Axp2101::IRQ_DIE_OVER_TEMP)
+    }
+
+    pub fn battery_charge_start(&self) -> bool {
+        self.contains(Axp2101::IRQ_BAT_CHG_START)
+    }
+
+    pub fn battery_charge_done(&self) -> bool {
+        self.contains(Axp2101::IRQ_BAT_CHG_DONE)
+    }
+
+    pub fn batfet_over_current(&self) -> bool {
+        self.contains(Axp2101::IRQ_BATFET_OVER_CURR)
+    }
+
+    pub fn ldo_over_current(&self) -> bool {
+        self.contains(Axp2101::IRQ_LDO_OVER_CURR)
+    }
+
+    pub fn watchdog_expired(&self) -> bool {
+        self.contains(Axp2101::IRQ_WDT_EXPIRE)
     }
 }

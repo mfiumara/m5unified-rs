@@ -647,7 +647,48 @@ mod tests {
         assert!(!axp.clear_irq_statuses());
         let status = axp.irq_statuses();
         assert_eq!(status.raw, 0);
+        assert!(status.is_empty());
         assert!(!status.battery_charger_under_temperature());
         assert!(!status.vbus_insert());
+
+        let status = Axp2101IrqStatus {
+            raw: Axp2101::IRQ_BAT_WORK_UNDER_TEMP
+                | Axp2101::IRQ_BAT_CHG_UNDER_TEMP
+                | Axp2101::IRQ_GAUGE_NEW_SOC
+                | Axp2101::IRQ_WARNING_LEVEL2
+                | Axp2101::IRQ_PKEY_SHORT_PRESS
+                | Axp2101::IRQ_BAT_INSERT
+                | Axp2101::IRQ_VBUS_INSERT
+                | Axp2101::IRQ_BAT_OVER_VOLTAGE
+                | Axp2101::IRQ_BAT_CHG_START
+                | Axp2101::IRQ_LDO_OVER_CURR
+                | Axp2101::IRQ_WDT_EXPIRE,
+        };
+        assert!(!status.is_empty());
+        assert!(status.contains(Axp2101::IRQ_PKEY_SHORT_PRESS));
+        assert!(status.battery_work_under_temperature());
+        assert!(!status.battery_work_over_temperature());
+        assert!(status.battery_charger_under_temperature());
+        assert!(!status.battery_charger_over_temperature());
+        assert!(status.gauge_new_soc());
+        assert!(!status.gauge_watchdog_timeout());
+        assert!(!status.warning_level1());
+        assert!(status.warning_level2());
+        assert!(!status.pkey_positive_edge());
+        assert!(!status.pkey_negative_edge());
+        assert!(!status.pkey_long_press());
+        assert!(status.pkey_short_press());
+        assert!(!status.battery_remove());
+        assert!(status.battery_insert());
+        assert!(!status.vbus_remove());
+        assert!(status.vbus_insert());
+        assert!(status.battery_over_voltage());
+        assert!(!status.charger_timer_expired());
+        assert!(!status.die_over_temperature());
+        assert!(status.battery_charge_start());
+        assert!(!status.battery_charge_done());
+        assert!(!status.batfet_over_current());
+        assert!(status.ldo_over_current());
+        assert!(status.watchdog_expired());
     }
 }
