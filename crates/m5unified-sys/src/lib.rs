@@ -278,8 +278,10 @@ extern "C" {
     pub fn m5u_get_pin(name: c_int) -> c_int;
     pub fn m5u_set_primary_display_index(index: usize) -> bool;
     pub fn m5u_set_primary_display_type(kind: c_int) -> bool;
+    pub fn m5u_set_primary_display_types(kinds: *const c_int, len: usize) -> bool;
     pub fn m5u_set_log_display_index(index: usize);
     pub fn m5u_set_log_display_type(kind: c_int);
+    pub fn m5u_set_log_display_types(kinds: *const c_int, len: usize);
     pub fn m5u_set_touch_button_height(pixel: u16);
     pub fn m5u_set_touch_button_height_by_ratio(ratio: u8);
     pub fn m5u_get_touch_button_height() -> u16;
@@ -445,6 +447,7 @@ extern "C" {
     pub fn m5u_display_color888(r: u8, g: u8, b: u8) -> u16;
     pub fn m5u_display_count() -> c_int;
     pub fn m5u_display_index_for_kind(kind: c_int) -> c_int;
+    pub fn m5u_display_index_for_kinds(kinds: *const c_int, len: usize) -> c_int;
     pub fn m5u_display_width_at(index: c_int) -> c_int;
     pub fn m5u_display_height_at(index: c_int) -> c_int;
     pub fn m5u_display_set_text_size_at(index: c_int, size: c_int);
@@ -691,8 +694,12 @@ mod host_stubs {
     pub unsafe fn m5u_set_primary_display_type(_kind: c_int) -> bool {
         false
     }
+    pub unsafe fn m5u_set_primary_display_types(_kinds: *const c_int, _len: usize) -> bool {
+        false
+    }
     pub unsafe fn m5u_set_log_display_index(_index: usize) {}
     pub unsafe fn m5u_set_log_display_type(_kind: c_int) {}
+    pub unsafe fn m5u_set_log_display_types(_kinds: *const c_int, _len: usize) {}
     pub unsafe fn m5u_set_touch_button_height(_pixel: u16) {}
     pub unsafe fn m5u_set_touch_button_height_by_ratio(_ratio: u8) {}
     pub unsafe fn m5u_get_touch_button_height() -> u16 {
@@ -1137,6 +1144,9 @@ mod host_stubs {
         1
     }
     pub unsafe fn m5u_display_index_for_kind(_kind: c_int) -> c_int {
+        -1
+    }
+    pub unsafe fn m5u_display_index_for_kinds(_kinds: *const c_int, _len: usize) -> c_int {
         -1
     }
     pub unsafe fn m5u_display_width_at(_index: c_int) -> c_int {

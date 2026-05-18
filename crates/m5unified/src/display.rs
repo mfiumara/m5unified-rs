@@ -1,7 +1,7 @@
 use core::ffi::c_int;
 use std::ffi::CString;
 
-use crate::{Error, M5Unified};
+use crate::{raw_display_kinds, Error, M5Unified};
 
 /// Common RGB565 color constants used by the translated examples.
 pub mod colors {
@@ -392,6 +392,13 @@ impl M5Unified {
 
     pub fn display_index(&self, kind: DisplayKind) -> Option<usize> {
         let index = unsafe { m5unified_sys::m5u_display_index_for_kind(kind.raw() as c_int) };
+        (index >= 0).then_some(index as usize)
+    }
+
+    pub fn display_index_any(&self, kinds: &[DisplayKind]) -> Option<usize> {
+        let kinds = raw_display_kinds(kinds);
+        let index =
+            unsafe { m5unified_sys::m5u_display_index_for_kinds(kinds.as_ptr(), kinds.len()) };
         (index >= 0).then_some(index as usize)
     }
 }

@@ -101,12 +101,37 @@ bool m5u_set_primary_display_type(int kind) {
     return M5.setPrimaryDisplayType((m5gfx::board_t)kind);
 }
 
+bool m5u_set_primary_display_types(const int* kinds, size_t len) {
+    if (!kinds) {
+        return false;
+    }
+    for (size_t i = 0; i < len; ++i) {
+        if (M5.setPrimaryDisplayType((m5gfx::board_t)kinds[i])) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void m5u_set_log_display_index(size_t index) {
     M5.setLogDisplayIndex(index);
 }
 
 void m5u_set_log_display_type(int kind) {
     M5.setLogDisplayType((m5gfx::board_t)kind);
+}
+
+void m5u_set_log_display_types(const int* kinds, size_t len) {
+    if (!kinds) {
+        return;
+    }
+    for (size_t i = 0; i < len; ++i) {
+        int index = M5.getDisplayIndex((m5gfx::board_t)kinds[i]);
+        if (index >= 0) {
+            M5.setLogDisplayIndex((size_t)index);
+            return;
+        }
+    }
 }
 
 void m5u_set_touch_button_height(uint16_t pixel) {
@@ -978,6 +1003,19 @@ int m5u_display_count(void) {
 
 int m5u_display_index_for_kind(int kind) {
     return M5.getDisplayIndex((m5::board_t)kind);
+}
+
+int m5u_display_index_for_kinds(const int* kinds, size_t len) {
+    if (!kinds) {
+        return -1;
+    }
+    for (size_t i = 0; i < len; ++i) {
+        int index = M5.getDisplayIndex((m5::board_t)kinds[i]);
+        if (index >= 0) {
+            return index;
+        }
+    }
+    return -1;
 }
 
 int m5u_display_width_at(int index) {

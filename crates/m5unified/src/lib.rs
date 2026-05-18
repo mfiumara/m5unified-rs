@@ -62,6 +62,7 @@ pub use power::{
 };
 pub use rtc::{Date, DateTime, Rtc, Time};
 pub use sd::{sd_begin, sd_begin_with_config, sd_end, sd_is_mounted, SdSpiConfig, SD_MOUNT_PATH};
+pub(crate) use system::raw_display_kinds;
 pub use system::{Board, PinName};
 pub use touch::{Touch, TouchDetail, TouchPoint, TouchState};
 
@@ -270,7 +271,11 @@ mod tests {
         assert_eq!(m5.get_pin(PinName::PORT_A_SDA), None);
         assert!(m5.set_primary_display(0));
         assert!(!m5.set_primary_display_type(DisplayKind::ModuleDisplay));
+        assert!(
+            !m5.set_primary_display_types(&[DisplayKind::UnitOled, DisplayKind::ModuleDisplay,])
+        );
         m5.set_touch_button_height(32);
+        m5.set_log_display_types(&[DisplayKind::UnitOled, DisplayKind::ModuleDisplay]);
         assert_eq!(m5.touch_button_height(), 0);
         assert_eq!(m5.millis(), 0);
         assert_eq!(m5.micros(), 0);
@@ -280,6 +285,10 @@ mod tests {
         assert_eq!(Board::from_raw(999), Board::Raw(999));
         assert_eq!(Board::M5AtomS3Lite.raw(), 137);
         assert_eq!(DisplayKind::ModuleDisplay.raw(), 199);
+        assert_eq!(
+            m5.display_index_any(&[DisplayKind::UnitOled, DisplayKind::ModuleDisplay]),
+            None
+        );
         assert!(!m5.in_i2c.is_enabled());
         assert_eq!(m5.in_i2c.port(), None);
         assert_eq!(m5.in_i2c.sda_pin(), None);

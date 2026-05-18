@@ -48,12 +48,20 @@ bool m5u_set_primary_display_type(int kind) {
     (void)kind; return false;
 }
 
+bool m5u_set_primary_display_types(const int* kinds, size_t len) {
+    (void)kinds; (void)len; return false;
+}
+
 void m5u_set_log_display_index(size_t index) {
     (void)index;
 }
 
 void m5u_set_log_display_type(int kind) {
     (void)kind;
+}
+
+void m5u_set_log_display_types(const int* kinds, size_t len) {
+    (void)kinds; (void)len;
 }
 
 void m5u_set_touch_button_height(uint16_t pixel) {
@@ -618,6 +626,10 @@ int m5u_display_count(void) {
 
 int m5u_display_index_for_kind(int kind) {
     (void)kind; return -1;
+}
+
+int m5u_display_index_for_kinds(const int* kinds, size_t len) {
+    (void)kinds; (void)len; return -1;
 }
 
 int m5u_display_width_at(int index) {

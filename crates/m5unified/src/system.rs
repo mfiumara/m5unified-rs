@@ -20,12 +20,22 @@ impl M5Unified {
         unsafe { m5unified_sys::m5u_set_primary_display_type(kind.raw() as c_int) }
     }
 
+    pub fn set_primary_display_types(&mut self, kinds: &[DisplayKind]) -> bool {
+        let kinds = raw_display_kinds(kinds);
+        unsafe { m5unified_sys::m5u_set_primary_display_types(kinds.as_ptr(), kinds.len()) }
+    }
+
     pub fn set_log_display_index(&mut self, index: usize) {
         unsafe { m5unified_sys::m5u_set_log_display_index(index) }
     }
 
     pub fn set_log_display_type(&mut self, kind: DisplayKind) {
         unsafe { m5unified_sys::m5u_set_log_display_type(kind.raw() as c_int) }
+    }
+
+    pub fn set_log_display_types(&mut self, kinds: &[DisplayKind]) {
+        let kinds = raw_display_kinds(kinds);
+        unsafe { m5unified_sys::m5u_set_log_display_types(kinds.as_ptr(), kinds.len()) }
     }
 
     pub fn set_touch_button_height(&mut self, pixel: u16) {
@@ -51,6 +61,10 @@ impl M5Unified {
     pub fn update_msec(&self) -> u32 {
         unsafe { m5unified_sys::m5u_get_update_msec() }
     }
+}
+
+pub(crate) fn raw_display_kinds(kinds: &[DisplayKind]) -> Vec<c_int> {
+    kinds.iter().map(|kind| kind.raw() as c_int).collect()
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
