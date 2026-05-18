@@ -428,6 +428,8 @@ mod tests {
         assert!(!m5.touch.is_enabled());
         assert!(!m5.touch.is_pressed());
         assert!(m5.touch.points().is_empty());
+        assert_eq!(m5.touch.raw_point(0), None);
+        assert!(m5.touch.raw_points().is_empty());
         assert_eq!(m5.touch.detail(0), None);
         m5.touch.set_hold_thresh_ms(500);
         m5.touch.set_flick_thresh_px(8);

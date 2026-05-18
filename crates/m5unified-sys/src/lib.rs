@@ -370,6 +370,7 @@ extern "C" {
 
     pub fn m5u_touch_count() -> c_int;
     pub fn m5u_touch_get(index: c_int, x: *mut c_int, y: *mut c_int) -> bool;
+    pub fn m5u_touch_get_raw(index: c_int, x: *mut c_int, y: *mut c_int) -> bool;
 
     pub fn m5u_rtc_is_enabled() -> bool;
     pub fn m5u_rtc_get_volt_low() -> bool;
@@ -985,6 +986,9 @@ mod host_stubs {
         0
     }
     pub unsafe fn m5u_touch_get(_index: c_int, _x: *mut c_int, _y: *mut c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_touch_get_raw(_index: c_int, _x: *mut c_int, _y: *mut c_int) -> bool {
         false
     }
 

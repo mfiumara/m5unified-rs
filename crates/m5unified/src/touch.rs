@@ -144,6 +144,19 @@ impl Touch {
             .collect()
     }
 
+    pub fn raw_point(&self, index: usize) -> Option<TouchPoint> {
+        let (mut x, mut y) = (0, 0);
+        let ok = unsafe { m5unified_sys::m5u_touch_get_raw(index as c_int, &mut x, &mut y) };
+        ok.then_some(TouchPoint { x, y })
+    }
+
+    pub fn raw_points(&self) -> Vec<TouchPoint> {
+        let count = unsafe { m5unified_sys::m5u_touch_count() }.max(0) as usize;
+        (0..count)
+            .filter_map(|index| self.raw_point(index))
+            .collect()
+    }
+
     pub fn is_pressed(&self) -> bool {
         unsafe { m5unified_sys::m5u_touch_count() > 0 }
     }

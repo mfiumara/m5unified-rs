@@ -341,6 +341,10 @@ bool m5u_touch_get(int index, int* x, int* y) {
     (void)index; (void)x; (void)y; return false;
 }
 
+bool m5u_touch_get_raw(int index, int* x, int* y) {
+    (void)index; (void)x; (void)y; return false;
+}
+
 bool m5u_rtc_get_datetime(int* year, int* month, int* day, int* hour, int* minute, int* second) {
     (void)year; (void)month; (void)day; (void)hour; (void)minute; (void)second; return false;
 }

@@ -295,6 +295,7 @@ typedef struct {
 
 int m5u_touch_count(void);
 bool m5u_touch_get(int index, int* x, int* y);
+bool m5u_touch_get_raw(int index, int* x, int* y);
 bool m5u_touch_get_detail(int index, m5u_touch_detail_t* out);
 bool m5u_touch_is_enabled(void);
 void m5u_touch_set_hold_thresh(uint16_t ms);
