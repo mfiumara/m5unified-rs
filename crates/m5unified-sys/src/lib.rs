@@ -177,6 +177,26 @@ impl Default for m5u_speaker_config_t {
 }
 
 #[repr(C)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct m5u_power_ext_port_bus_t {
+    pub voltage_mv: u16,
+    pub current_limit_ma: u8,
+    pub enable: bool,
+    pub direction_output: bool,
+}
+
+impl Default for m5u_power_ext_port_bus_t {
+    fn default() -> Self {
+        Self {
+            voltage_mv: 5_000,
+            current_limit_ma: 0,
+            enable: false,
+            direction_output: false,
+        }
+    }
+}
+
+#[repr(C)]
 #[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]
 pub struct m5u_touch_detail_t {
     pub x: c_int,
@@ -326,6 +346,7 @@ extern "C" {
 
     pub fn m5u_battery_level() -> c_int;
     pub fn m5u_battery_voltage_mv() -> c_int;
+    pub fn m5u_power_begin() -> bool;
     pub fn m5u_power_get_type() -> c_int;
     pub fn m5u_power_get_charge_state() -> c_int;
     pub fn m5u_power_is_charging() -> bool;
@@ -339,8 +360,15 @@ extern "C" {
     pub fn m5u_power_set_charge_voltage(max_mv: u16);
     pub fn m5u_power_get_vbus_voltage_mv() -> c_int;
     pub fn m5u_power_get_battery_current_ma() -> c_int;
+    pub fn m5u_power_get_ext_voltage_mv(port_mask: u16) -> c_float;
+    pub fn m5u_power_get_ext_current_ma(port_mask: u16) -> c_float;
     pub fn m5u_power_get_key_state() -> u8;
+    pub fn m5u_power_set_ext_port_bus_config(config: *const m5u_power_ext_port_bus_t);
     pub fn m5u_power_set_vibration(level: u8);
+    pub fn m5u_power_power_off();
+    pub fn m5u_power_timer_sleep_seconds(seconds: c_int);
+    pub fn m5u_power_deep_sleep_us(micro_seconds: u64, touch_wakeup: bool);
+    pub fn m5u_power_light_sleep_us(micro_seconds: u64, touch_wakeup: bool);
 
     pub fn m5u_display_get_rotation() -> c_int;
     pub fn m5u_display_set_brightness(brightness: u8);
@@ -836,6 +864,9 @@ mod host_stubs {
     pub unsafe fn m5u_battery_voltage_mv() -> c_int {
         4200
     }
+    pub unsafe fn m5u_power_begin() -> bool {
+        false
+    }
     pub unsafe fn m5u_power_get_type() -> c_int {
         0
     }
@@ -863,10 +894,21 @@ mod host_stubs {
     pub unsafe fn m5u_power_get_battery_current_ma() -> c_int {
         0
     }
+    pub unsafe fn m5u_power_get_ext_voltage_mv(_port_mask: u16) -> c_float {
+        0.0
+    }
+    pub unsafe fn m5u_power_get_ext_current_ma(_port_mask: u16) -> c_float {
+        0.0
+    }
     pub unsafe fn m5u_power_get_key_state() -> u8 {
         0
     }
+    pub unsafe fn m5u_power_set_ext_port_bus_config(_config: *const m5u_power_ext_port_bus_t) {}
     pub unsafe fn m5u_power_set_vibration(_level: u8) {}
+    pub unsafe fn m5u_power_power_off() {}
+    pub unsafe fn m5u_power_timer_sleep_seconds(_seconds: c_int) {}
+    pub unsafe fn m5u_power_deep_sleep_us(_micro_seconds: u64, _touch_wakeup: bool) {}
+    pub unsafe fn m5u_power_light_sleep_us(_micro_seconds: u64, _touch_wakeup: bool) {}
 
     pub unsafe fn m5u_display_get_rotation() -> c_int {
         0

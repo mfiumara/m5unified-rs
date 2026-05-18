@@ -313,6 +313,10 @@ int m5u_battery_voltage_mv(void) {
     return -1;
 }
 
+bool m5u_power_begin(void) {
+    return false;
+}
+
 int m5u_power_get_type(void) {
     return 0;
 }
@@ -365,12 +369,39 @@ int m5u_power_get_battery_current_ma(void) {
     return 0;
 }
 
+float m5u_power_get_ext_voltage_mv(uint16_t port_mask) {
+    (void)port_mask; return 0.0f;
+}
+
+float m5u_power_get_ext_current_ma(uint16_t port_mask) {
+    (void)port_mask; return 0.0f;
+}
+
 uint8_t m5u_power_get_key_state(void) {
     return 0;
 }
 
+void m5u_power_set_ext_port_bus_config(const m5u_power_ext_port_bus_t* config) {
+    (void)config;
+}
+
 void m5u_power_set_vibration(uint8_t level) {
     (void)level;
+}
+
+void m5u_power_power_off(void) {
+}
+
+void m5u_power_timer_sleep_seconds(int seconds) {
+    (void)seconds;
+}
+
+void m5u_power_deep_sleep_us(uint64_t micro_seconds, bool touch_wakeup) {
+    (void)micro_seconds; (void)touch_wakeup;
+}
+
+void m5u_power_light_sleep_us(uint64_t micro_seconds, bool touch_wakeup) {
+    (void)micro_seconds; (void)touch_wakeup;
 }
 
 void m5u_log_println(const char* text) {

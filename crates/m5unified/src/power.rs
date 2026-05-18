@@ -2,6 +2,14 @@
 pub struct Power;
 
 impl Power {
+    /// Initialize the power-management backend.
+    ///
+    /// `M5Unified::begin` calls this as part of normal startup; this helper is
+    /// exposed for parity with M5Unified and advanced reinitialization flows.
+    pub fn begin(&mut self) -> bool {
+        unsafe { m5unified_sys::m5u_power_begin() }
+    }
+
     /// Return the detected power-management IC type.
     pub fn pmic_type(&self) -> PowerType {
         PowerType::from_raw(unsafe { m5unified_sys::m5u_power_get_type() as i32 })
@@ -35,6 +43,16 @@ impl Power {
     /// discharge current.
     pub fn battery_current_ma(&self) -> i32 {
         unsafe { m5unified_sys::m5u_power_get_battery_current_ma() as i32 }
+    }
+
+    /// Return external-port voltage in millivolts for the selected port mask.
+    pub fn ext_voltage_mv(&self, port_mask: ExtPortMask) -> f32 {
+        unsafe { m5unified_sys::m5u_power_get_ext_voltage_mv(port_mask.bits()) }
+    }
+
+    /// Return external-port current in milliamps for the selected port mask.
+    pub fn ext_current_ma(&self, port_mask: ExtPortMask) -> f32 {
+        unsafe { m5unified_sys::m5u_power_get_ext_current_ma(port_mask.bits()) }
     }
 
     /// Return the explicit charging state reported by M5Unified.
@@ -102,13 +120,69 @@ impl Power {
         unsafe { m5unified_sys::m5u_power_get_key_state() }
     }
 
+    /// Configure external-port bus output where the board supports it.
+    pub fn set_ext_port_bus_config(&mut self, config: ExtPortBusConfig) {
+        let raw = config.to_raw();
+        unsafe { m5unified_sys::m5u_power_set_ext_port_bus_config(&raw) }
+    }
+
     /// Set vibration motor strength where the board supports it.
     pub fn set_vibration(&mut self, level: u8) {
         unsafe { m5unified_sys::m5u_power_set_vibration(level) }
     }
 
+    /// Power the board off through M5Unified.
+    pub fn power_off(&mut self) {
+        unsafe { m5unified_sys::m5u_power_power_off() }
+    }
+
+    /// Enter timer sleep and wake after the given number of seconds.
+    pub fn timer_sleep_seconds(&mut self, seconds: i32) {
+        unsafe { m5unified_sys::m5u_power_timer_sleep_seconds(seconds) }
+    }
+
+    /// Enter ESP32 deep sleep, optionally enabling touch wakeup.
+    pub fn deep_sleep_us(&mut self, micro_seconds: u64, touch_wakeup: bool) {
+        unsafe { m5unified_sys::m5u_power_deep_sleep_us(micro_seconds, touch_wakeup) }
+    }
+
+    /// Enter ESP32 light sleep, optionally enabling touch wakeup.
+    pub fn light_sleep_us(&mut self, micro_seconds: u64, touch_wakeup: bool) {
+        unsafe { m5unified_sys::m5u_power_light_sleep_us(micro_seconds, touch_wakeup) }
+    }
+
     pub fn axp2101(&self) -> Axp2101 {
         Axp2101
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct ExtPortBusConfig {
+    pub voltage_mv: u16,
+    pub current_limit_ma: u8,
+    pub enable: bool,
+    pub direction_output: bool,
+}
+
+impl ExtPortBusConfig {
+    fn to_raw(self) -> m5unified_sys::m5u_power_ext_port_bus_t {
+        m5unified_sys::m5u_power_ext_port_bus_t {
+            voltage_mv: self.voltage_mv,
+            current_limit_ma: self.current_limit_ma,
+            enable: self.enable,
+            direction_output: self.direction_output,
+        }
+    }
+}
+
+impl Default for ExtPortBusConfig {
+    fn default() -> Self {
+        Self {
+            voltage_mv: 5_000,
+            current_limit_ma: 0,
+            enable: false,
+            direction_output: false,
+        }
     }
 }
 

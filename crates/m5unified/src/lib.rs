@@ -55,7 +55,9 @@ pub use error::Error;
 pub use imu::{Imu, ImuAxis, ImuData, ImuKind, ImuSensorMask, Vec3};
 pub use led::{Led, LedColor};
 pub use log::{Log, LogLevel, LogTarget, RawLogCallback};
-pub use power::{Axp2101, Axp2101IrqStatus, ChargeState, ExtPortMask, Power, PowerType};
+pub use power::{
+    Axp2101, Axp2101IrqStatus, ChargeState, ExtPortBusConfig, ExtPortMask, Power, PowerType,
+};
 pub use rtc::{Date, DateTime, Rtc, Time};
 pub use sd::{sd_begin, sd_begin_with_config, sd_end, sd_is_mounted, SdSpiConfig, SD_MOUNT_PATH};
 pub use system::{Board, PinName};
@@ -420,10 +422,13 @@ mod tests {
     #[test]
     fn axp2101_irq_helpers_compile_on_host() {
         let mut m5 = M5Unified::begin().expect("host stub begin should succeed");
+        assert!(!m5.power.begin());
         assert_eq!(m5.power.pmic_type(), PowerType::Unknown);
         assert_eq!(m5.power.charge_state(), ChargeState::Unknown);
         assert_eq!(m5.power.vbus_voltage_mv(), None);
         assert_eq!(m5.power.battery_current_ma(), 0);
+        assert_eq!(m5.power.ext_voltage_mv(ExtPortMask::PA), 0.0);
+        assert_eq!(m5.power.ext_current_ma(ExtPortMask::PA), 0.0);
         assert_eq!(m5.power.key_state(), 0);
         m5.power.set_led(32);
         m5.power
@@ -436,6 +441,16 @@ mod tests {
         m5.power.set_charge_current_ma(500);
         m5.power.set_charge_voltage_mv(4_200);
         m5.power.set_vibration(0);
+        m5.power.set_ext_port_bus_config(ExtPortBusConfig {
+            voltage_mv: 5_000,
+            current_limit_ma: 100,
+            enable: true,
+            direction_output: true,
+        });
+        m5.power.timer_sleep_seconds(0);
+        m5.power.deep_sleep_us(0, false);
+        m5.power.light_sleep_us(0, false);
+        m5.power.power_off();
         let axp = m5.power.axp2101();
         let mask = Axp2101::IRQ_BAT_CHG_UNDER_TEMP | Axp2101::IRQ_VBUS_INSERT;
         assert!(!axp.disable_irq(Axp2101::IRQ_ALL));

@@ -507,6 +507,10 @@ int m5u_battery_voltage_mv(void) {
     return M5.Power.getBatteryVoltage();
 }
 
+bool m5u_power_begin(void) {
+    return M5.Power.begin();
+}
+
 int m5u_power_get_type(void) {
     return (int)M5.Power.getType();
 }
@@ -559,12 +563,48 @@ int m5u_power_get_battery_current_ma(void) {
     return M5.Power.getBatteryCurrent();
 }
 
+float m5u_power_get_ext_voltage_mv(uint16_t port_mask) {
+    return M5.Power.getExtVoltage((m5::ext_port_mask_t)port_mask);
+}
+
+float m5u_power_get_ext_current_ma(uint16_t port_mask) {
+    return M5.Power.getExtCurrent((m5::ext_port_mask_t)port_mask);
+}
+
 uint8_t m5u_power_get_key_state(void) {
     return M5.Power.getKeyState();
 }
 
+void m5u_power_set_ext_port_bus_config(const m5u_power_ext_port_bus_t* config) {
+    if (!config) {
+        return;
+    }
+    m5::ext_port_bus_t bus_config;
+    bus_config.voltage = config->voltage_mv;
+    bus_config.currentLimit = config->current_limit_ma;
+    bus_config.enable = config->enable;
+    bus_config.direction = config->direction_output;
+    M5.Power.setExtPortBusConfig(bus_config);
+}
+
 void m5u_power_set_vibration(uint8_t level) {
     M5.Power.setVibration(level);
+}
+
+void m5u_power_power_off(void) {
+    M5.Power.powerOff();
+}
+
+void m5u_power_timer_sleep_seconds(int seconds) {
+    M5.Power.timerSleep(seconds);
+}
+
+void m5u_power_deep_sleep_us(uint64_t micro_seconds, bool touch_wakeup) {
+    M5.Power.deepSleep(micro_seconds, touch_wakeup);
+}
+
+void m5u_power_light_sleep_us(uint64_t micro_seconds, bool touch_wakeup) {
+    M5.Power.lightSleep(micro_seconds, touch_wakeup);
 }
 
 void m5u_log_println(const char* text) {
