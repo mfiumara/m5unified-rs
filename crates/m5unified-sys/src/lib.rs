@@ -284,6 +284,48 @@ extern "C" {
     pub fn m5u_set_touch_button_height_by_ratio(ratio: u8);
     pub fn m5u_get_touch_button_height() -> u16;
 
+    pub fn m5u_i2c_set_port(bus: c_int, port_num: c_int, pin_sda: c_int, pin_scl: c_int);
+    pub fn m5u_i2c_begin(bus: c_int) -> bool;
+    pub fn m5u_i2c_begin_with_port(
+        bus: c_int,
+        port_num: c_int,
+        pin_sda: c_int,
+        pin_scl: c_int,
+    ) -> bool;
+    pub fn m5u_i2c_release(bus: c_int) -> bool;
+    pub fn m5u_i2c_is_enabled(bus: c_int) -> bool;
+    pub fn m5u_i2c_get_port(bus: c_int) -> c_int;
+    pub fn m5u_i2c_get_sda(bus: c_int) -> c_int;
+    pub fn m5u_i2c_get_scl(bus: c_int) -> c_int;
+    pub fn m5u_i2c_start(bus: c_int, address: u8, read: bool, freq: u32) -> bool;
+    pub fn m5u_i2c_restart(bus: c_int, address: u8, read: bool, freq: u32) -> bool;
+    pub fn m5u_i2c_stop(bus: c_int) -> bool;
+    pub fn m5u_i2c_write_byte(bus: c_int, data: u8) -> bool;
+    pub fn m5u_i2c_write(bus: c_int, data: *const u8, length: usize) -> bool;
+    pub fn m5u_i2c_read(bus: c_int, result: *mut u8, length: usize, last_nack: bool) -> bool;
+    pub fn m5u_i2c_write_register(
+        bus: c_int,
+        address: u8,
+        reg: u8,
+        data: *const u8,
+        length: usize,
+        freq: u32,
+    ) -> bool;
+    pub fn m5u_i2c_read_register(
+        bus: c_int,
+        address: u8,
+        reg: u8,
+        result: *mut u8,
+        length: usize,
+        freq: u32,
+    ) -> bool;
+    pub fn m5u_i2c_write_register8(bus: c_int, address: u8, reg: u8, data: u8, freq: u32) -> bool;
+    pub fn m5u_i2c_read_register8(bus: c_int, address: u8, reg: u8, freq: u32) -> u8;
+    pub fn m5u_i2c_bit_on(bus: c_int, address: u8, reg: u8, data: u8, freq: u32) -> bool;
+    pub fn m5u_i2c_bit_off(bus: c_int, address: u8, reg: u8, data: u8, freq: u32) -> bool;
+    pub fn m5u_i2c_scan(bus: c_int, result: *mut bool, freq: u32);
+    pub fn m5u_i2c_scan_address(bus: c_int, address: u8, freq: u32) -> bool;
+
     pub fn m5u_display_width() -> c_int;
     pub fn m5u_display_height() -> c_int;
     pub fn m5u_display_fill_screen(color: u16);
@@ -653,6 +695,133 @@ mod host_stubs {
     pub unsafe fn m5u_set_touch_button_height_by_ratio(_ratio: u8) {}
     pub unsafe fn m5u_get_touch_button_height() -> u16 {
         0
+    }
+
+    pub unsafe fn m5u_i2c_set_port(
+        _bus: c_int,
+        _port_num: c_int,
+        _pin_sda: c_int,
+        _pin_scl: c_int,
+    ) {
+    }
+    pub unsafe fn m5u_i2c_begin(_bus: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_i2c_begin_with_port(
+        _bus: c_int,
+        _port_num: c_int,
+        _pin_sda: c_int,
+        _pin_scl: c_int,
+    ) -> bool {
+        false
+    }
+    pub unsafe fn m5u_i2c_release(_bus: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_i2c_is_enabled(_bus: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_i2c_get_port(_bus: c_int) -> c_int {
+        -1
+    }
+    pub unsafe fn m5u_i2c_get_sda(_bus: c_int) -> c_int {
+        -1
+    }
+    pub unsafe fn m5u_i2c_get_scl(_bus: c_int) -> c_int {
+        -1
+    }
+    pub unsafe fn m5u_i2c_start(_bus: c_int, _address: u8, _read: bool, _freq: u32) -> bool {
+        false
+    }
+    pub unsafe fn m5u_i2c_restart(_bus: c_int, _address: u8, _read: bool, _freq: u32) -> bool {
+        false
+    }
+    pub unsafe fn m5u_i2c_stop(_bus: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_i2c_write_byte(_bus: c_int, _data: u8) -> bool {
+        false
+    }
+    pub unsafe fn m5u_i2c_write(_bus: c_int, _data: *const u8, _length: usize) -> bool {
+        false
+    }
+    pub unsafe fn m5u_i2c_read(
+        _bus: c_int,
+        result: *mut u8,
+        length: usize,
+        _last_nack: bool,
+    ) -> bool {
+        if !result.is_null() {
+            for i in 0..length {
+                ptr::write(result.add(i), 0);
+            }
+        }
+        false
+    }
+    pub unsafe fn m5u_i2c_write_register(
+        _bus: c_int,
+        _address: u8,
+        _reg: u8,
+        _data: *const u8,
+        _length: usize,
+        _freq: u32,
+    ) -> bool {
+        false
+    }
+    pub unsafe fn m5u_i2c_read_register(
+        _bus: c_int,
+        _address: u8,
+        _reg: u8,
+        result: *mut u8,
+        length: usize,
+        _freq: u32,
+    ) -> bool {
+        if !result.is_null() {
+            for i in 0..length {
+                ptr::write(result.add(i), 0);
+            }
+        }
+        false
+    }
+    pub unsafe fn m5u_i2c_write_register8(
+        _bus: c_int,
+        _address: u8,
+        _reg: u8,
+        _data: u8,
+        _freq: u32,
+    ) -> bool {
+        false
+    }
+    pub unsafe fn m5u_i2c_read_register8(_bus: c_int, _address: u8, _reg: u8, _freq: u32) -> u8 {
+        0
+    }
+    pub unsafe fn m5u_i2c_bit_on(
+        _bus: c_int,
+        _address: u8,
+        _reg: u8,
+        _data: u8,
+        _freq: u32,
+    ) -> bool {
+        false
+    }
+    pub unsafe fn m5u_i2c_bit_off(
+        _bus: c_int,
+        _address: u8,
+        _reg: u8,
+        _data: u8,
+        _freq: u32,
+    ) -> bool {
+        false
+    }
+    pub unsafe fn m5u_i2c_scan(_bus: c_int, result: *mut bool, _freq: u32) {
+        if !result.is_null() {
+            for i in 0..120 {
+                ptr::write(result.add(i), false);
+            }
+        }
+    }
+    pub unsafe fn m5u_i2c_scan_address(_bus: c_int, _address: u8, _freq: u32) -> bool {
+        false
     }
 
     pub unsafe fn m5u_display_width() -> c_int {

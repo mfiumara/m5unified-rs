@@ -121,6 +121,128 @@ uint16_t m5u_get_touch_button_height(void) {
     return M5.getTouchButtonHeight();
 }
 
+static m5::I2C_Class* m5u_i2c_for_bus(int bus) {
+    switch (bus) {
+        case 0: return &M5.In_I2C;
+        case 1: return &M5.Ex_I2C;
+        default: return nullptr;
+    }
+}
+
+void m5u_i2c_set_port(int bus, int port_num, int pin_sda, int pin_scl) {
+    auto i2c = m5u_i2c_for_bus(bus);
+    if (i2c) {
+        i2c->setPort((i2c_port_t)port_num, pin_sda, pin_scl);
+    }
+}
+
+bool m5u_i2c_begin(int bus) {
+    auto i2c = m5u_i2c_for_bus(bus);
+    return i2c && i2c->begin();
+}
+
+bool m5u_i2c_begin_with_port(int bus, int port_num, int pin_sda, int pin_scl) {
+    auto i2c = m5u_i2c_for_bus(bus);
+    return i2c && i2c->begin((i2c_port_t)port_num, pin_sda, pin_scl);
+}
+
+bool m5u_i2c_release(int bus) {
+    auto i2c = m5u_i2c_for_bus(bus);
+    return i2c && i2c->release();
+}
+
+bool m5u_i2c_is_enabled(int bus) {
+    auto i2c = m5u_i2c_for_bus(bus);
+    return i2c && i2c->isEnabled();
+}
+
+int m5u_i2c_get_port(int bus) {
+    auto i2c = m5u_i2c_for_bus(bus);
+    return i2c ? (int)i2c->getPort() : -1;
+}
+
+int m5u_i2c_get_sda(int bus) {
+    auto i2c = m5u_i2c_for_bus(bus);
+    return i2c ? i2c->getSDA() : -1;
+}
+
+int m5u_i2c_get_scl(int bus) {
+    auto i2c = m5u_i2c_for_bus(bus);
+    return i2c ? i2c->getSCL() : -1;
+}
+
+bool m5u_i2c_start(int bus, uint8_t address, bool read, uint32_t freq) {
+    auto i2c = m5u_i2c_for_bus(bus);
+    return i2c && i2c->start(address, read, freq);
+}
+
+bool m5u_i2c_restart(int bus, uint8_t address, bool read, uint32_t freq) {
+    auto i2c = m5u_i2c_for_bus(bus);
+    return i2c && i2c->restart(address, read, freq);
+}
+
+bool m5u_i2c_stop(int bus) {
+    auto i2c = m5u_i2c_for_bus(bus);
+    return i2c && i2c->stop();
+}
+
+bool m5u_i2c_write_byte(int bus, uint8_t data) {
+    auto i2c = m5u_i2c_for_bus(bus);
+    return i2c && i2c->write(data);
+}
+
+bool m5u_i2c_write(int bus, const uint8_t* data, size_t length) {
+    auto i2c = m5u_i2c_for_bus(bus);
+    return i2c && i2c->write(data, length);
+}
+
+bool m5u_i2c_read(int bus, uint8_t* result, size_t length, bool last_nack) {
+    auto i2c = m5u_i2c_for_bus(bus);
+    return i2c && i2c->read(result, length, last_nack);
+}
+
+bool m5u_i2c_write_register(int bus, uint8_t address, uint8_t reg, const uint8_t* data, size_t length, uint32_t freq) {
+    auto i2c = m5u_i2c_for_bus(bus);
+    return i2c && i2c->writeRegister(address, reg, data, length, freq);
+}
+
+bool m5u_i2c_read_register(int bus, uint8_t address, uint8_t reg, uint8_t* result, size_t length, uint32_t freq) {
+    auto i2c = m5u_i2c_for_bus(bus);
+    return i2c && i2c->readRegister(address, reg, result, length, freq);
+}
+
+bool m5u_i2c_write_register8(int bus, uint8_t address, uint8_t reg, uint8_t data, uint32_t freq) {
+    auto i2c = m5u_i2c_for_bus(bus);
+    return i2c && i2c->writeRegister8(address, reg, data, freq);
+}
+
+uint8_t m5u_i2c_read_register8(int bus, uint8_t address, uint8_t reg, uint32_t freq) {
+    auto i2c = m5u_i2c_for_bus(bus);
+    return i2c ? i2c->readRegister8(address, reg, freq) : 0;
+}
+
+bool m5u_i2c_bit_on(int bus, uint8_t address, uint8_t reg, uint8_t data, uint32_t freq) {
+    auto i2c = m5u_i2c_for_bus(bus);
+    return i2c && i2c->bitOn(address, reg, data, freq);
+}
+
+bool m5u_i2c_bit_off(int bus, uint8_t address, uint8_t reg, uint8_t data, uint32_t freq) {
+    auto i2c = m5u_i2c_for_bus(bus);
+    return i2c && i2c->bitOff(address, reg, data, freq);
+}
+
+void m5u_i2c_scan(int bus, bool* result, uint32_t freq) {
+    auto i2c = m5u_i2c_for_bus(bus);
+    if (i2c && result) {
+        i2c->scanID(result, freq);
+    }
+}
+
+bool m5u_i2c_scan_address(int bus, uint8_t address, uint32_t freq) {
+    auto i2c = m5u_i2c_for_bus(bus);
+    return i2c && i2c->scanID(address, freq);
+}
+
 int m5u_display_width(void) {
     return M5.Display.width();
 }

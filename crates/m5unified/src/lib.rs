@@ -32,6 +32,7 @@ mod buttons;
 mod config;
 mod display;
 mod error;
+mod i2c;
 mod imu;
 mod led;
 mod log;
@@ -52,6 +53,7 @@ pub use display::{
     TextDatum,
 };
 pub use error::Error;
+pub use i2c::I2cBus;
 pub use imu::{Imu, ImuAxis, ImuData, ImuKind, ImuSensorMask, Vec3};
 pub use led::{Led, LedColor, LedType};
 pub use log::{Log, LogLevel, LogTarget, RawLogCallback};
@@ -70,6 +72,8 @@ pub struct M5Unified {
     pub buttons: Buttons,
     pub mic: Mic,
     pub speaker: Speaker,
+    pub in_i2c: I2cBus,
+    pub ex_i2c: I2cBus,
     pub imu: Imu,
     pub touch: Touch,
     pub rtc: Rtc,
@@ -101,6 +105,8 @@ impl M5Unified {
             buttons: Buttons,
             mic: Mic,
             speaker: Speaker,
+            in_i2c: I2cBus::INTERNAL,
+            ex_i2c: I2cBus::EXTERNAL,
             imu: Imu,
             touch: Touch,
             rtc: Rtc,
@@ -269,6 +275,28 @@ mod tests {
         assert_eq!(m5.millis(), 0);
         assert_eq!(m5.micros(), 0);
         assert_eq!(m5.update_msec(), 0);
+        assert!(!m5.in_i2c.is_enabled());
+        assert_eq!(m5.in_i2c.port(), None);
+        assert_eq!(m5.in_i2c.sda_pin(), None);
+        assert_eq!(m5.in_i2c.scl_pin(), None);
+        m5.ex_i2c.set_port(0, 1, 2);
+        assert!(!m5.ex_i2c.begin());
+        assert!(!m5.ex_i2c.begin_with_port(0, 1, 2));
+        assert!(!m5.ex_i2c.start(0x42, false, 100_000));
+        assert!(!m5.ex_i2c.restart(0x42, true, 100_000));
+        assert!(!m5.ex_i2c.write_byte(0xAA));
+        assert!(!m5.ex_i2c.write(&[1, 2, 3]));
+        assert!(!m5.ex_i2c.read(&mut [0_u8; 2], true));
+        assert!(!m5.ex_i2c.write_register(0x42, 0x10, &[1], 100_000));
+        assert!(!m5.ex_i2c.read_register(0x42, 0x10, &mut [0_u8; 2], 100_000));
+        assert!(!m5.ex_i2c.write_register8(0x42, 0x10, 1, 100_000));
+        assert_eq!(m5.ex_i2c.read_register8(0x42, 0x10, 100_000), 0);
+        assert!(!m5.ex_i2c.bit_on(0x42, 0x10, 0x01, 100_000));
+        assert!(!m5.ex_i2c.bit_off(0x42, 0x10, 0x01, 100_000));
+        assert!(!m5.ex_i2c.scan_address(0x42, 100_000));
+        assert_eq!(m5.ex_i2c.scan(100_000), [false; 120]);
+        assert!(!m5.ex_i2c.stop());
+        assert!(!m5.ex_i2c.release());
     }
 
     #[test]

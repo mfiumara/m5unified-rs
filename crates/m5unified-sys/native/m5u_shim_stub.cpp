@@ -68,6 +68,99 @@ uint16_t m5u_get_touch_button_height(void) {
     return 0;
 }
 
+void m5u_i2c_set_port(int bus, int port_num, int pin_sda, int pin_scl) {
+    (void)bus; (void)port_num; (void)pin_sda; (void)pin_scl;
+}
+
+bool m5u_i2c_begin(int bus) {
+    (void)bus; return false;
+}
+
+bool m5u_i2c_begin_with_port(int bus, int port_num, int pin_sda, int pin_scl) {
+    (void)bus; (void)port_num; (void)pin_sda; (void)pin_scl; return false;
+}
+
+bool m5u_i2c_release(int bus) {
+    (void)bus; return false;
+}
+
+bool m5u_i2c_is_enabled(int bus) {
+    (void)bus; return false;
+}
+
+int m5u_i2c_get_port(int bus) {
+    (void)bus; return -1;
+}
+
+int m5u_i2c_get_sda(int bus) {
+    (void)bus; return -1;
+}
+
+int m5u_i2c_get_scl(int bus) {
+    (void)bus; return -1;
+}
+
+bool m5u_i2c_start(int bus, uint8_t address, bool read, uint32_t freq) {
+    (void)bus; (void)address; (void)read; (void)freq; return false;
+}
+
+bool m5u_i2c_restart(int bus, uint8_t address, bool read, uint32_t freq) {
+    (void)bus; (void)address; (void)read; (void)freq; return false;
+}
+
+bool m5u_i2c_stop(int bus) {
+    (void)bus; return false;
+}
+
+bool m5u_i2c_write_byte(int bus, uint8_t data) {
+    (void)bus; (void)data; return false;
+}
+
+bool m5u_i2c_write(int bus, const uint8_t* data, size_t length) {
+    (void)bus; (void)data; (void)length; return false;
+}
+
+bool m5u_i2c_read(int bus, uint8_t* result, size_t length, bool last_nack) {
+    (void)bus; (void)result; (void)length; (void)last_nack; return false;
+}
+
+bool m5u_i2c_write_register(int bus, uint8_t address, uint8_t reg, const uint8_t* data, size_t length, uint32_t freq) {
+    (void)bus; (void)address; (void)reg; (void)data; (void)length; (void)freq; return false;
+}
+
+bool m5u_i2c_read_register(int bus, uint8_t address, uint8_t reg, uint8_t* result, size_t length, uint32_t freq) {
+    (void)bus; (void)address; (void)reg; (void)result; (void)length; (void)freq; return false;
+}
+
+bool m5u_i2c_write_register8(int bus, uint8_t address, uint8_t reg, uint8_t data, uint32_t freq) {
+    (void)bus; (void)address; (void)reg; (void)data; (void)freq; return false;
+}
+
+uint8_t m5u_i2c_read_register8(int bus, uint8_t address, uint8_t reg, uint32_t freq) {
+    (void)bus; (void)address; (void)reg; (void)freq; return 0;
+}
+
+bool m5u_i2c_bit_on(int bus, uint8_t address, uint8_t reg, uint8_t data, uint32_t freq) {
+    (void)bus; (void)address; (void)reg; (void)data; (void)freq; return false;
+}
+
+bool m5u_i2c_bit_off(int bus, uint8_t address, uint8_t reg, uint8_t data, uint32_t freq) {
+    (void)bus; (void)address; (void)reg; (void)data; (void)freq; return false;
+}
+
+void m5u_i2c_scan(int bus, bool* result, uint32_t freq) {
+    (void)bus; (void)freq;
+    if (result) {
+        for (size_t i = 0; i < 120; ++i) {
+            result[i] = false;
+        }
+    }
+}
+
+bool m5u_i2c_scan_address(int bus, uint8_t address, uint32_t freq) {
+    (void)bus; (void)address; (void)freq; return false;
+}
+
 int m5u_display_width(void) {
     return 0;
 }
