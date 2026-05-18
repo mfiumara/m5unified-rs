@@ -61,7 +61,9 @@ pub use power::{
     Axp2101, Axp2101IrqStatus, ChargeState, ExtPortBusConfig, ExtPortMask, Power, PowerType,
 };
 pub use rtc::{Date, DateTime, Rtc, Time};
-pub use sd::{sd_begin, sd_begin_with_config, sd_end, sd_is_mounted, SdSpiConfig, SD_MOUNT_PATH};
+pub use sd::{
+    sd_begin, sd_begin_with_config, sd_end, sd_is_mounted, SdCard, SdSpiConfig, SD_MOUNT_PATH,
+};
 pub(crate) use system::raw_display_kinds;
 pub use system::{Board, PinName};
 pub use touch::{Touch, TouchDetail, TouchPoint, TouchState};
@@ -553,9 +555,19 @@ mod tests {
             ..SdSpiConfig::default()
         };
         assert_eq!(SD_MOUNT_PATH, "/sdcard");
+        assert_eq!(
+            SdCard::path_for("sound.wav"),
+            std::path::PathBuf::from("/sdcard/sound.wav")
+        );
+        assert_eq!(
+            SdCard::path_for("/tmp/sound.wav"),
+            std::path::PathBuf::from("/tmp/sound.wav")
+        );
         assert!(!sd_begin());
         assert!(!sd_begin_with_config(&config));
         assert!(!sd_is_mounted());
+        assert!(SdCard::mount().is_err());
+        assert!(SdCard::mount_with_config(&config).is_err());
         sd_end();
     }
 

@@ -1,4 +1,7 @@
 use core::ffi::c_int;
+use std::path::{Path, PathBuf};
+
+use crate::Error;
 
 /// FAT VFS mount path used by the native SD SPI helper.
 pub const SD_MOUNT_PATH: &str = "/sdcard";
@@ -22,6 +25,62 @@ pub fn sd_is_mounted() -> bool {
 /// Unmount the SD card mounted by [`sd_begin`] or [`sd_begin_with_config`].
 pub fn sd_end() {
     unsafe { m5unified_sys::m5u_sd_end() }
+}
+
+/// Mounted SD card handle.
+///
+/// Dropping this value unmounts the card through the native shim.
+#[derive(Debug)]
+pub struct SdCard;
+
+impl SdCard {
+    /// Mount an SD card using the board SD SPI pins reported by M5Unified.
+    pub fn mount() -> Result<Self, Error> {
+        sd_begin()
+            .then_some(Self)
+            .ok_or(Error::Unavailable("sd card"))
+    }
+
+    /// Mount an SD card using explicit SPI pins and mount options.
+    pub fn mount_with_config(config: &SdSpiConfig) -> Result<Self, Error> {
+        sd_begin_with_config(config)
+            .then_some(Self)
+            .ok_or(Error::Unavailable("sd card"))
+    }
+
+    /// Return whether this shim has an SD card mounted at [`SD_MOUNT_PATH`].
+    pub fn is_mounted(&self) -> bool {
+        sd_is_mounted()
+    }
+
+    /// Return the FAT VFS mount path used by the native SD SPI helper.
+    pub const fn mount_path(&self) -> &'static str {
+        SD_MOUNT_PATH
+    }
+
+    /// Convert a card-relative path into an absolute path under [`SD_MOUNT_PATH`].
+    pub fn path_for(path: impl AsRef<Path>) -> PathBuf {
+        let path = path.as_ref();
+        if path.is_absolute() {
+            path.to_path_buf()
+        } else {
+            Path::new(SD_MOUNT_PATH).join(path)
+        }
+    }
+
+    /// Read a file from the mounted SD card.
+    ///
+    /// Absolute paths are used unchanged. Relative paths are resolved under
+    /// [`SD_MOUNT_PATH`].
+    pub fn read(&self, path: impl AsRef<Path>) -> std::io::Result<Vec<u8>> {
+        std::fs::read(Self::path_for(path))
+    }
+}
+
+impl Drop for SdCard {
+    fn drop(&mut self) {
+        sd_end();
+    }
 }
 
 /// SPI configuration for mounting an SD card through ESP-IDF's SDSPI driver.

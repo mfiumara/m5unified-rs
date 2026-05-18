@@ -39,7 +39,7 @@ rust_bin = "advanced_speaker_sd_wav_file"
 status = "host_compiles"
 category = "advanced"
 requires = ["speaker", "sd", "wav"]
-notes = "SD mount uses the ESP-IDF SDSPI helper; WAV file parsing/streaming remains application-level."
+notes = "SD mount uses the ESP-IDF SDSPI helper; example loads WAV bytes from the mounted VFS and passes them to Speaker::play_wav."
 
 [[example]]
 upstream = "Advanced/WebRadio_with_ESP8266Audio/WebRadio_with_ESP8266Audio.ino"
