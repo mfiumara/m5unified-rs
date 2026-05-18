@@ -275,6 +275,11 @@ mod tests {
         assert_eq!(m5.millis(), 0);
         assert_eq!(m5.micros(), 0);
         assert_eq!(m5.update_msec(), 0);
+        assert_eq!(Board::from_raw(1), Board::M5Stack);
+        assert_eq!(Board::from_raw(199), Board::M5ModuleDisplay);
+        assert_eq!(Board::from_raw(999), Board::Raw(999));
+        assert_eq!(Board::M5AtomS3Lite.raw(), 137);
+        assert_eq!(DisplayKind::ModuleDisplay.raw(), 199);
         assert!(!m5.in_i2c.is_enabled());
         assert_eq!(m5.in_i2c.port(), None);
         assert_eq!(m5.in_i2c.sda_pin(), None);
@@ -329,6 +334,13 @@ mod tests {
         };
         let m5 = M5Unified::begin_with_config(&config).expect("host stub begin should succeed");
         assert_eq!(m5.display.width(), 320);
+        assert_eq!(config.to_raw().fallback_board, -1);
+
+        let config = M5UnifiedConfig {
+            fallback_board: Some(Board::M5AtomS3Lite),
+            ..M5UnifiedConfig::default()
+        };
+        assert_eq!(config.to_raw().fallback_board, 137);
     }
 
     #[test]

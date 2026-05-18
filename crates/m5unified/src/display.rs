@@ -296,17 +296,15 @@ pub enum DisplayKind {
 impl DisplayKind {
     pub(crate) fn raw(self) -> i32 {
         match self {
-            // These values intentionally remain best-effort. M5Unified's enum is
-            // version-dependent; callers can use Raw for exact board IDs.
-            Self::ModuleDisplay => 0,
-            Self::AtomDisplay => 1,
-            Self::ModuleRca => 2,
-            Self::UnitGlass => 3,
-            Self::UnitGlass2 => 4,
-            Self::UnitOled => 5,
-            Self::UnitMiniOled => 6,
-            Self::UnitLcd => 7,
-            Self::UnitRca => 8,
+            Self::AtomDisplay => 192,
+            Self::UnitLcd => 193,
+            Self::UnitOled => 194,
+            Self::UnitMiniOled => 195,
+            Self::UnitGlass => 196,
+            Self::UnitGlass2 => 197,
+            Self::UnitRca => 198,
+            Self::ModuleDisplay => 199,
+            Self::ModuleRca => 200,
             Self::Raw(value) => value,
         }
     }

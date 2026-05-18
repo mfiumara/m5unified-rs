@@ -73,7 +73,7 @@ The current wrapper covers the API used by the translated upstream examples:
 - touch points, touch detail state, flick/drag state helpers, and touch thresholds
 - RTC date/time, date-only/time-only, low-voltage and IRQ helpers, system-time sync, power PMIC type, battery/VBUS/external-port readings, sleep/power-off, output/charge controls, AXP2101 IRQ helpers, LED control/color batches/type queries, logging dump/path/configuration/callbacks, and SD SPI mount helpers
 - internal/external I2C bus setup, raw transfers, register helpers, device helpers, bit helpers, and address scanning
-- board identity, timing helpers, pin lookup, primary/log display selection, and touch-button sizing
+- named board identity, timing helpers, pin lookup, primary/log display selection, and touch-button sizing
 
 This is not a complete M5Unified port yet. Missing APIs should be added through
 the C ABI shim first, then wrapped by `m5unified`.
