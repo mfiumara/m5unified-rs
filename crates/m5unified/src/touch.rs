@@ -133,9 +133,12 @@ impl Touch {
         unsafe { m5unified_sys::m5u_touch_is_enabled() }
     }
 
+    pub fn count(&self) -> usize {
+        unsafe { m5unified_sys::m5u_touch_count() }.max(0) as usize
+    }
+
     pub fn points(&self) -> Vec<TouchPoint> {
-        let count = unsafe { m5unified_sys::m5u_touch_count() }.max(0) as usize;
-        (0..count)
+        (0..self.count())
             .filter_map(|index| {
                 let (mut x, mut y) = (0, 0);
                 let ok = unsafe { m5unified_sys::m5u_touch_get(index as c_int, &mut x, &mut y) };
@@ -151,14 +154,13 @@ impl Touch {
     }
 
     pub fn raw_points(&self) -> Vec<TouchPoint> {
-        let count = unsafe { m5unified_sys::m5u_touch_count() }.max(0) as usize;
-        (0..count)
+        (0..self.count())
             .filter_map(|index| self.raw_point(index))
             .collect()
     }
 
     pub fn is_pressed(&self) -> bool {
-        unsafe { m5unified_sys::m5u_touch_count() > 0 }
+        self.count() > 0
     }
 
     pub fn detail(&self, index: usize) -> Option<TouchDetail> {
@@ -181,6 +183,12 @@ impl Touch {
             is_holding: raw.is_holding,
             click_count: raw.click_count,
         })
+    }
+
+    pub fn details(&self) -> Vec<TouchDetail> {
+        (0..self.count())
+            .filter_map(|index| self.detail(index))
+            .collect()
     }
 
     pub fn set_hold_thresh_ms(&mut self, ms: u16) {
@@ -212,6 +220,34 @@ pub struct TouchDetail {
 }
 
 impl TouchDetail {
+    pub fn is_pressed(&self) -> bool {
+        self.is_pressed
+    }
+
+    pub fn was_pressed(&self) -> bool {
+        self.was_pressed
+    }
+
+    pub fn was_clicked(&self) -> bool {
+        self.was_clicked
+    }
+
+    pub fn was_released(&self) -> bool {
+        self.was_released
+    }
+
+    pub fn is_holding(&self) -> bool {
+        self.is_holding
+    }
+
+    pub fn was_hold(&self) -> bool {
+        self.was_hold
+    }
+
+    pub fn click_count(&self) -> i32 {
+        self.click_count
+    }
+
     pub fn delta_x(&self) -> i32 {
         self.x - self.prev_x
     }

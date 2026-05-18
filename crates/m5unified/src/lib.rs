@@ -433,10 +433,12 @@ mod tests {
         let mut m5 = M5Unified::begin().expect("host stub begin should succeed");
         assert!(!m5.touch.is_enabled());
         assert!(!m5.touch.is_pressed());
+        assert_eq!(m5.touch.count(), 0);
         assert!(m5.touch.points().is_empty());
         assert_eq!(m5.touch.raw_point(0), None);
         assert!(m5.touch.raw_points().is_empty());
         assert_eq!(m5.touch.detail(0), None);
+        assert!(m5.touch.details().is_empty());
         m5.touch.set_hold_thresh_ms(500);
         m5.touch.set_flick_thresh_px(8);
 
@@ -462,8 +464,22 @@ mod tests {
             base_x: 4,
             base_y: 5,
             state: TouchState::DragBegin,
+            is_pressed: true,
+            was_pressed: true,
+            was_clicked: false,
+            was_released: false,
+            was_hold: false,
+            is_holding: true,
+            click_count: 2,
             ..TouchDetail::default()
         };
+        assert!(detail.is_pressed());
+        assert!(detail.was_pressed());
+        assert!(!detail.was_clicked());
+        assert!(!detail.was_released());
+        assert!(detail.is_holding());
+        assert!(!detail.was_hold());
+        assert_eq!(detail.click_count(), 2);
         assert_eq!(detail.delta_x(), 2);
         assert_eq!(detail.delta_y(), 4);
         assert_eq!(detail.delta(), (2, 4));
