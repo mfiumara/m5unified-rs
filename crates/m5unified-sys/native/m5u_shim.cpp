@@ -216,12 +216,24 @@ bool m5u_mic_begin(void) {
     return M5.Mic.begin();
 }
 
+bool m5u_mic_is_running(void) {
+    return M5.Mic.isRunning();
+}
+
 bool m5u_mic_record_i16(int16_t* buffer, size_t samples) {
+    return M5.Mic.record(buffer, samples);
+}
+
+bool m5u_mic_record_u8(uint8_t* buffer, size_t samples) {
     return M5.Mic.record(buffer, samples);
 }
 
 bool m5u_speaker_begin(void) {
     return M5.Speaker.begin();
+}
+
+bool m5u_speaker_is_running(void) {
+    return M5.Speaker.isRunning();
 }
 
 void m5u_speaker_set_volume(uint8_t volume) {
@@ -922,12 +934,28 @@ bool m5u_mic_is_recording(void) {
     return M5.Mic.isRecording();
 }
 
+size_t m5u_mic_recording_state(void) {
+    return M5.Mic.isRecording();
+}
+
 void m5u_mic_end(void) {
     M5.Mic.end();
 }
 
 bool m5u_mic_record_i16_at(int16_t* buffer, size_t samples, uint32_t sample_rate_hz) {
     return M5.Mic.record(buffer, samples, sample_rate_hz);
+}
+
+bool m5u_mic_record_i16_ex(int16_t* buffer, size_t samples, uint32_t sample_rate_hz, bool stereo) {
+    return M5.Mic.record(buffer, samples, sample_rate_hz, stereo);
+}
+
+bool m5u_mic_record_u8_ex(uint8_t* buffer, size_t samples, uint32_t sample_rate_hz, bool stereo) {
+    return M5.Mic.record(buffer, samples, sample_rate_hz, stereo);
+}
+
+void m5u_mic_set_sample_rate(uint32_t sample_rate_hz) {
+    M5.Mic.setSampleRate(sample_rate_hz);
 }
 
 bool m5u_mic_get_config(m5u_mic_config_t* out) {
@@ -1053,16 +1081,48 @@ bool m5u_speaker_tone_ex(float frequency_hz, uint32_t duration_ms, int channel) 
     return M5.Speaker.tone(frequency_hz, duration_ms, channel);
 }
 
+bool m5u_speaker_tone_options(float frequency_hz, uint32_t duration_ms, int channel, bool stop_current_sound) {
+    return M5.Speaker.tone(frequency_hz, duration_ms, channel, stop_current_sound);
+}
+
+bool m5u_speaker_tone_full(float frequency_hz, uint32_t duration_ms, int channel, bool stop_current_sound, const uint8_t* raw_data, size_t len, bool stereo) {
+    return raw_data && len ? M5.Speaker.tone(frequency_hz, duration_ms, channel, stop_current_sound, raw_data, len, stereo) : false;
+}
+
 bool m5u_speaker_play_u8(const uint8_t* samples, size_t len, uint32_t sample_rate_hz) {
     return M5.Speaker.playRaw(samples, len, sample_rate_hz, false, 1, 0);
+}
+
+bool m5u_speaker_play_u8_ex(const uint8_t* samples, size_t len, uint32_t sample_rate_hz, bool stereo, uint32_t repeat, int channel, bool stop_current_sound) {
+    return M5.Speaker.playRaw(samples, len, sample_rate_hz, stereo, repeat, channel, stop_current_sound);
+}
+
+bool m5u_speaker_play_i8_ex(const int8_t* samples, size_t len, uint32_t sample_rate_hz, bool stereo, uint32_t repeat, int channel, bool stop_current_sound) {
+    return M5.Speaker.playRaw(samples, len, sample_rate_hz, stereo, repeat, channel, stop_current_sound);
+}
+
+bool m5u_speaker_play_i16_ex(const int16_t* samples, size_t len, uint32_t sample_rate_hz, bool stereo, uint32_t repeat, int channel, bool stop_current_sound) {
+    return M5.Speaker.playRaw(samples, len, sample_rate_hz, stereo, repeat, channel, stop_current_sound);
 }
 
 bool m5u_speaker_play_wav(const uint8_t* data, size_t len) {
     return M5.Speaker.playWav(data, len);
 }
 
+bool m5u_speaker_play_wav_ex(const uint8_t* data, size_t len, uint32_t repeat, int channel, bool stop_current_sound) {
+    return M5.Speaker.playWav(data, len, repeat, channel, stop_current_sound);
+}
+
 bool m5u_speaker_is_playing(int channel) {
     return channel < 0 ? M5.Speaker.isPlaying() : M5.Speaker.isPlaying(channel);
+}
+
+size_t m5u_speaker_playing_channels(void) {
+    return M5.Speaker.getPlayingChannels();
+}
+
+size_t m5u_speaker_channel_playing_state(int channel) {
+    return channel >= 0 ? M5.Speaker.isPlaying(channel) : 0;
 }
 
 void m5u_speaker_stop(int channel) {

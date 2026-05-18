@@ -1,5 +1,9 @@
 use crate::Error;
 
+fn channel_to_raw(channel: Option<u8>) -> i32 {
+    channel.map(i32::from).unwrap_or(-1)
+}
+
 #[derive(Debug)]
 pub struct Mic;
 
@@ -8,8 +12,16 @@ impl Mic {
         unsafe { m5unified_sys::m5u_mic_begin() }
     }
 
+    pub fn is_running(&self) -> bool {
+        unsafe { m5unified_sys::m5u_mic_is_running() }
+    }
+
     pub fn record_i16(&mut self, buffer: &mut [i16]) -> bool {
         unsafe { m5unified_sys::m5u_mic_record_i16(buffer.as_mut_ptr(), buffer.len()) }
+    }
+
+    pub fn record_u8(&mut self, buffer: &mut [u8]) -> bool {
+        unsafe { m5unified_sys::m5u_mic_record_u8(buffer.as_mut_ptr(), buffer.len()) }
     }
 
     pub fn rms(&mut self, buffer: &mut [i16]) -> Option<f32> {
@@ -28,13 +40,57 @@ impl Mic {
         unsafe { m5unified_sys::m5u_mic_is_recording() }
     }
 
+    pub fn recording_state(&self) -> AudioQueueState {
+        AudioQueueState::from_raw(unsafe { m5unified_sys::m5u_mic_recording_state() })
+    }
+
     pub fn end(&mut self) {
         unsafe { m5unified_sys::m5u_mic_end() }
+    }
+
+    pub fn set_sample_rate(&mut self, sample_rate_hz: u32) {
+        unsafe { m5unified_sys::m5u_mic_set_sample_rate(sample_rate_hz) }
     }
 
     pub fn record_i16_at(&mut self, buffer: &mut [i16], sample_rate_hz: u32) -> bool {
         unsafe {
             m5unified_sys::m5u_mic_record_i16_at(buffer.as_mut_ptr(), buffer.len(), sample_rate_hz)
+        }
+    }
+
+    pub fn record_u8_at(&mut self, buffer: &mut [u8], sample_rate_hz: u32) -> bool {
+        self.record_u8_with_options(
+            buffer,
+            RecordingOptions {
+                sample_rate_hz,
+                stereo: false,
+            },
+        )
+    }
+
+    pub fn record_i16_with_options(
+        &mut self,
+        buffer: &mut [i16],
+        options: RecordingOptions,
+    ) -> bool {
+        unsafe {
+            m5unified_sys::m5u_mic_record_i16_ex(
+                buffer.as_mut_ptr(),
+                buffer.len(),
+                options.sample_rate_hz,
+                options.stereo,
+            )
+        }
+    }
+
+    pub fn record_u8_with_options(&mut self, buffer: &mut [u8], options: RecordingOptions) -> bool {
+        unsafe {
+            m5unified_sys::m5u_mic_record_u8_ex(
+                buffer.as_mut_ptr(),
+                buffer.len(),
+                options.sample_rate_hz,
+                options.stereo,
+            )
         }
     }
 
@@ -126,12 +182,54 @@ impl Default for MicConfig {
     }
 }
 
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct RecordingOptions {
+    pub sample_rate_hz: u32,
+    pub stereo: bool,
+}
+
+impl Default for RecordingOptions {
+    fn default() -> Self {
+        Self {
+            sample_rate_hz: 16_000,
+            stereo: false,
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum AudioQueueState {
+    Idle,
+    Active,
+    Full,
+    Unknown(usize),
+}
+
+impl AudioQueueState {
+    fn from_raw(raw: usize) -> Self {
+        match raw {
+            0 => Self::Idle,
+            1 => Self::Active,
+            2 => Self::Full,
+            other => Self::Unknown(other),
+        }
+    }
+
+    pub fn is_active(self) -> bool {
+        !matches!(self, Self::Idle)
+    }
+}
+
 #[derive(Debug)]
 pub struct Speaker;
 
 impl Speaker {
     pub fn begin(&mut self) -> bool {
         unsafe { m5unified_sys::m5u_speaker_begin() }
+    }
+
+    pub fn is_running(&self) -> bool {
+        unsafe { m5unified_sys::m5u_speaker_is_running() }
     }
 
     pub fn set_volume(&mut self, volume: u8) {
@@ -179,10 +277,37 @@ impl Speaker {
 
     pub fn tone_ex(&mut self, frequency_hz: f32, duration_ms: u32, channel: Option<u8>) -> bool {
         unsafe {
-            m5unified_sys::m5u_speaker_tone_ex(
+            m5unified_sys::m5u_speaker_tone_ex(frequency_hz, duration_ms, channel_to_raw(channel))
+        }
+    }
+
+    pub fn tone_with_options(&mut self, frequency_hz: f32, options: ToneOptions) -> bool {
+        unsafe {
+            m5unified_sys::m5u_speaker_tone_options(
                 frequency_hz,
-                duration_ms,
-                channel.map(i32::from).unwrap_or(-1),
+                options.duration_ms,
+                channel_to_raw(options.channel),
+                options.stop_current_sound,
+            )
+        }
+    }
+
+    pub fn tone_with_raw(
+        &mut self,
+        frequency_hz: f32,
+        data: &[u8],
+        options: ToneOptions,
+        stereo: bool,
+    ) -> bool {
+        unsafe {
+            m5unified_sys::m5u_speaker_tone_full(
+                frequency_hz,
+                options.duration_ms,
+                channel_to_raw(options.channel),
+                options.stop_current_sound,
+                data.as_ptr(),
+                data.len(),
+                stereo,
             )
         }
     }
@@ -193,16 +318,80 @@ impl Speaker {
         }
     }
 
+    pub fn play_u8_with_options(&mut self, samples: &[u8], options: RawPlaybackOptions) -> bool {
+        unsafe {
+            m5unified_sys::m5u_speaker_play_u8_ex(
+                samples.as_ptr(),
+                samples.len(),
+                options.sample_rate_hz,
+                options.stereo,
+                options.repeat,
+                channel_to_raw(options.channel),
+                options.stop_current_sound,
+            )
+        }
+    }
+
+    pub fn play_i8_with_options(&mut self, samples: &[i8], options: RawPlaybackOptions) -> bool {
+        unsafe {
+            m5unified_sys::m5u_speaker_play_i8_ex(
+                samples.as_ptr(),
+                samples.len(),
+                options.sample_rate_hz,
+                options.stereo,
+                options.repeat,
+                channel_to_raw(options.channel),
+                options.stop_current_sound,
+            )
+        }
+    }
+
+    pub fn play_i16_with_options(&mut self, samples: &[i16], options: RawPlaybackOptions) -> bool {
+        unsafe {
+            m5unified_sys::m5u_speaker_play_i16_ex(
+                samples.as_ptr(),
+                samples.len(),
+                options.sample_rate_hz,
+                options.stereo,
+                options.repeat,
+                channel_to_raw(options.channel),
+                options.stop_current_sound,
+            )
+        }
+    }
+
     pub fn play_wav(&mut self, data: &[u8]) -> bool {
         unsafe { m5unified_sys::m5u_speaker_play_wav(data.as_ptr(), data.len()) }
     }
 
+    pub fn play_wav_with_options(&mut self, data: &[u8], options: WavPlaybackOptions) -> bool {
+        unsafe {
+            m5unified_sys::m5u_speaker_play_wav_ex(
+                data.as_ptr(),
+                data.len(),
+                options.repeat,
+                channel_to_raw(options.channel),
+                options.stop_current_sound,
+            )
+        }
+    }
+
     pub fn is_playing(&self, channel: Option<u8>) -> bool {
-        unsafe { m5unified_sys::m5u_speaker_is_playing(channel.map(i32::from).unwrap_or(-1)) }
+        unsafe { m5unified_sys::m5u_speaker_is_playing(channel_to_raw(channel)) }
+    }
+
+    pub fn playing_channels(&self) -> usize {
+        unsafe { m5unified_sys::m5u_speaker_playing_channels() }
+    }
+
+    pub fn channel_playing_state(&self, channel: u8) -> AudioQueueState {
+        AudioQueueState::from_raw(unsafe {
+            m5unified_sys::m5u_speaker_channel_playing_state(i32::from(channel))
+        })
     }
 
     pub fn stop(&mut self, channel: Option<u8>) {
-        unsafe { m5unified_sys::m5u_speaker_stop(channel.map(i32::from).unwrap_or(-1)) }
+        unsafe { m5unified_sys::m5u_speaker_stop(channel_to_raw(channel)) }
     }
 
     pub fn channel_volume(&self, channel: u8) -> u8 {
@@ -215,6 +404,61 @@ impl Speaker {
 
     pub fn set_all_channel_volume(&mut self, volume: u8) {
         unsafe { m5unified_sys::m5u_speaker_set_all_channel_volume(volume) }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct ToneOptions {
+    pub duration_ms: u32,
+    pub channel: Option<u8>,
+    pub stop_current_sound: bool,
+}
+
+impl Default for ToneOptions {
+    fn default() -> Self {
+        Self {
+            duration_ms: u32::MAX,
+            channel: None,
+            stop_current_sound: true,
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct RawPlaybackOptions {
+    pub sample_rate_hz: u32,
+    pub stereo: bool,
+    pub repeat: u32,
+    pub channel: Option<u8>,
+    pub stop_current_sound: bool,
+}
+
+impl Default for RawPlaybackOptions {
+    fn default() -> Self {
+        Self {
+            sample_rate_hz: 44_100,
+            stereo: false,
+            repeat: 1,
+            channel: None,
+            stop_current_sound: false,
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct WavPlaybackOptions {
+    pub repeat: u32,
+    pub channel: Option<u8>,
+    pub stop_current_sound: bool,
+}
+
+impl Default for WavPlaybackOptions {
+    fn default() -> Self {
+        Self {
+            repeat: 1,
+            channel: None,
+            stop_current_sound: false,
+        }
     }
 }
 

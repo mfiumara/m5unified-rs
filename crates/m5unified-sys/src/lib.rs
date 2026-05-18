@@ -283,6 +283,7 @@ extern "C" {
 
     pub fn m5u_mic_begin() -> bool;
     pub fn m5u_mic_record_i16(buffer: *mut i16, samples: usize) -> bool;
+    pub fn m5u_mic_record_u8(buffer: *mut u8, samples: usize) -> bool;
     pub fn m5u_speaker_begin() -> bool;
     pub fn m5u_speaker_set_volume(volume: u8);
     pub fn m5u_speaker_tone(frequency_hz: u32, duration_ms: u32) -> bool;
@@ -416,23 +417,90 @@ extern "C" {
     pub fn m5u_button_get_update_msec(button: c_int) -> u32;
 
     pub fn m5u_mic_is_enabled() -> bool;
+    pub fn m5u_mic_is_running() -> bool;
     pub fn m5u_mic_is_recording() -> bool;
+    pub fn m5u_mic_recording_state() -> usize;
     pub fn m5u_mic_end();
     pub fn m5u_mic_record_i16_at(buffer: *mut i16, samples: usize, sample_rate_hz: u32) -> bool;
+    pub fn m5u_mic_record_i16_ex(
+        buffer: *mut i16,
+        samples: usize,
+        sample_rate_hz: u32,
+        stereo: bool,
+    ) -> bool;
+    pub fn m5u_mic_record_u8_ex(
+        buffer: *mut u8,
+        samples: usize,
+        sample_rate_hz: u32,
+        stereo: bool,
+    ) -> bool;
+    pub fn m5u_mic_set_sample_rate(sample_rate_hz: u32);
     pub fn m5u_mic_get_config(out: *mut m5u_mic_config_t) -> bool;
     pub fn m5u_mic_set_config(config: *const m5u_mic_config_t) -> bool;
     pub fn m5u_mic_get_noise_filter_level() -> c_int;
     pub fn m5u_mic_set_noise_filter_level(level: c_int) -> bool;
 
     pub fn m5u_speaker_is_enabled() -> bool;
+    pub fn m5u_speaker_is_running() -> bool;
     pub fn m5u_speaker_end();
     pub fn m5u_speaker_get_volume() -> u8;
     pub fn m5u_speaker_get_config(out: *mut m5u_speaker_config_t) -> bool;
     pub fn m5u_speaker_set_config(config: *const m5u_speaker_config_t) -> bool;
     pub fn m5u_speaker_tone_ex(frequency_hz: c_float, duration_ms: u32, channel: c_int) -> bool;
+    pub fn m5u_speaker_tone_options(
+        frequency_hz: c_float,
+        duration_ms: u32,
+        channel: c_int,
+        stop_current_sound: bool,
+    ) -> bool;
+    pub fn m5u_speaker_tone_full(
+        frequency_hz: c_float,
+        duration_ms: u32,
+        channel: c_int,
+        stop_current_sound: bool,
+        raw_data: *const u8,
+        len: usize,
+        stereo: bool,
+    ) -> bool;
     pub fn m5u_speaker_play_u8(samples: *const u8, len: usize, sample_rate_hz: u32) -> bool;
+    pub fn m5u_speaker_play_u8_ex(
+        samples: *const u8,
+        len: usize,
+        sample_rate_hz: u32,
+        stereo: bool,
+        repeat: u32,
+        channel: c_int,
+        stop_current_sound: bool,
+    ) -> bool;
+    pub fn m5u_speaker_play_i8_ex(
+        samples: *const i8,
+        len: usize,
+        sample_rate_hz: u32,
+        stereo: bool,
+        repeat: u32,
+        channel: c_int,
+        stop_current_sound: bool,
+    ) -> bool;
+    pub fn m5u_speaker_play_i16_ex(
+        samples: *const i16,
+        len: usize,
+        sample_rate_hz: u32,
+        stereo: bool,
+        repeat: u32,
+        channel: c_int,
+        stop_current_sound: bool,
+    ) -> bool;
     pub fn m5u_speaker_play_wav(data: *const u8, len: usize) -> bool;
+    pub fn m5u_speaker_play_wav_ex(
+        data: *const u8,
+        len: usize,
+        repeat: u32,
+        channel: c_int,
+        stop_current_sound: bool,
+    ) -> bool;
     pub fn m5u_speaker_is_playing(channel: c_int) -> bool;
+    pub fn m5u_speaker_playing_channels() -> usize;
+    pub fn m5u_speaker_channel_playing_state(channel: c_int) -> usize;
     pub fn m5u_speaker_stop(channel: c_int);
     pub fn m5u_speaker_get_channel_volume(channel: c_int) -> u8;
     pub fn m5u_speaker_set_channel_volume(channel: c_int, volume: u8);
@@ -604,6 +672,14 @@ mod host_stubs {
         true
     }
     pub unsafe fn m5u_mic_record_i16(buffer: *mut i16, samples: usize) -> bool {
+        if !buffer.is_null() {
+            for i in 0..samples {
+                ptr::write(buffer.add(i), 0);
+            }
+        }
+        true
+    }
+    pub unsafe fn m5u_mic_record_u8(buffer: *mut u8, samples: usize) -> bool {
         if !buffer.is_null() {
             for i in 0..samples {
                 ptr::write(buffer.add(i), 0);
@@ -945,8 +1021,14 @@ mod host_stubs {
     pub unsafe fn m5u_mic_is_enabled() -> bool {
         true
     }
+    pub unsafe fn m5u_mic_is_running() -> bool {
+        false
+    }
     pub unsafe fn m5u_mic_is_recording() -> bool {
         false
+    }
+    pub unsafe fn m5u_mic_recording_state() -> usize {
+        0
     }
     pub unsafe fn m5u_mic_end() {}
     pub unsafe fn m5u_mic_record_i16_at(
@@ -956,6 +1038,23 @@ mod host_stubs {
     ) -> bool {
         m5u_mic_record_i16(buffer, samples)
     }
+    pub unsafe fn m5u_mic_record_i16_ex(
+        buffer: *mut i16,
+        samples: usize,
+        _sample_rate_hz: u32,
+        _stereo: bool,
+    ) -> bool {
+        m5u_mic_record_i16(buffer, samples)
+    }
+    pub unsafe fn m5u_mic_record_u8_ex(
+        buffer: *mut u8,
+        samples: usize,
+        _sample_rate_hz: u32,
+        _stereo: bool,
+    ) -> bool {
+        m5u_mic_record_u8(buffer, samples)
+    }
+    pub unsafe fn m5u_mic_set_sample_rate(_sample_rate_hz: u32) {}
     pub unsafe fn m5u_mic_get_noise_filter_level() -> c_int {
         0
     }
@@ -974,6 +1073,9 @@ mod host_stubs {
 
     pub unsafe fn m5u_speaker_is_enabled() -> bool {
         true
+    }
+    pub unsafe fn m5u_speaker_is_running() -> bool {
+        false
     }
     pub unsafe fn m5u_speaker_end() {}
     pub unsafe fn m5u_speaker_get_volume() -> u8 {
@@ -995,6 +1097,25 @@ mod host_stubs {
     ) -> bool {
         true
     }
+    pub unsafe fn m5u_speaker_tone_options(
+        _frequency_hz: c_float,
+        _duration_ms: u32,
+        _channel: c_int,
+        _stop_current_sound: bool,
+    ) -> bool {
+        true
+    }
+    pub unsafe fn m5u_speaker_tone_full(
+        _frequency_hz: c_float,
+        _duration_ms: u32,
+        _channel: c_int,
+        _stop_current_sound: bool,
+        _raw_data: *const u8,
+        _len: usize,
+        _stereo: bool,
+    ) -> bool {
+        true
+    }
     pub unsafe fn m5u_speaker_play_u8(
         _samples: *const u8,
         _len: usize,
@@ -1002,11 +1123,59 @@ mod host_stubs {
     ) -> bool {
         true
     }
+    pub unsafe fn m5u_speaker_play_u8_ex(
+        _samples: *const u8,
+        _len: usize,
+        _sample_rate_hz: u32,
+        _stereo: bool,
+        _repeat: u32,
+        _channel: c_int,
+        _stop_current_sound: bool,
+    ) -> bool {
+        true
+    }
+    pub unsafe fn m5u_speaker_play_i8_ex(
+        _samples: *const i8,
+        _len: usize,
+        _sample_rate_hz: u32,
+        _stereo: bool,
+        _repeat: u32,
+        _channel: c_int,
+        _stop_current_sound: bool,
+    ) -> bool {
+        true
+    }
+    pub unsafe fn m5u_speaker_play_i16_ex(
+        _samples: *const i16,
+        _len: usize,
+        _sample_rate_hz: u32,
+        _stereo: bool,
+        _repeat: u32,
+        _channel: c_int,
+        _stop_current_sound: bool,
+    ) -> bool {
+        true
+    }
     pub unsafe fn m5u_speaker_play_wav(_data: *const u8, _len: usize) -> bool {
+        true
+    }
+    pub unsafe fn m5u_speaker_play_wav_ex(
+        _data: *const u8,
+        _len: usize,
+        _repeat: u32,
+        _channel: c_int,
+        _stop_current_sound: bool,
+    ) -> bool {
         true
     }
     pub unsafe fn m5u_speaker_is_playing(_channel: c_int) -> bool {
         false
+    }
+    pub unsafe fn m5u_speaker_playing_channels() -> usize {
+        0
+    }
+    pub unsafe fn m5u_speaker_channel_playing_state(_channel: c_int) -> usize {
+        0
     }
     pub unsafe fn m5u_speaker_stop(_channel: c_int) {}
     pub unsafe fn m5u_speaker_get_channel_volume(_channel: c_int) -> u8 {

@@ -67,8 +67,8 @@ The current wrapper covers the API used by the translated upstream examples:
 - startup configuration through `M5UnifiedConfig` and `M5Unified::begin_with_config`
 - display drawing, text, color, fonts, EPD modes, scrolling, transactions, and indexed multi-display drawing
 - button press, release, hold, click, click-count, timing, threshold, and state helpers
-- microphone recording, configuration helpers, and simple RMS calculation
-- speaker configuration, tone, PCM, WAV, channel, and volume controls
+- microphone recording, recording state, sample-rate, configuration helpers, and simple RMS calculation
+- speaker configuration, running/playing state, tone, PCM, WAV, channel, repeat, and volume controls
 - IMU acceleration, gyro, temperature, sensor masks, axis order, calibration, raw data, and NVS offsets
 - touch points, touch detail state, flick/drag state helpers, and touch thresholds
 - RTC date/time, date-only/time-only, low-voltage and IRQ helpers, system-time sync, power PMIC type, battery/VBUS readings, charging state, output/charge controls, AXP2101 IRQ helpers, LED control, logging configuration/callbacks, and SD SPI mount helpers

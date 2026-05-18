@@ -41,7 +41,10 @@ mod sd;
 mod system;
 mod touch;
 
-pub use audio::{Mic, MicConfig, Speaker, SpeakerConfig};
+pub use audio::{
+    AudioQueueState, Mic, MicConfig, RawPlaybackOptions, RecordingOptions, Speaker, SpeakerConfig,
+    ToneOptions, WavPlaybackOptions,
+};
 pub use buttons::{Button, ButtonId, ButtonState, Buttons};
 pub use config::{ExternalDisplayConfig, ExternalSpeakerConfig, M5UnifiedConfig};
 pub use display::{
@@ -150,12 +153,58 @@ mod tests {
         mic.dma_buf_len = 256;
         mic.noise_filter_level = 8;
         assert_eq!(m5.mic.set_config(mic), Ok(()));
+        m5.mic.set_sample_rate(24_000);
+        assert!(!m5.mic.is_running());
+        assert_eq!(m5.mic.recording_state(), AudioQueueState::Idle);
+        let mut rec_u8 = [0_u8; 8];
+        assert!(m5.mic.record_u8(&mut rec_u8));
+        assert!(m5.mic.record_u8_at(&mut rec_u8, 24_000));
+        assert!(m5.mic.record_i16_with_options(
+            &mut [0_i16; 8],
+            RecordingOptions {
+                sample_rate_hz: 24_000,
+                stereo: true,
+            }
+        ));
 
         let mut speaker = m5.speaker.config();
         assert_eq!(speaker.sample_rate, 48_000);
         speaker.sample_rate = 96_000;
         speaker.dma_buf_count = 20;
         assert_eq!(m5.speaker.set_config(speaker), Ok(()));
+        assert!(!m5.speaker.is_running());
+        assert_eq!(m5.speaker.playing_channels(), 0);
+        assert_eq!(m5.speaker.channel_playing_state(0), AudioQueueState::Idle);
+        assert!(m5.speaker.tone_with_options(
+            440.0,
+            ToneOptions {
+                duration_ms: 100,
+                channel: Some(1),
+                stop_current_sound: false,
+            }
+        ));
+        assert!(m5
+            .speaker
+            .tone_with_raw(440.0, &[0x80; 16], ToneOptions::default(), false));
+        assert!(m5.speaker.play_i8_with_options(
+            &[0_i8; 8],
+            RawPlaybackOptions {
+                sample_rate_hz: 22_050,
+                stereo: false,
+                repeat: 2,
+                channel: Some(2),
+                stop_current_sound: true,
+            }
+        ));
+        assert!(m5
+            .speaker
+            .play_i16_with_options(&[0_i16; 8], RawPlaybackOptions::default()));
+        assert!(m5
+            .speaker
+            .play_u8_with_options(&[0_u8; 8], RawPlaybackOptions::default()));
+        assert!(m5
+            .speaker
+            .play_wav_with_options(&[0_u8; 44], WavPlaybackOptions::default()));
     }
 
     #[test]
