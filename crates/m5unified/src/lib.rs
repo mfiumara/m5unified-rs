@@ -117,6 +117,28 @@ impl M5Unified {
         })
     }
 
+    /// Alias for the primary display, matching upstream's `M5.Lcd` naming.
+    pub fn lcd(&self) -> &Display {
+        &self.display
+    }
+
+    /// Mutable alias for the primary display, matching upstream's `M5.Lcd`.
+    pub fn lcd_mut(&mut self) -> &mut Display {
+        &mut self.display
+    }
+
+    pub fn button(&self, index: usize) -> Option<Button> {
+        self.buttons.get(index)
+    }
+
+    pub fn buttons(&self, index: usize) -> Option<Button> {
+        self.button(index)
+    }
+
+    pub fn displays(&self, index: usize) -> Option<DisplayRef> {
+        self.display(index)
+    }
+
     /// Poll/update M5Unified internals, including button edge state.
     pub fn update(&mut self) {
         unsafe { m5unified_sys::m5u_update() }
@@ -134,9 +156,14 @@ mod tests {
 
     #[test]
     fn display_dimensions_are_available_on_host_stubs() {
-        let m5 = M5Unified::begin().expect("host stub begin should succeed");
+        let mut m5 = M5Unified::begin().expect("host stub begin should succeed");
         assert!(m5.display.width() > 0);
         assert!(m5.display.height() > 0);
+        assert_eq!(m5.lcd().width(), m5.display.width());
+        assert_eq!(m5.lcd_mut().height(), m5.display.height());
+        assert!(m5.button(0).is_some());
+        assert!(m5.buttons(0).is_some());
+        assert!(m5.displays(0).is_some());
     }
 
     #[test]
