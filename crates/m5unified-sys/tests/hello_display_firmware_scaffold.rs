@@ -16,6 +16,8 @@ fn hello_display_example_scaffold_consumes_native_component() {
     assert!(examples.join("Cargo.toml").exists());
     assert!(examples.join("src/bin/hello_display.rs").exists());
     assert!(examples.join(".cargo/config.toml").exists());
+    assert!(root.join("tools/build_espidf_smoke.sh").exists());
+    assert!(root.join("docs/examples/hardware-verification.md").exists());
     assert!(examples
         .join("components/m5unified-rs/CMakeLists.txt")
         .exists());
@@ -50,6 +52,18 @@ fn hello_display_example_scaffold_consumes_native_component() {
     assert!(main_rs.contains("hello from rust"));
     assert!(main_rs.contains("was_pressed"));
     assert!(main_rs.contains("link_patches"));
+
+    let smoke_script =
+        fs::read_to_string(root.join("tools/build_espidf_smoke.sh")).expect("read smoke script");
+    assert!(smoke_script.contains("xtensa-esp32s3-espidf"));
+    assert!(smoke_script.contains("ESPIDF_SMOKE_BINS"));
+    assert!(smoke_script.contains("hello_display"));
+
+    let hardware_doc = fs::read_to_string(root.join("docs/examples/hardware-verification.md"))
+        .expect("read hardware verification doc");
+    assert!(hardware_doc.contains("tools/build_espidf_smoke.sh"));
+    assert!(hardware_doc.contains("hello_display"));
+    assert!(hardware_doc.contains("pending hardware"));
 }
 
 #[test]

@@ -120,13 +120,14 @@ cargo +stable install espflash
 Then build and flash the sample:
 
 ```bash
-cd examples
-cargo build --bin hello_display --target xtensa-esp32s3-espidf
-espflash flash --monitor ../target/xtensa-esp32s3-espidf/debug/hello_display
+bash tools/build_espidf_smoke.sh
+espflash flash --monitor target/xtensa-esp32s3-espidf/debug/hello_display
 ```
 
 Expected hardware behavior: the display shows `hello from rust`; Button A/B
 presses change the screen.
+
+Record hardware runs in `docs/examples/hardware-verification.md`.
 
 ## Release Checks
 
@@ -134,6 +135,7 @@ presses change the screen.
 python3 tools/check_examples_manifest.py
 python3 tools/check_no_sys_in_examples.py
 bash scripts/check-host.sh
+bash tools/build_espidf_smoke.sh
 cargo package -p m5unified-sys
 cargo publish -p m5unified-sys --dry-run
 ```
