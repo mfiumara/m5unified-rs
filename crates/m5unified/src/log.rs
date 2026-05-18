@@ -95,6 +95,12 @@ impl Log {
     }
 }
 
+impl core::fmt::Write for Log {
+    fn write_str(&mut self, s: &str) -> core::fmt::Result {
+        self.print(s).map_err(|_| core::fmt::Error)
+    }
+}
+
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum LogLevel {
     None = 0,

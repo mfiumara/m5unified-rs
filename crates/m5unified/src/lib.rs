@@ -154,6 +154,8 @@ impl M5Unified {
 
 #[cfg(test)]
 mod tests {
+    use core::fmt::Write as _;
+
     use super::*;
 
     #[test]
@@ -500,6 +502,7 @@ mod tests {
         assert!(m5.display.set_font(DisplayFont::DejaVu18));
         m5.display.set_text_scroll(true);
         m5.display.set_epd_mode(EpdMode::Fastest);
+        assert!(write!(&mut m5.display, "primary value={}", 7).is_ok());
         m5.rtc.set_system_time_from_rtc();
         assert!(!m5.rtc.volt_low());
         let date = m5.rtc.get_date().expect("host stub date should exist");
@@ -527,6 +530,7 @@ mod tests {
         display.set_text_color(colors::WHITE, colors::BLACK);
         display.set_rotation(1);
         display.set_color(colors::YELLOW);
+        assert!(write!(&mut display, "indexed value={}", 3).is_ok());
         assert_eq!(display.println("indexed display"), Ok(()));
         assert_eq!(display.draw_string("indexed", 0, 0), Ok(0));
         display.transaction(|display| {
@@ -542,7 +546,7 @@ mod tests {
 
     #[test]
     fn log_configuration_helpers_compile_on_host() {
-        let m5 = M5Unified::begin().expect("host stub begin should succeed");
+        let mut m5 = M5Unified::begin().expect("host stub begin should succeed");
         assert!(m5.log.set_enable_color(LogTarget::Serial, true));
         assert!(m5.log.enable_color(LogTarget::Serial));
         assert!(m5.log.set_log_level(LogTarget::Display, LogLevel::Debug));
@@ -553,6 +557,7 @@ mod tests {
             Ok("source.cpp".to_string())
         );
         m5.log.println_empty();
+        assert!(write!(&mut m5.log, "formatted log {}", 42).is_ok());
         m5.log.dump(&[0, 1, 2, 3], LogLevel::Info);
         assert!(m5.log.clear_callback());
     }

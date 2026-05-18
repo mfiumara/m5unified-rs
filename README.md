@@ -65,13 +65,13 @@ hardware simulation.
 The current wrapper covers the API used by the translated upstream examples:
 
 - startup configuration through `M5UnifiedConfig` and `M5Unified::begin_with_config`
-- display drawing, text, color, fonts, EPD modes, scrolling, transactions, and indexed multi-display drawing
+- display drawing, text, `core::fmt::Write` formatting, color, fonts, EPD modes, scrolling, transactions, and indexed multi-display drawing
 - button press, release, hold, click, click-count, timing, threshold, and state helpers
 - microphone recording, recording state, sample-rate, configuration helpers, and simple RMS calculation
 - speaker configuration, running/playing state, tone, PCM, WAV, channel, repeat, and volume controls
 - IMU acceleration, gyro, temperature, sensor masks, axis order, calibration, raw data, and NVS offsets
 - touch points, touch detail state, flick/drag state helpers, and touch thresholds
-- RTC date/time, date-only/time-only, low-voltage and IRQ helpers, system-time sync, power PMIC type, battery/VBUS/external-port readings, sleep/power-off, output/charge controls, AXP2101 IRQ helpers, LED control/color batches/type queries, logging dump/path/configuration/callbacks, and SD SPI mount helpers
+- RTC date/time, date-only/time-only, low-voltage and IRQ helpers, system-time sync, power PMIC type, battery/VBUS/external-port readings, sleep/power-off, output/charge controls, AXP2101 IRQ helpers, LED control/color batches/type queries, logging dump/path/configuration/callbacks, `core::fmt::Write` log formatting, and SD SPI mount helpers
 - internal/external I2C bus setup, raw transfers, register helpers, device helpers, bit helpers, and address scanning
 - named board identity, timing helpers, pin lookup, primary/log display selection, and touch-button sizing
 

@@ -201,6 +201,12 @@ impl Display {
     }
 }
 
+impl core::fmt::Write for Display {
+    fn write_str(&mut self, s: &str) -> core::fmt::Result {
+        self.print(s).map_err(|_| core::fmt::Error)
+    }
+}
+
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct Color565(pub u16);
 
@@ -424,6 +430,12 @@ impl DisplayRef {
 
     pub fn draw_pixel(&mut self, x: i32, y: i32, color: u16) {
         unsafe { m5unified_sys::m5u_display_draw_pixel_at(self.index, x, y, color) }
+    }
+}
+
+impl core::fmt::Write for DisplayRef {
+    fn write_str(&mut self, s: &str) -> core::fmt::Result {
+        self.print(s).map_err(|_| core::fmt::Error)
     }
 }
 
