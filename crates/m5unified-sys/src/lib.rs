@@ -198,6 +198,14 @@ impl Default for m5u_power_ext_port_bus_t {
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]
+pub struct m5u_led_color_t {
+    pub r: u8,
+    pub g: u8,
+    pub b: u8,
+}
+
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]
 pub struct m5u_touch_detail_t {
     pub x: c_int,
     pub y: c_int,
@@ -583,11 +591,16 @@ extern "C" {
     pub fn m5u_led_set_brightness(brightness: u8);
     pub fn m5u_led_set_color_rgb(index: usize, r: u8, g: u8, b: u8);
     pub fn m5u_led_set_all_color_rgb(r: u8, g: u8, b: u8);
+    pub fn m5u_led_set_colors_rgb(colors: *const m5u_led_color_t, index: usize, length: usize);
+    pub fn m5u_led_get_type(index: usize) -> c_int;
     pub fn m5u_led_is_enabled() -> bool;
 
     pub fn m5u_log_print(text: *const c_char);
     pub fn m5u_log_println(text: *const c_char);
+    pub fn m5u_log_println_empty();
     pub fn m5u_log_level(level: c_int, text: *const c_char);
+    pub fn m5u_log_dump(addr: *const c_void, len: u32, level: c_int);
+    pub fn m5u_log_path_to_file_name(path: *const c_char) -> *const c_char;
     pub fn m5u_log_set_callback(callback: m5u_log_callback_t, user_data: *mut c_void) -> bool;
     pub fn m5u_log_set_enable_color(target: c_int, enable: bool) -> bool;
     pub fn m5u_log_get_enable_color(target: c_int) -> bool;
@@ -1348,13 +1361,38 @@ mod host_stubs {
     pub unsafe fn m5u_led_set_brightness(_brightness: u8) {}
     pub unsafe fn m5u_led_set_color_rgb(_index: usize, _r: u8, _g: u8, _b: u8) {}
     pub unsafe fn m5u_led_set_all_color_rgb(_r: u8, _g: u8, _b: u8) {}
+    pub unsafe fn m5u_led_set_colors_rgb(
+        _colors: *const m5u_led_color_t,
+        _index: usize,
+        _length: usize,
+    ) {
+    }
+    pub unsafe fn m5u_led_get_type(_index: usize) -> c_int {
+        0
+    }
     pub unsafe fn m5u_led_is_enabled() -> bool {
         false
     }
 
     pub unsafe fn m5u_log_print(_text: *const c_char) {}
     pub unsafe fn m5u_log_println(_text: *const c_char) {}
+    pub unsafe fn m5u_log_println_empty() {}
     pub unsafe fn m5u_log_level(_level: c_int, _text: *const c_char) {}
+    pub unsafe fn m5u_log_dump(_addr: *const c_void, _len: u32, _level: c_int) {}
+    pub unsafe fn m5u_log_path_to_file_name(path: *const c_char) -> *const c_char {
+        if path.is_null() {
+            return path;
+        }
+        let mut current = path;
+        let mut file = path;
+        while *current != 0 {
+            if *current == b'/' as c_char || *current == b'\\' as c_char {
+                file = current.add(1);
+            }
+            current = current.add(1);
+        }
+        file
+    }
     pub unsafe fn m5u_log_set_callback(
         _callback: m5u_log_callback_t,
         _user_data: *mut c_void,

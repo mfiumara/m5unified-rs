@@ -408,6 +408,9 @@ void m5u_log_println(const char* text) {
     (void)text;
 }
 
+void m5u_log_println_empty(void) {
+}
+
 bool m5u_sd_begin(void) {
     return false;
 }
@@ -908,6 +911,14 @@ void m5u_led_set_all_color_rgb(uint8_t r, uint8_t g, uint8_t b) {
     (void)r; (void)g; (void)b;
 }
 
+void m5u_led_set_colors_rgb(const m5u_led_color_t* colors, size_t index, size_t length) {
+    (void)colors; (void)index; (void)length;
+}
+
+int m5u_led_get_type(size_t index) {
+    (void)index; return 0;
+}
+
 bool m5u_led_is_enabled(void) {
     return false;
 }
@@ -918,6 +929,23 @@ void m5u_log_print(const char* text) {
 
 void m5u_log_level(int level, const char* text) {
     (void)level; (void)text;
+}
+
+void m5u_log_dump(const void* addr, uint32_t len, int level) {
+    (void)addr; (void)len; (void)level;
+}
+
+const char* m5u_log_path_to_file_name(const char* path) {
+    if (!path) {
+        return nullptr;
+    }
+    const char* file = path;
+    for (const char* p = path; *p; ++p) {
+        if (*p == '/' || *p == '\\') {
+            file = p + 1;
+        }
+    }
+    return file;
 }
 
 bool m5u_log_set_callback(m5u_log_callback_t callback, void* user_data) {

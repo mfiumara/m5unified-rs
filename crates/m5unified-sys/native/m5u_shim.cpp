@@ -8,6 +8,7 @@
 #include <esp_vfs_fat.h>
 #include <sdmmc_cmd.h>
 #include <string>
+#include <vector>
 
 static std::string s_m5u_log_suffixes[3];
 static m5u_log_callback_t s_m5u_log_callback = nullptr;
@@ -608,7 +609,7 @@ void m5u_power_light_sleep_us(uint64_t micro_seconds, bool touch_wakeup) {
 }
 
 void m5u_log_println(const char* text) {
-    M5_LOGI("%s", text);
+    M5.Log.println(text);
 }
 
 bool m5u_sd_begin(void) {
@@ -1395,6 +1396,22 @@ void m5u_led_set_all_color_rgb(uint8_t r, uint8_t g, uint8_t b) {
     M5.Led.setAllColor(RGBColor{r, g, b});
 }
 
+void m5u_led_set_colors_rgb(const m5u_led_color_t* colors, size_t index, size_t length) {
+    if (!colors || !length) {
+        return;
+    }
+    std::vector<RGBColor> rgb;
+    rgb.reserve(length);
+    for (size_t i = 0; i < length; ++i) {
+        rgb.push_back(RGBColor{colors[i].r, colors[i].g, colors[i].b});
+    }
+    M5.Led.setColors(rgb.data(), index, length);
+}
+
+int m5u_led_get_type(size_t index) {
+    return (int)M5.Led.getLedType(index);
+}
+
 bool m5u_led_is_enabled(void) {
     return M5.Led.isEnabled();
 }
@@ -1403,8 +1420,20 @@ void m5u_log_print(const char* text) {
     M5.Log.print(text);
 }
 
+void m5u_log_println_empty(void) {
+    M5.Log.println();
+}
+
 void m5u_log_level(int level, const char* text) {
     M5.Log((esp_log_level_t)level, "%s", text);
+}
+
+void m5u_log_dump(const void* addr, uint32_t len, int level) {
+    M5.Log.dump(addr, len, (esp_log_level_t)level);
+}
+
+const char* m5u_log_path_to_file_name(const char* path) {
+    return path ? m5::Log_Class::pathToFileName(path) : nullptr;
 }
 
 bool m5u_log_set_callback(m5u_log_callback_t callback, void* user_data) {

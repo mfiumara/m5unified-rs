@@ -53,7 +53,7 @@ pub use display::{
 };
 pub use error::Error;
 pub use imu::{Imu, ImuAxis, ImuData, ImuKind, ImuSensorMask, Vec3};
-pub use led::{Led, LedColor};
+pub use led::{Led, LedColor, LedType};
 pub use log::{Log, LogLevel, LogTarget, RawLogCallback};
 pub use power::{
     Axp2101, Axp2101IrqStatus, ChargeState, ExtPortBusConfig, ExtPortMask, Power, PowerType,
@@ -251,7 +251,10 @@ mod tests {
         let mut m5 = M5Unified::begin().expect("host stub begin should succeed");
         assert!(!m5.led.is_enabled());
         assert_eq!(m5.led.count(), 0);
+        assert_eq!(m5.led.led_type(0), LedType::Unknown);
         m5.led.set_all_color(LedColor::RED);
+        m5.led
+            .set_colors(0, &[LedColor::RED, LedColor::GREEN, LedColor::BLUE]);
     }
 
     #[test]
@@ -400,6 +403,12 @@ mod tests {
         assert!(m5.log.set_log_level(LogTarget::Display, LogLevel::Debug));
         assert!(m5.log.log_level(LogTarget::Display).is_some());
         assert_eq!(m5.log.set_suffix(LogTarget::Callback, ""), Ok(true));
+        assert_eq!(
+            Log::path_to_file_name("/tmp/example/source.cpp"),
+            Ok("source.cpp".to_string())
+        );
+        m5.log.println_empty();
+        m5.log.dump(&[0, 1, 2, 3], LogLevel::Info);
         assert!(m5.log.clear_callback());
     }
 

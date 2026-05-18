@@ -1,5 +1,5 @@
 use core::ffi::{c_char, c_int, c_void};
-use std::ffi::CString;
+use std::ffi::{CStr, CString};
 
 use crate::Error;
 
@@ -13,6 +13,10 @@ impl Log {
         Ok(())
     }
 
+    pub fn println_empty(&self) {
+        unsafe { m5unified_sys::m5u_log_println_empty() }
+    }
+
     pub fn print(&self, text: &str) -> Result<(), Error> {
         let text = CString::new(text).map_err(|_| Error::InvalidString)?;
         unsafe { m5unified_sys::m5u_log_print(text.as_ptr()) }
@@ -23,6 +27,27 @@ impl Log {
         let text = CString::new(text).map_err(|_| Error::InvalidString)?;
         unsafe { m5unified_sys::m5u_log_level(level as c_int, text.as_ptr()) }
         Ok(())
+    }
+
+    pub fn dump(&self, data: &[u8], level: LogLevel) {
+        unsafe {
+            m5unified_sys::m5u_log_dump(
+                data.as_ptr().cast::<c_void>(),
+                data.len().min(u32::MAX as usize) as u32,
+                level as c_int,
+            )
+        }
+    }
+
+    pub fn path_to_file_name(path: &str) -> Result<String, Error> {
+        let path = CString::new(path).map_err(|_| Error::InvalidString)?;
+        let file_name = unsafe { m5unified_sys::m5u_log_path_to_file_name(path.as_ptr()) };
+        if file_name.is_null() {
+            return Ok(String::new());
+        }
+        Ok(unsafe { CStr::from_ptr(file_name) }
+            .to_string_lossy()
+            .into_owned())
     }
 
     /// # Safety

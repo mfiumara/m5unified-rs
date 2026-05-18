@@ -341,6 +341,11 @@ bool m5u_power_axp2101_is_bat_charger_over_temperature_irq(void);
 bool m5u_power_axp2101_is_vbus_insert_irq(void);
 bool m5u_power_axp2101_is_vbus_remove_irq(void);
 
+typedef struct {
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+} m5u_led_color_t;
 bool m5u_led_begin(void);
 void m5u_led_display(void);
 void m5u_led_set_auto_display(bool enable);
@@ -348,11 +353,16 @@ size_t m5u_led_count(void);
 void m5u_led_set_brightness(uint8_t brightness);
 void m5u_led_set_color_rgb(size_t index, uint8_t r, uint8_t g, uint8_t b);
 void m5u_led_set_all_color_rgb(uint8_t r, uint8_t g, uint8_t b);
+void m5u_led_set_colors_rgb(const m5u_led_color_t* colors, size_t index, size_t length);
+int m5u_led_get_type(size_t index);
 bool m5u_led_is_enabled(void);
 
 void m5u_log_print(const char* text);
 void m5u_log_println(const char* text);
+void m5u_log_println_empty(void);
 void m5u_log_level(int level, const char* text);
+void m5u_log_dump(const void* addr, uint32_t len, int level);
+const char* m5u_log_path_to_file_name(const char* path);
 typedef void (*m5u_log_callback_t)(int level, bool use_color, const char* text, void* user_data);
 bool m5u_log_set_callback(m5u_log_callback_t callback, void* user_data);
 bool m5u_log_set_enable_color(int target, bool enable);

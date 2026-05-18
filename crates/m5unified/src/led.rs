@@ -30,8 +30,52 @@ impl Led {
         unsafe { m5unified_sys::m5u_led_set_all_color_rgb(color.r, color.g, color.b) }
     }
 
+    pub fn set_colors(&mut self, index: usize, colors: &[LedColor]) {
+        let raw: Vec<m5unified_sys::m5u_led_color_t> = colors
+            .iter()
+            .map(|color| m5unified_sys::m5u_led_color_t {
+                r: color.r,
+                g: color.g,
+                b: color.b,
+            })
+            .collect();
+        unsafe { m5unified_sys::m5u_led_set_colors_rgb(raw.as_ptr(), index, raw.len()) }
+    }
+
+    pub fn led_type(&self, index: usize) -> LedType {
+        LedType::from_raw(unsafe { m5unified_sys::m5u_led_get_type(index) })
+    }
+
     pub fn is_enabled(&self) -> bool {
         unsafe { m5unified_sys::m5u_led_is_enabled() }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum LedType {
+    Unknown,
+    FullColor,
+    Single,
+    Raw(i32),
+}
+
+impl LedType {
+    pub const fn from_raw(raw: i32) -> Self {
+        match raw {
+            0 => Self::Unknown,
+            1 => Self::FullColor,
+            2 => Self::Single,
+            other => Self::Raw(other),
+        }
+    }
+
+    pub const fn raw(self) -> i32 {
+        match self {
+            Self::Unknown => 0,
+            Self::FullColor => 1,
+            Self::Single => 2,
+            Self::Raw(raw) => raw,
+        }
     }
 }
 
