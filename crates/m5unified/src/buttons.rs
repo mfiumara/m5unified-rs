@@ -141,12 +141,22 @@ impl Button {
         unsafe { m5unified_sys::m5u_button_was_decide_click_count(self.raw_id()) }
     }
 
+    #[deprecated(note = "use was_decide_click_count")]
+    pub fn was_decied_click_count(&self) -> bool {
+        self.was_decide_click_count()
+    }
+
     pub fn click_count(&self) -> i32 {
         unsafe { m5unified_sys::m5u_button_get_click_count(self.raw_id()) as i32 }
     }
 
     pub fn was_release_for_ms(&self, ms: u32) -> bool {
         unsafe { m5unified_sys::m5u_button_was_release_for(self.raw_id(), ms) }
+    }
+
+    #[deprecated(note = "use was_release_for_ms")]
+    pub fn was_releasefor_ms(&self, ms: u32) -> bool {
+        self.was_release_for_ms(ms)
     }
 
     pub fn pressed_for_ms(&self, ms: u32) -> bool {

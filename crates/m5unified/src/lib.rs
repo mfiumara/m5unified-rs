@@ -362,8 +362,14 @@ mod tests {
         assert!(!button.is_holding());
         assert!(!button.was_change_pressed());
         assert!(!button.was_decide_click_count());
+        #[allow(deprecated)]
+        let was_decied_click_count = button.was_decied_click_count();
+        assert!(!was_decied_click_count);
         assert_eq!(button.click_count(), 0);
         assert!(!button.was_release_for_ms(10));
+        #[allow(deprecated)]
+        let was_releasefor_ms = button.was_releasefor_ms(10);
+        assert!(!was_releasefor_ms);
         assert!(!button.pressed_for_ms(10));
         assert!(button.released_for_ms(10));
         button.set_debounce_thresh_ms(12);
