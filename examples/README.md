@@ -48,4 +48,4 @@ cargo build --bin hello_display --target xtensa-esp32s3-espidf
 espflash flash --monitor ../target/xtensa-esp32s3-espidf/debug/hello_display
 ```
 
-The advanced network/Bluetooth/codec examples currently define the Rust API boundary and compile-time sample shape. They intentionally leave codec/network stack selection to the application crate while routing display/speaker/control operations through `m5unified`.
+The advanced network/Bluetooth/codec/TTS examples compile, but entries that need ESP8266Audio, Bluetooth A2DP, or AquesTalk are marked `blocked` in `docs/examples/upstream-examples.toml`. They show a clear unavailable path while keeping codec, network, Bluetooth, and licensed TTS stack selection outside the core `m5unified` crate.

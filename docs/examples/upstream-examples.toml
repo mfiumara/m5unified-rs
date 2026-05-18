@@ -4,18 +4,18 @@
 [[example]]
 upstream = "Advanced/Bluetooth_with_ESP32A2DP/Bluetooth_with_ESP32A2DP.ino"
 rust_bin = "advanced_bluetooth_with_esp32a2dp"
-status = "host_compiles"
+status = "blocked"
 category = "advanced"
 requires = ["speaker", "buttons", "display", "bluetooth-a2dp"]
-notes = "Bluetooth stack remains example-level/feature-gated; core crate provides speaker raw playback."
+notes = "Blocked on app-level Bluetooth A2DP stack selection; the example exposes a clear unavailable path and core crate provides speaker raw playback."
 
 [[example]]
 upstream = "Advanced/MP3_with_ESP8266Audio/MP3_with_ESP8266Audio.ino"
 rust_bin = "advanced_mp3_with_esp8266audio"
-status = "host_compiles"
+status = "blocked"
 category = "advanced"
 requires = ["speaker", "display", "sd", "mp3-decoder"]
-notes = "ESP8266Audio is not part of core binding; prefer Rust decoder or feature-gated adapter."
+notes = "Blocked on app-level MP3 decoder choice; ESP8266Audio is not part of core binding."
 
 [[example]]
 upstream = "Advanced/Mic_FFT/Mic_FFT.ino"
@@ -28,10 +28,10 @@ notes = "Uses an in-example DFT-style spectrum calculation; DSP dependencies sta
 [[example]]
 upstream = "Advanced/Speak_with_AquesTalk/Speak_with_AquesTalk.ino"
 rust_bin = "advanced_speak_with_aquestalk"
-status = "host_compiles"
+status = "blocked"
 category = "advanced"
 requires = ["speaker", "display", "aquestalk"]
-notes = "AquesTalk remains optional due licensing/binary availability."
+notes = "Blocked on external AquesTalk licensing/binary support; the example exposes a clear unavailable path."
 
 [[example]]
 upstream = "Advanced/Speaker_SD_wav_file/Speaker_SD_wav_file.ino"
@@ -44,10 +44,10 @@ notes = "SD mount uses the ESP-IDF SDSPI helper; example loads WAV bytes from th
 [[example]]
 upstream = "Advanced/WebRadio_with_ESP8266Audio/WebRadio_with_ESP8266Audio.ino"
 rust_bin = "advanced_webradio_with_esp8266audio"
-status = "host_compiles"
+status = "blocked"
 category = "advanced"
 requires = ["wifi", "speaker", "display", "mp3-decoder"]
-notes = "Networking/codec dependencies remain example-level."
+notes = "Blocked on app-level networking and MP3 decoder selection; the example exposes a clear unavailable path."
 
 [[example]]
 upstream = "Basic/Axp2101/IRQ/IRQExample/IRQExample.ino"
