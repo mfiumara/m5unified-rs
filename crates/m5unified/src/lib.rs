@@ -194,6 +194,8 @@ mod tests {
         mic.noise_filter_level = 8;
         assert_eq!(m5.mic.set_config(mic), Ok(()));
         m5.mic.set_sample_rate(24_000);
+        assert_eq!(m5.mic.noise_filter_level(), 0);
+        assert!(m5.mic.set_noise_filter_level(8));
         assert!(!m5.mic.is_running());
         assert_eq!(m5.mic.recording_state(), AudioQueueState::Idle);
         let mut rec_u8 = [0_u8; 8];

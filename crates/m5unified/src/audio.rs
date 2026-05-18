@@ -57,6 +57,14 @@ impl Mic {
         unsafe { m5unified_sys::m5u_mic_set_sample_rate(sample_rate_hz) }
     }
 
+    pub fn noise_filter_level(&self) -> i32 {
+        unsafe { m5unified_sys::m5u_mic_get_noise_filter_level() as i32 }
+    }
+
+    pub fn set_noise_filter_level(&mut self, level: i32) -> bool {
+        unsafe { m5unified_sys::m5u_mic_set_noise_filter_level(level) }
+    }
+
     pub fn record_i16_at(&mut self, buffer: &mut [i16], sample_rate_hz: u32) -> bool {
         unsafe {
             m5unified_sys::m5u_mic_record_i16_at(buffer.as_mut_ptr(), buffer.len(), sample_rate_hz)
