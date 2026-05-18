@@ -53,7 +53,7 @@ pub use display::{
     TextDatum,
 };
 pub use error::Error;
-pub use i2c::I2cBus;
+pub use i2c::{I2cBus, I2cDevice};
 pub use imu::{Imu, ImuAxis, ImuData, ImuKind, ImuSensorMask, Vec3};
 pub use led::{Led, LedColor, LedType};
 pub use log::{Log, LogLevel, LogTarget, RawLogCallback};
@@ -297,6 +297,26 @@ mod tests {
         assert_eq!(m5.ex_i2c.scan(100_000), [false; 120]);
         assert!(!m5.ex_i2c.stop());
         assert!(!m5.ex_i2c.release());
+
+        let mut device = I2cDevice::external(0x42, 100_000);
+        assert_eq!(device.address(), 0x42);
+        assert_eq!(device.clock_hz(), 100_000);
+        assert!(!device.is_bus_enabled());
+        device.set_address(0x43);
+        device.set_clock(400_000);
+        device.set_port(I2cBus::INTERNAL);
+        assert_eq!(device.address(), 0x43);
+        assert_eq!(device.clock_hz(), 400_000);
+        assert_eq!(device.bus(), I2cBus::INTERNAL);
+        assert!(!device.write_register8(0x10, 0x01));
+        assert_eq!(device.read_register8(0x10), 0);
+        assert!(!device.write_register8_array(&[0x10, 0x01, 0x11, 0x02]));
+        assert!(!device.write_register8_array(&[0x10]));
+        assert!(!device.write_register8_pairs(&[(0x10, 0x01)]));
+        assert!(!device.write_register(0x10, &[1, 2]));
+        assert!(!device.read_register(0x10, &mut [0_u8; 2]));
+        assert!(!device.bit_on(0x10, 0x01));
+        assert!(!device.bit_off(0x10, 0x01));
     }
 
     #[test]

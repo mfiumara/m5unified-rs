@@ -136,3 +136,100 @@ enum I2cBusKind {
     Internal = 0,
     External = 1,
 }
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct I2cDevice {
+    bus: I2cBus,
+    address: u8,
+    freq_hz: u32,
+}
+
+impl I2cDevice {
+    pub const fn new(address: u8, freq_hz: u32, bus: I2cBus) -> Self {
+        Self {
+            bus,
+            address,
+            freq_hz,
+        }
+    }
+
+    pub const fn internal(address: u8, freq_hz: u32) -> Self {
+        Self::new(address, freq_hz, I2cBus::INTERNAL)
+    }
+
+    pub const fn external(address: u8, freq_hz: u32) -> Self {
+        Self::new(address, freq_hz, I2cBus::EXTERNAL)
+    }
+
+    pub fn set_port(&mut self, bus: I2cBus) {
+        self.bus = bus;
+    }
+
+    pub fn bus(&self) -> I2cBus {
+        self.bus
+    }
+
+    pub fn set_clock(&mut self, freq_hz: u32) {
+        self.freq_hz = freq_hz;
+    }
+
+    pub fn clock_hz(&self) -> u32 {
+        self.freq_hz
+    }
+
+    pub fn set_address(&mut self, address: u8) {
+        self.address = address;
+    }
+
+    pub fn address(&self) -> u8 {
+        self.address
+    }
+
+    pub fn write_register8(&mut self, reg: u8, data: u8) -> bool {
+        self.bus
+            .write_register8(self.address, reg, data, self.freq_hz)
+    }
+
+    pub fn read_register8(&mut self, reg: u8) -> u8 {
+        self.bus.read_register8(self.address, reg, self.freq_hz)
+    }
+
+    pub fn write_register8_array(&mut self, reg_data_array: &[u8]) -> bool {
+        if reg_data_array.len() % 2 != 0 {
+            return false;
+        }
+
+        reg_data_array
+            .chunks_exact(2)
+            .all(|pair| self.write_register8(pair[0], pair[1]))
+    }
+
+    pub fn write_register8_pairs(&mut self, reg_data: &[(u8, u8)]) -> bool {
+        reg_data
+            .iter()
+            .copied()
+            .all(|(reg, data)| self.write_register8(reg, data))
+    }
+
+    pub fn write_register(&mut self, reg: u8, data: &[u8]) -> bool {
+        self.bus
+            .write_register(self.address, reg, data, self.freq_hz)
+    }
+
+    pub fn read_register(&mut self, reg: u8, result: &mut [u8]) -> bool {
+        self.bus
+            .read_register(self.address, reg, result, self.freq_hz)
+    }
+
+    pub fn bit_on(&mut self, reg: u8, bit: u8) -> bool {
+        self.bus.bit_on(self.address, reg, bit, self.freq_hz)
+    }
+
+    pub fn bit_off(&mut self, reg: u8, bit: u8) -> bool {
+        self.bus.bit_off(self.address, reg, bit, self.freq_hz)
+    }
+
+    pub fn is_bus_enabled(&self) -> bool {
+        self.bus.is_enabled()
+    }
+}
