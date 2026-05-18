@@ -330,8 +330,38 @@ impl DisplayRef {
         unsafe { m5unified_sys::m5u_display_height_at(self.index) as i32 }
     }
 
+    pub fn clear(&mut self) {
+        self.fill_screen(colors::BLACK);
+    }
+
+    pub fn fill_screen(&mut self, color: u16) {
+        unsafe { m5unified_sys::m5u_display_fill_screen_at(self.index, color) }
+    }
+
+    pub fn set_cursor(&mut self, x: i32, y: i32) {
+        unsafe { m5unified_sys::m5u_display_set_cursor_at(self.index, x as c_int, y as c_int) }
+    }
+
     pub fn set_text_size(&mut self, size: i32) {
         unsafe { m5unified_sys::m5u_display_set_text_size_at(self.index, size as c_int) }
+    }
+
+    pub fn set_text_color(&mut self, fg: u16, bg: u16) {
+        unsafe { m5unified_sys::m5u_display_set_text_color_at(self.index, fg, bg) }
+    }
+
+    pub fn rotation(&self) -> i32 {
+        unsafe { m5unified_sys::m5u_display_get_rotation_at(self.index) as i32 }
+    }
+
+    pub fn set_rotation(&mut self, rotation: i32) {
+        unsafe {
+            m5unified_sys::m5u_display_set_rotation_at(self.index, rotation as c_int);
+        }
+    }
+
+    pub fn set_color(&mut self, color: u16) {
+        unsafe { m5unified_sys::m5u_display_set_color_at(self.index, color) }
     }
 
     pub fn start_write(&mut self) {
@@ -368,8 +398,20 @@ impl DisplayRef {
         })
     }
 
+    pub fn draw_line(&mut self, x0: i32, y0: i32, x1: i32, y1: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_draw_line_at(self.index, x0, y0, x1, y1, color) }
+    }
+
+    pub fn draw_rect(&mut self, x: i32, y: i32, w: i32, h: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_draw_rect_at(self.index, x, y, w, h, color) }
+    }
+
     pub fn fill_rect(&mut self, x: i32, y: i32, w: i32, h: i32, color: u16) {
         unsafe { m5unified_sys::m5u_display_fill_rect_at(self.index, x, y, w, h, color) }
+    }
+
+    pub fn draw_circle(&mut self, x: i32, y: i32, r: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_draw_circle_at(self.index, x, y, r, color) }
     }
 
     pub fn fill_circle(&mut self, x: i32, y: i32, r: i32, color: u16) {

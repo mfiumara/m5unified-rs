@@ -517,13 +517,25 @@ mod tests {
         m5.rtc.disable_irq();
 
         let mut display = m5.display(0).expect("host stub display should exist");
+        assert_eq!(display.width(), 320);
+        assert_eq!(display.height(), 240);
+        assert_eq!(display.rotation(), 0);
+        display.clear();
+        display.fill_screen(colors::BLACK);
+        display.set_cursor(0, 0);
         display.set_text_size(1);
+        display.set_text_color(colors::WHITE, colors::BLACK);
+        display.set_rotation(1);
+        display.set_color(colors::YELLOW);
         assert_eq!(display.println("indexed display"), Ok(()));
         assert_eq!(display.draw_string("indexed", 0, 0), Ok(0));
         display.transaction(|display| {
             display.write_pixel(0, 0, colors::WHITE);
             display.draw_pixel(1, 1, colors::RED);
+            display.draw_line(0, 0, 8, 8, colors::GREEN);
+            display.draw_rect(0, 0, 6, 6, colors::CYAN);
             display.fill_rect(0, 0, 4, 4, colors::BLUE);
+            display.draw_circle(8, 8, 3, colors::MAGENTA);
             display.fill_circle(8, 8, 2, colors::GREEN);
         });
     }

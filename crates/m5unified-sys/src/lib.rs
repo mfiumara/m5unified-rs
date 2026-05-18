@@ -457,7 +457,13 @@ extern "C" {
     pub fn m5u_display_index_for_kinds(kinds: *const c_int, len: usize) -> c_int;
     pub fn m5u_display_width_at(index: c_int) -> c_int;
     pub fn m5u_display_height_at(index: c_int) -> c_int;
+    pub fn m5u_display_fill_screen_at(index: c_int, color: u16);
+    pub fn m5u_display_set_cursor_at(index: c_int, x: c_int, y: c_int);
     pub fn m5u_display_set_text_size_at(index: c_int, size: c_int);
+    pub fn m5u_display_set_text_color_at(index: c_int, fg: u16, bg: u16);
+    pub fn m5u_display_get_rotation_at(index: c_int) -> c_int;
+    pub fn m5u_display_set_rotation_at(index: c_int, rotation: c_int);
+    pub fn m5u_display_set_color_at(index: c_int, color: u16);
     pub fn m5u_display_start_write_at(index: c_int);
     pub fn m5u_display_end_write_at(index: c_int);
     pub fn m5u_display_print_at(index: c_int, text: *const c_char);
@@ -468,6 +474,22 @@ extern "C" {
         x: c_int,
         y: c_int,
     ) -> c_int;
+    pub fn m5u_display_draw_line_at(
+        index: c_int,
+        x0: c_int,
+        y0: c_int,
+        x1: c_int,
+        y1: c_int,
+        color: u16,
+    );
+    pub fn m5u_display_draw_rect_at(
+        index: c_int,
+        x: c_int,
+        y: c_int,
+        w: c_int,
+        h: c_int,
+        color: u16,
+    );
     pub fn m5u_display_fill_rect_at(
         index: c_int,
         x: c_int,
@@ -476,6 +498,7 @@ extern "C" {
         h: c_int,
         color: u16,
     );
+    pub fn m5u_display_draw_circle_at(index: c_int, x: c_int, y: c_int, r: c_int, color: u16);
     pub fn m5u_display_fill_circle_at(index: c_int, x: c_int, y: c_int, r: c_int, color: u16);
     pub fn m5u_display_write_pixel_at(index: c_int, x: c_int, y: c_int, color: u16);
     pub fn m5u_display_draw_pixel_at(index: c_int, x: c_int, y: c_int, color: u16);
@@ -1174,7 +1197,15 @@ mod host_stubs {
     pub unsafe fn m5u_display_height_at(_index: c_int) -> c_int {
         240
     }
+    pub unsafe fn m5u_display_fill_screen_at(_index: c_int, _color: u16) {}
+    pub unsafe fn m5u_display_set_cursor_at(_index: c_int, _x: c_int, _y: c_int) {}
     pub unsafe fn m5u_display_set_text_size_at(_index: c_int, _size: c_int) {}
+    pub unsafe fn m5u_display_set_text_color_at(_index: c_int, _fg: u16, _bg: u16) {}
+    pub unsafe fn m5u_display_get_rotation_at(_index: c_int) -> c_int {
+        0
+    }
+    pub unsafe fn m5u_display_set_rotation_at(_index: c_int, _rotation: c_int) {}
+    pub unsafe fn m5u_display_set_color_at(_index: c_int, _color: u16) {}
     pub unsafe fn m5u_display_start_write_at(_index: c_int) {}
     pub unsafe fn m5u_display_end_write_at(_index: c_int) {}
     pub unsafe fn m5u_display_print_at(_index: c_int, _text: *const c_char) {}
@@ -1187,12 +1218,38 @@ mod host_stubs {
     ) -> c_int {
         0
     }
+    pub unsafe fn m5u_display_draw_line_at(
+        _index: c_int,
+        _x0: c_int,
+        _y0: c_int,
+        _x1: c_int,
+        _y1: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_draw_rect_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _h: c_int,
+        _color: u16,
+    ) {
+    }
     pub unsafe fn m5u_display_fill_rect_at(
         _index: c_int,
         _x: c_int,
         _y: c_int,
         _w: c_int,
         _h: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_draw_circle_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _r: c_int,
         _color: u16,
     ) {
     }

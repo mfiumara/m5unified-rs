@@ -656,8 +656,32 @@ int m5u_display_height_at(int index) {
     (void)index; return 240;
 }
 
+void m5u_display_fill_screen_at(int index, uint16_t color) {
+    (void)index; (void)color;
+}
+
+void m5u_display_set_cursor_at(int index, int x, int y) {
+    (void)index; (void)x; (void)y;
+}
+
 void m5u_display_set_text_size_at(int index, int size) {
     (void)index; (void)size;
+}
+
+void m5u_display_set_text_color_at(int index, uint16_t fg, uint16_t bg) {
+    (void)index; (void)fg; (void)bg;
+}
+
+int m5u_display_get_rotation_at(int index) {
+    (void)index; return 0;
+}
+
+void m5u_display_set_rotation_at(int index, int rotation) {
+    (void)index; (void)rotation;
+}
+
+void m5u_display_set_color_at(int index, uint16_t color) {
+    (void)index; (void)color;
 }
 
 void m5u_display_start_write_at(int index) {
@@ -680,8 +704,20 @@ int m5u_display_draw_string_at(int index, const char* text, int x, int y) {
     (void)index; (void)text; (void)x; (void)y; return 0;
 }
 
+void m5u_display_draw_line_at(int index, int x0, int y0, int x1, int y1, uint16_t color) {
+    (void)index; (void)x0; (void)y0; (void)x1; (void)y1; (void)color;
+}
+
+void m5u_display_draw_rect_at(int index, int x, int y, int w, int h, uint16_t color) {
+    (void)index; (void)x; (void)y; (void)w; (void)h; (void)color;
+}
+
 void m5u_display_fill_rect_at(int index, int x, int y, int w, int h, uint16_t color) {
     (void)index; (void)x; (void)y; (void)w; (void)h; (void)color;
+}
+
+void m5u_display_draw_circle_at(int index, int x, int y, int r, uint16_t color) {
+    (void)index; (void)x; (void)y; (void)r; (void)color;
 }
 
 void m5u_display_fill_circle_at(int index, int x, int y, int r, uint16_t color) {

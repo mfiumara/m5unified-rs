@@ -1057,8 +1057,32 @@ int m5u_display_height_at(int index) {
     return M5.Displays(index).height();
 }
 
+void m5u_display_fill_screen_at(int index, uint16_t color) {
+    M5.Displays(index).fillScreen(color);
+}
+
+void m5u_display_set_cursor_at(int index, int x, int y) {
+    M5.Displays(index).setCursor(x, y);
+}
+
 void m5u_display_set_text_size_at(int index, int size) {
     M5.Displays(index).setTextSize(size);
+}
+
+void m5u_display_set_text_color_at(int index, uint16_t fg, uint16_t bg) {
+    M5.Displays(index).setTextColor(fg, bg);
+}
+
+int m5u_display_get_rotation_at(int index) {
+    return M5.Displays(index).getRotation();
+}
+
+void m5u_display_set_rotation_at(int index, int rotation) {
+    M5.Displays(index).setRotation(rotation);
+}
+
+void m5u_display_set_color_at(int index, uint16_t color) {
+    M5.Displays(index).setColor(color);
 }
 
 void m5u_display_start_write_at(int index) {
@@ -1081,8 +1105,20 @@ int m5u_display_draw_string_at(int index, const char* text, int x, int y) {
     return M5.Displays(index).drawString(text, x, y);
 }
 
+void m5u_display_draw_line_at(int index, int x0, int y0, int x1, int y1, uint16_t color) {
+    M5.Displays(index).drawLine(x0, y0, x1, y1, color);
+}
+
+void m5u_display_draw_rect_at(int index, int x, int y, int w, int h, uint16_t color) {
+    M5.Displays(index).drawRect(x, y, w, h, color);
+}
+
 void m5u_display_fill_rect_at(int index, int x, int y, int w, int h, uint16_t color) {
     M5.Displays(index).fillRect(x, y, w, h, color);
+}
+
+void m5u_display_draw_circle_at(int index, int x, int y, int r, uint16_t color) {
+    M5.Displays(index).drawCircle(x, y, r, color);
 }
 
 void m5u_display_fill_circle_at(int index, int x, int y, int r, uint16_t color) {
