@@ -23,7 +23,7 @@ rust_bin = "advanced_mic_fft"
 status = "host_compiles"
 category = "advanced"
 requires = ["microphone", "display", "fft"]
-notes = "Rust FFT should live in example package, not m5unified core."
+notes = "Uses an in-example DFT-style spectrum calculation; DSP dependencies stay outside m5unified core."
 
 [[example]]
 upstream = "Advanced/Speak_with_AquesTalk/Speak_with_AquesTalk.ino"
