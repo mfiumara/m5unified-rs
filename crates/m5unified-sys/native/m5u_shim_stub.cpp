@@ -236,12 +236,28 @@ bool m5u_rtc_get_datetime_detail(m5u_rtc_datetime_t* out) {
     (void)out; return false;
 }
 
+bool m5u_rtc_get_date_detail(m5u_rtc_datetime_t* out) {
+    (void)out; return false;
+}
+
+bool m5u_rtc_get_time_detail(m5u_rtc_datetime_t* out) {
+    (void)out; return false;
+}
+
 bool m5u_rtc_set_datetime(int year, int month, int day, int hour, int minute, int second) {
     (void)year; (void)month; (void)day; (void)hour; (void)minute; (void)second; return false;
 }
 
 bool m5u_rtc_set_datetime_detail(const m5u_rtc_datetime_t* datetime) {
     (void)datetime; return false;
+}
+
+bool m5u_rtc_set_date_detail(const m5u_rtc_datetime_t* date) {
+    (void)date; return false;
+}
+
+bool m5u_rtc_set_time_detail(const m5u_rtc_datetime_t* time) {
+    (void)time; return false;
 }
 
 void m5u_rtc_set_system_time_from_rtc(void) {
@@ -261,6 +277,10 @@ int m5u_rtc_set_alarm_irq_after_seconds(int after_seconds) {
 
 int m5u_rtc_set_alarm_irq_datetime(const m5u_rtc_datetime_t* datetime) {
     (void)datetime; return -1;
+}
+
+int m5u_rtc_set_alarm_irq_time(const m5u_rtc_datetime_t* time) {
+    (void)time; return -1;
 }
 
 bool m5u_rtc_get_irq_status(void) {

@@ -309,6 +309,8 @@ extern "C" {
         second: *mut c_int,
     ) -> bool;
     pub fn m5u_rtc_get_datetime_detail(out: *mut m5u_rtc_datetime_t) -> bool;
+    pub fn m5u_rtc_get_date_detail(out: *mut m5u_rtc_datetime_t) -> bool;
+    pub fn m5u_rtc_get_time_detail(out: *mut m5u_rtc_datetime_t) -> bool;
     pub fn m5u_rtc_set_datetime(
         year: c_int,
         month: c_int,
@@ -318,6 +320,8 @@ extern "C" {
         second: c_int,
     ) -> bool;
     pub fn m5u_rtc_set_datetime_detail(datetime: *const m5u_rtc_datetime_t) -> bool;
+    pub fn m5u_rtc_set_date_detail(date: *const m5u_rtc_datetime_t) -> bool;
+    pub fn m5u_rtc_set_time_detail(time: *const m5u_rtc_datetime_t) -> bool;
 
     pub fn m5u_battery_level() -> c_int;
     pub fn m5u_battery_voltage_mv() -> c_int;
@@ -462,6 +466,7 @@ extern "C" {
     pub fn m5u_rtc_set_timer_irq(timer_msec: u32) -> u32;
     pub fn m5u_rtc_set_alarm_irq_after_seconds(after_seconds: c_int) -> c_int;
     pub fn m5u_rtc_set_alarm_irq_datetime(datetime: *const m5u_rtc_datetime_t) -> c_int;
+    pub fn m5u_rtc_set_alarm_irq_time(time: *const m5u_rtc_datetime_t) -> c_int;
     pub fn m5u_rtc_get_irq_status() -> bool;
     pub fn m5u_rtc_clear_irq();
     pub fn m5u_rtc_disable_irq();
@@ -723,6 +728,12 @@ mod host_stubs {
         }
         true
     }
+    pub unsafe fn m5u_rtc_get_date_detail(out: *mut m5u_rtc_datetime_t) -> bool {
+        m5u_rtc_get_datetime_detail(out)
+    }
+    pub unsafe fn m5u_rtc_get_time_detail(out: *mut m5u_rtc_datetime_t) -> bool {
+        m5u_rtc_get_datetime_detail(out)
+    }
     pub unsafe fn m5u_rtc_set_datetime(
         _year: c_int,
         _month: c_int,
@@ -735,6 +746,12 @@ mod host_stubs {
     }
     pub unsafe fn m5u_rtc_set_datetime_detail(datetime: *const m5u_rtc_datetime_t) -> bool {
         !datetime.is_null()
+    }
+    pub unsafe fn m5u_rtc_set_date_detail(date: *const m5u_rtc_datetime_t) -> bool {
+        !date.is_null()
+    }
+    pub unsafe fn m5u_rtc_set_time_detail(time: *const m5u_rtc_datetime_t) -> bool {
+        !time.is_null()
     }
 
     pub unsafe fn m5u_battery_level() -> c_int {
@@ -1066,6 +1083,13 @@ mod host_stubs {
     }
     pub unsafe fn m5u_rtc_set_alarm_irq_datetime(datetime: *const m5u_rtc_datetime_t) -> c_int {
         if datetime.is_null() {
+            -1
+        } else {
+            0
+        }
+    }
+    pub unsafe fn m5u_rtc_set_alarm_irq_time(time: *const m5u_rtc_datetime_t) -> c_int {
+        if time.is_null() {
             -1
         } else {
             0

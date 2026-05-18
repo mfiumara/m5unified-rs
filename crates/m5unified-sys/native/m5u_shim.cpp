@@ -319,6 +319,26 @@ static void m5u_rtc_to_raw(const m5::rtc_datetime_t& src, m5u_rtc_datetime_t* ou
     out->second = src.time.seconds;
 }
 
+static void m5u_rtc_date_to_raw(const m5::rtc_date_t& src, m5u_rtc_datetime_t* out) {
+    out->year = src.year;
+    out->month = src.month;
+    out->day = src.date;
+    out->weekday = src.weekDay;
+    out->hour = 0;
+    out->minute = 0;
+    out->second = 0;
+}
+
+static void m5u_rtc_time_to_raw(const m5::rtc_time_t& src, m5u_rtc_datetime_t* out) {
+    out->year = 0;
+    out->month = 0;
+    out->day = 0;
+    out->weekday = -1;
+    out->hour = src.hours;
+    out->minute = src.minutes;
+    out->second = src.seconds;
+}
+
 static m5::rtc_datetime_t m5u_rtc_from_raw(const m5u_rtc_datetime_t* src) {
     m5::rtc_datetime_t dt = {};
     dt.date.year = src->year;
@@ -331,6 +351,23 @@ static m5::rtc_datetime_t m5u_rtc_from_raw(const m5u_rtc_datetime_t* src) {
     return dt;
 }
 
+static m5::rtc_date_t m5u_rtc_date_from_raw(const m5u_rtc_datetime_t* src) {
+    m5::rtc_date_t date = {};
+    date.year = src->year;
+    date.month = src->month;
+    date.date = src->day;
+    date.weekDay = src->weekday;
+    return date;
+}
+
+static m5::rtc_time_t m5u_rtc_time_from_raw(const m5u_rtc_datetime_t* src) {
+    m5::rtc_time_t time = {};
+    time.hours = src->hour;
+    time.minutes = src->minute;
+    time.seconds = src->second;
+    return time;
+}
+
 bool m5u_rtc_get_datetime_detail(m5u_rtc_datetime_t* out) {
     if (!out) {
         return false;
@@ -340,6 +377,30 @@ bool m5u_rtc_get_datetime_detail(m5u_rtc_datetime_t* out) {
         return false;
     }
     m5u_rtc_to_raw(dt, out);
+    return true;
+}
+
+bool m5u_rtc_get_date_detail(m5u_rtc_datetime_t* out) {
+    if (!out) {
+        return false;
+    }
+    m5::rtc_date_t date;
+    if (!M5.Rtc.getDate(&date)) {
+        return false;
+    }
+    m5u_rtc_date_to_raw(date, out);
+    return true;
+}
+
+bool m5u_rtc_get_time_detail(m5u_rtc_datetime_t* out) {
+    if (!out) {
+        return false;
+    }
+    m5::rtc_time_t time;
+    if (!M5.Rtc.getTime(&time)) {
+        return false;
+    }
+    m5u_rtc_time_to_raw(time, out);
     return true;
 }
 
@@ -361,6 +422,24 @@ bool m5u_rtc_set_datetime_detail(const m5u_rtc_datetime_t* datetime) {
     }
     auto dt = m5u_rtc_from_raw(datetime);
     M5.Rtc.setDateTime(&dt);
+    return true;
+}
+
+bool m5u_rtc_set_date_detail(const m5u_rtc_datetime_t* date) {
+    if (!date) {
+        return false;
+    }
+    auto raw = m5u_rtc_date_from_raw(date);
+    M5.Rtc.setDate(&raw);
+    return true;
+}
+
+bool m5u_rtc_set_time_detail(const m5u_rtc_datetime_t* time) {
+    if (!time) {
+        return false;
+    }
+    auto raw = m5u_rtc_time_from_raw(time);
+    M5.Rtc.setTime(&raw);
     return true;
 }
 
@@ -386,6 +465,14 @@ int m5u_rtc_set_alarm_irq_datetime(const m5u_rtc_datetime_t* datetime) {
     }
     auto dt = m5u_rtc_from_raw(datetime);
     return M5.Rtc.setAlarmIRQ(&dt.date, &dt.time);
+}
+
+int m5u_rtc_set_alarm_irq_time(const m5u_rtc_datetime_t* time) {
+    if (!time) {
+        return -1;
+    }
+    auto raw = m5u_rtc_time_from_raw(time);
+    return M5.Rtc.setAlarmIRQ((const m5::rtc_date_t*)nullptr, &raw);
 }
 
 bool m5u_rtc_get_irq_status(void) {
