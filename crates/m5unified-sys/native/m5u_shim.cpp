@@ -827,8 +827,8 @@ static m5::Button_Class* m5u_button_for_id(int button) {
     case 0: return &M5.BtnA;
     case 1: return &M5.BtnB;
     case 2: return &M5.BtnC;
-    case 3: return &M5.BtnPWR;
-    case 4: return &M5.BtnEXT;
+    case 3: return &M5.BtnEXT;
+    case 4: return &M5.BtnPWR;
     default: return nullptr;
     }
 }

@@ -348,6 +348,9 @@ mod tests {
         let m5 = M5Unified::begin().expect("host stub begin should succeed");
         let button = m5.buttons.a();
 
+        assert!(m5.buttons.get(0).is_some());
+        assert!(m5.buttons.get(4).is_some());
+        assert!(m5.buttons.get(5).is_none());
         assert_eq!(ButtonState::from_raw(0), ButtonState::NoChange);
         assert_eq!(ButtonState::Raw(9).raw(), 9);
         assert!(!button.is_pressed());

@@ -48,6 +48,18 @@ impl Buttons {
         Button { id }
     }
 
+    pub fn get(&self, index: usize) -> Option<Button> {
+        let id = match index {
+            0 => ButtonId::A,
+            1 => ButtonId::B,
+            2 => ButtonId::C,
+            3 => ButtonId::Ext,
+            4 => ButtonId::Pwr,
+            _ => return None,
+        };
+        Some(self.button(id))
+    }
+
     pub fn a(&self) -> Button {
         self.button(ButtonId::A)
     }
@@ -88,8 +100,8 @@ impl Button {
             ButtonId::A => 0,
             ButtonId::B => 1,
             ButtonId::C => 2,
-            ButtonId::Pwr => 3,
-            ButtonId::Ext => 4,
+            ButtonId::Ext => 3,
+            ButtonId::Pwr => 4,
         }
     }
 
