@@ -30,6 +30,12 @@ static bool s_m5u_sd_owns_bus = false;
 #define M5U_HAS_AW32001 0
 #endif
 
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+#define M5U_HAS_PY32PMIC 1
+#else
+#define M5U_HAS_PY32PMIC 0
+#endif
+
 extern "C" {
 
 static auto m5u_apply_config(const m5u_config_t* src) {
@@ -1551,6 +1557,14 @@ static bool m5u_has_aw32001(void) {
 #endif
 }
 
+static bool m5u_has_py32pmic(void) {
+#if M5U_HAS_PY32PMIC
+    return M5.Power.getType() == m5::Power_Class::pmic_t::pmic_py32pmic;
+#else
+    return false;
+#endif
+}
+
 bool m5u_power_aw32001_begin(void) {
 #if M5U_HAS_AW32001
     return m5u_has_aw32001() && M5.Power.Aw32001.begin();
@@ -1615,6 +1629,90 @@ int m5u_power_aw32001_get_charge_status(void) {
     return m5u_has_aw32001() ? M5.Power.Aw32001.getChargeStatus() : -1;
 #else
     return -1;
+#endif
+}
+
+bool m5u_power_py32pmic_begin(void) {
+#if M5U_HAS_PY32PMIC
+    return m5u_has_py32pmic() && M5.Power.PY32pmic.begin();
+#else
+    return false;
+#endif
+}
+
+bool m5u_power_py32pmic_set_ext_output(bool enable) {
+#if M5U_HAS_PY32PMIC
+    return m5u_has_py32pmic() && M5.Power.PY32pmic.setExtOutput(enable);
+#else
+    (void)enable;
+    return false;
+#endif
+}
+
+bool m5u_power_py32pmic_set_battery_charge(bool enable) {
+#if M5U_HAS_PY32PMIC
+    return m5u_has_py32pmic() && M5.Power.PY32pmic.setBatteryCharge(enable);
+#else
+    (void)enable;
+    return false;
+#endif
+}
+
+bool m5u_power_py32pmic_set_charge_current(uint16_t max_ma) {
+#if M5U_HAS_PY32PMIC
+    return m5u_has_py32pmic() && M5.Power.PY32pmic.setChargeCurrent(max_ma);
+#else
+    (void)max_ma;
+    return false;
+#endif
+}
+
+bool m5u_power_py32pmic_set_charge_voltage(uint16_t max_mv) {
+#if M5U_HAS_PY32PMIC
+    return m5u_has_py32pmic() && M5.Power.PY32pmic.setChargeVoltage(max_mv);
+#else
+    (void)max_mv;
+    return false;
+#endif
+}
+
+bool m5u_power_py32pmic_is_charging(void) {
+#if M5U_HAS_PY32PMIC
+    return m5u_has_py32pmic() && M5.Power.PY32pmic.isCharging();
+#else
+    return false;
+#endif
+}
+
+uint16_t m5u_power_py32pmic_get_charge_current(void) {
+#if M5U_HAS_PY32PMIC
+    return m5u_has_py32pmic() ? M5.Power.PY32pmic.getChargeCurrent() : 0;
+#else
+    return 0;
+#endif
+}
+
+uint16_t m5u_power_py32pmic_get_charge_voltage(void) {
+#if M5U_HAS_PY32PMIC
+    return m5u_has_py32pmic() ? M5.Power.PY32pmic.getChargeVoltage() : 0;
+#else
+    return 0;
+#endif
+}
+
+uint8_t m5u_power_py32pmic_get_pek_press(void) {
+#if M5U_HAS_PY32PMIC
+    return m5u_has_py32pmic() ? M5.Power.PY32pmic.getPekPress() : 0;
+#else
+    return 0;
+#endif
+}
+
+bool m5u_power_py32pmic_power_off(void) {
+#if M5U_HAS_PY32PMIC
+    return m5u_has_py32pmic() && M5.Power.PY32pmic.powerOff();
+#else
+    return false;
 #endif
 }
 

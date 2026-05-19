@@ -59,7 +59,7 @@ pub use led::{Led, LedColor, LedType};
 pub use log::{Log, LogLevel, LogTarget, RawLogCallback};
 pub use power::{
     Aw32001, Aw32001ChargeStatus, Axp2101, Axp2101ChargeStatus, Axp2101IrqStatus, Axp2101PekPress,
-    ChargeState, ExtPortBusConfig, ExtPortMask, Power, PowerType,
+    ChargeState, ExtPortBusConfig, ExtPortMask, Power, PowerType, Py32Pmic, Py32PmicPekPress,
 };
 pub use rtc::{Date, DateTime, Rtc, Time};
 pub use sd::{
@@ -655,6 +655,19 @@ mod tests {
             Aw32001ChargeStatus::from_raw(77),
             Aw32001ChargeStatus::Raw(77)
         );
+        let py32 = m5.power.py32pmic();
+        assert!(!py32.begin());
+        assert!(!py32.set_ext_output(true));
+        assert!(!py32.set_battery_charge(true));
+        assert!(!py32.set_charge_current_ma(100));
+        assert!(!py32.set_charge_voltage_mv(4_200));
+        assert!(!py32.is_charging());
+        assert_eq!(py32.charge_current_ma(), None);
+        assert_eq!(py32.charge_voltage_mv(), None);
+        assert_eq!(py32.pek_press(), Py32PmicPekPress::None);
+        assert_eq!(Py32PmicPekPress::Short.raw(), 2);
+        assert_eq!(Py32PmicPekPress::from_raw(7), Py32PmicPekPress::Raw(7));
+        assert!(!py32.power_off());
         let axp = m5.power.axp2101();
         assert!(!axp.begin());
         assert_eq!(axp.battery_level(), None);

@@ -660,6 +660,16 @@ extern "C" {
     pub fn m5u_power_aw32001_get_charge_current() -> u16;
     pub fn m5u_power_aw32001_get_charge_voltage() -> u16;
     pub fn m5u_power_aw32001_get_charge_status() -> c_int;
+    pub fn m5u_power_py32pmic_begin() -> bool;
+    pub fn m5u_power_py32pmic_set_ext_output(enable: bool) -> bool;
+    pub fn m5u_power_py32pmic_set_battery_charge(enable: bool) -> bool;
+    pub fn m5u_power_py32pmic_set_charge_current(max_ma: u16) -> bool;
+    pub fn m5u_power_py32pmic_set_charge_voltage(max_mv: u16) -> bool;
+    pub fn m5u_power_py32pmic_is_charging() -> bool;
+    pub fn m5u_power_py32pmic_get_charge_current() -> u16;
+    pub fn m5u_power_py32pmic_get_charge_voltage() -> u16;
+    pub fn m5u_power_py32pmic_get_pek_press() -> u8;
+    pub fn m5u_power_py32pmic_power_off() -> bool;
     pub fn m5u_power_axp2101_begin() -> bool;
     pub fn m5u_power_axp2101_get_battery_level() -> c_int;
     pub fn m5u_power_axp2101_set_battery_charge(enable: bool) -> bool;
@@ -1644,6 +1654,36 @@ mod host_stubs {
     }
     pub unsafe fn m5u_power_aw32001_get_charge_status() -> c_int {
         -1
+    }
+    pub unsafe fn m5u_power_py32pmic_begin() -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_py32pmic_set_ext_output(_enable: bool) -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_py32pmic_set_battery_charge(_enable: bool) -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_py32pmic_set_charge_current(_max_ma: u16) -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_py32pmic_set_charge_voltage(_max_mv: u16) -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_py32pmic_is_charging() -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_py32pmic_get_charge_current() -> u16 {
+        0
+    }
+    pub unsafe fn m5u_power_py32pmic_get_charge_voltage() -> u16 {
+        0
+    }
+    pub unsafe fn m5u_power_py32pmic_get_pek_press() -> u8 {
+        0
+    }
+    pub unsafe fn m5u_power_py32pmic_power_off() -> bool {
+        false
     }
     pub unsafe fn m5u_power_axp2101_begin() -> bool {
         false

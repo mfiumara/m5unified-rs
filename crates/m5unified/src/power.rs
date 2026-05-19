@@ -183,6 +183,10 @@ impl Power {
     pub fn aw32001(&self) -> Aw32001 {
         Aw32001
     }
+
+    pub fn py32pmic(&self) -> Py32Pmic {
+        Py32Pmic
+    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -397,6 +401,34 @@ impl Aw32001ChargeStatus {
     }
 }
 
+/// Latched PY32 PMIC power-key press state.
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum Py32PmicPekPress {
+    None,
+    Short,
+    Raw(u8),
+}
+
+impl Py32PmicPekPress {
+    /// Convert the raw M5Unified PY32 PMIC PEK state into a Rust enum.
+    pub const fn from_raw(raw: u8) -> Self {
+        match raw {
+            0 => Self::None,
+            2 => Self::Short,
+            other => Self::Raw(other),
+        }
+    }
+
+    /// Return the raw M5Unified PY32 PMIC PEK state.
+    pub const fn raw(self) -> u8 {
+        match self {
+            Self::None => 0,
+            Self::Short => 2,
+            Self::Raw(raw) => raw,
+        }
+    }
+}
+
 /// External port mask for boards with independently switchable power outputs.
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct ExtPortMask(u16);
@@ -503,6 +535,71 @@ impl Aw32001 {
         Aw32001ChargeStatus::from_raw(unsafe {
             m5unified_sys::m5u_power_aw32001_get_charge_status()
         })
+    }
+}
+
+#[derive(Debug)]
+pub struct Py32Pmic;
+
+impl Py32Pmic {
+    /// Initialize the direct PY32 PMIC backend when this board has one.
+    pub fn begin(&self) -> bool {
+        unsafe { m5unified_sys::m5u_power_py32pmic_begin() }
+    }
+
+    /// Enable or disable external output through the PY32 PMIC.
+    pub fn set_ext_output(&self, enable: bool) -> bool {
+        unsafe { m5unified_sys::m5u_power_py32pmic_set_ext_output(enable) }
+    }
+
+    /// Enable or disable battery charging through the PY32 PMIC.
+    pub fn set_battery_charge(&self, enable: bool) -> bool {
+        unsafe { m5unified_sys::m5u_power_py32pmic_set_battery_charge(enable) }
+    }
+
+    /// Set the PY32 PMIC charge-current target in milliamps.
+    ///
+    /// M5Unified currently exposes this as unsupported and returns `false`.
+    pub fn set_charge_current_ma(&self, max_ma: u16) -> bool {
+        unsafe { m5unified_sys::m5u_power_py32pmic_set_charge_current(max_ma) }
+    }
+
+    /// Set the PY32 PMIC charge-voltage target in millivolts.
+    ///
+    /// M5Unified currently exposes this as unsupported and returns `false`.
+    pub fn set_charge_voltage_mv(&self, max_mv: u16) -> bool {
+        unsafe { m5unified_sys::m5u_power_py32pmic_set_charge_voltage(max_mv) }
+    }
+
+    /// Return whether the PY32 PMIC reports that the battery is charging.
+    ///
+    /// M5Unified currently returns `false` for this direct PY32 PMIC helper.
+    pub fn is_charging(&self) -> bool {
+        unsafe { m5unified_sys::m5u_power_py32pmic_is_charging() }
+    }
+
+    /// Return the configured PY32 PMIC charge current in milliamps.
+    pub fn charge_current_ma(&self) -> Option<u16> {
+        let current = unsafe { m5unified_sys::m5u_power_py32pmic_get_charge_current() };
+        (current != 0).then_some(current)
+    }
+
+    /// Return the configured PY32 PMIC charge voltage in millivolts.
+    pub fn charge_voltage_mv(&self) -> Option<u16> {
+        let voltage = unsafe { m5unified_sys::m5u_power_py32pmic_get_charge_voltage() };
+        (voltage != 0).then_some(voltage)
+    }
+
+    /// Return the latched PY32 PMIC PEK press state.
+    ///
+    /// On supported PMICs this read clears the latched short-press state.
+    pub fn pek_press(&self) -> Py32PmicPekPress {
+        Py32PmicPekPress::from_raw(unsafe { m5unified_sys::m5u_power_py32pmic_get_pek_press() })
+    }
+
+    /// Power the board off through the PY32 PMIC.
+    pub fn power_off(&self) -> bool {
+        unsafe { m5unified_sys::m5u_power_py32pmic_power_off() }
     }
 }
 

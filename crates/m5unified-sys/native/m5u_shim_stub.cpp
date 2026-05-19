@@ -1046,6 +1046,16 @@ bool m5u_power_aw32001_is_charging(void) { return false; }
 uint16_t m5u_power_aw32001_get_charge_current(void) { return 0; }
 uint16_t m5u_power_aw32001_get_charge_voltage(void) { return 0; }
 int m5u_power_aw32001_get_charge_status(void) { return -1; }
+bool m5u_power_py32pmic_begin(void) { return false; }
+bool m5u_power_py32pmic_set_ext_output(bool enable) { (void)enable; return false; }
+bool m5u_power_py32pmic_set_battery_charge(bool enable) { (void)enable; return false; }
+bool m5u_power_py32pmic_set_charge_current(uint16_t max_ma) { (void)max_ma; return false; }
+bool m5u_power_py32pmic_set_charge_voltage(uint16_t max_mv) { (void)max_mv; return false; }
+bool m5u_power_py32pmic_is_charging(void) { return false; }
+uint16_t m5u_power_py32pmic_get_charge_current(void) { return 0; }
+uint16_t m5u_power_py32pmic_get_charge_voltage(void) { return 0; }
+uint8_t m5u_power_py32pmic_get_pek_press(void) { return 0; }
+bool m5u_power_py32pmic_power_off(void) { return false; }
 bool m5u_power_axp2101_begin(void) { return false; }
 int m5u_power_axp2101_get_battery_level(void) { return -1; }
 bool m5u_power_axp2101_set_battery_charge(bool enable) { (void)enable; return false; }
