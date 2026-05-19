@@ -68,7 +68,7 @@ hardware simulation.
 The current wrapper covers the API used by the translated upstream examples:
 
 - startup configuration through `M5UnifiedConfig` and `M5Unified::begin_with_config`
-- display drawing primitives, Bezier/wide/gradient lines, ellipse arcs, smooth fills, gradient fills, pivot/clip/scroll state, image buffer push/readback, text, text metrics, `core::fmt::Write` formatting, color, fonts, EPD modes, scrolling, transactions, and indexed multi-display drawing
+- display drawing primitives, Bezier/wide/gradient lines, ellipse arcs, smooth fills, gradient fills, pivot/clip/scroll state, RGB565 image buffer push/readback, BMP/JPG/PNG/QOI image drawing, text, text metrics, `core::fmt::Write` formatting, color, fonts, EPD modes, scrolling, transactions, and indexed multi-display drawing
 - button press, release, hold, click, click-count, timing, threshold, and state helpers
 - microphone recording, recording state, sample-rate, configuration helpers, and simple RMS calculation
 - speaker configuration, running/playing state, tone, PCM, WAV, channel, repeat, and volume controls

@@ -52,7 +52,7 @@ pub use buttons::{Button, ButtonId, ButtonState, Buttons};
 pub use config::{ExternalDisplayConfig, ExternalSpeakerConfig, M5UnifiedConfig};
 pub use display::{
     colors, Color565, Display, DisplayFont, DisplayKind, DisplayRef, EpdMode, GradientFillStyle,
-    Point, Rect, Size, TextDatum,
+    ImageDrawOptions, ImageFormat, Point, Rect, Size, TextDatum,
 };
 pub use error::Error;
 pub use i2c::{I2cBus, I2cDevice};
@@ -207,6 +207,15 @@ mod tests {
             h: 16,
         };
         let image = [colors::RED, colors::GREEN, colors::BLUE, colors::WHITE];
+        let encoded_image = [0xFF_u8];
+        let image_options = ImageDrawOptions {
+            position: Point { x: 1, y: 2 },
+            max_size: Size { w: 32, h: 24 },
+            offset: Point { x: 0, y: 0 },
+            scale_x: 1.0,
+            scale_y: 1.0,
+            datum: TextDatum::MiddleCenter,
+        };
         m5.display.draw_triangle(p0, p1, p2, colors::YELLOW);
         m5.display.fill_triangle(p0, p1, p2, colors::CYAN);
         m5.display.draw_ellipse(30, 30, 8, 4, colors::WHITE);
@@ -297,6 +306,39 @@ mod tests {
             Size { w: 2, h: 2 },
             Point { x: 0, y: 0 },
         );
+        assert_eq!(
+            m5.display
+                .draw_image(ImageFormat::Bmp, &encoded_image, image_options),
+            Ok(())
+        );
+        assert_eq!(m5.display.draw_bmp(&encoded_image, image_options), Ok(()));
+        assert_eq!(m5.display.draw_jpg(&encoded_image, image_options), Ok(()));
+        assert_eq!(m5.display.draw_png(&encoded_image, image_options), Ok(()));
+        assert_eq!(m5.display.draw_qoi(&encoded_image, image_options), Ok(()));
+        assert_eq!(
+            m5.display.draw_bmp(&[], ImageDrawOptions::default()),
+            Err(Error::InvalidBufferLength)
+        );
+        assert_eq!(
+            m5.display
+                .draw_bmp_file("/tmp/missing.bmp", ImageDrawOptions::default()),
+            Ok(())
+        );
+        assert_eq!(
+            m5.display
+                .draw_jpg_file("/tmp/missing.jpg", ImageDrawOptions::default()),
+            Ok(())
+        );
+        assert_eq!(
+            m5.display
+                .draw_png_file("/tmp/missing.png", ImageDrawOptions::default()),
+            Ok(())
+        );
+        assert_eq!(
+            m5.display
+                .draw_qoi_file("/tmp/missing.qoi", ImageDrawOptions::default()),
+            Ok(())
+        );
         let mut display = m5.displays(0).expect("host stub display should exist");
         display.draw_pixel(1, 1, colors::WHITE);
         display.write_pixel(2, 2, colors::RED);
@@ -381,6 +423,34 @@ mod tests {
             Size { w: 2, h: 2 },
             Point { x: 0, y: 0 },
         );
+        assert_eq!(
+            display.draw_image(ImageFormat::Bmp, &encoded_image, image_options),
+            Ok(())
+        );
+        assert_eq!(display.draw_bmp(&encoded_image, image_options), Ok(()));
+        assert_eq!(display.draw_jpg(&encoded_image, image_options), Ok(()));
+        assert_eq!(display.draw_png(&encoded_image, image_options), Ok(()));
+        assert_eq!(display.draw_qoi(&encoded_image, image_options), Ok(()));
+        assert_eq!(
+            display.draw_bmp(&[], ImageDrawOptions::default()),
+            Err(Error::InvalidBufferLength)
+        );
+        assert_eq!(
+            display.draw_bmp_file("/tmp/missing.bmp", ImageDrawOptions::default()),
+            Ok(())
+        );
+        assert_eq!(
+            display.draw_jpg_file("/tmp/missing.jpg", ImageDrawOptions::default()),
+            Ok(())
+        );
+        assert_eq!(
+            display.draw_png_file("/tmp/missing.png", ImageDrawOptions::default()),
+            Ok(())
+        );
+        assert_eq!(
+            display.draw_qoi_file("/tmp/missing.qoi", ImageDrawOptions::default()),
+            Ok(())
+        );
     }
 
     #[test]
@@ -391,8 +461,17 @@ mod tests {
             m5.display.text_width("bad\0string"),
             Err(Error::InvalidString)
         );
-        let display = m5.displays(0).expect("host stub display should exist");
+        assert_eq!(
+            m5.display
+                .draw_bmp_file("bad\0path", ImageDrawOptions::default()),
+            Err(Error::InvalidString)
+        );
+        let mut display = m5.displays(0).expect("host stub display should exist");
         assert_eq!(display.text_width("bad\0string"), Err(Error::InvalidString));
+        assert_eq!(
+            display.draw_bmp_file("bad\0path", ImageDrawOptions::default()),
+            Err(Error::InvalidString)
+        );
     }
 
     #[test]

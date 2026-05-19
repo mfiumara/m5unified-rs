@@ -26,6 +26,18 @@ typedef struct {
     int fallback_board;
 } m5u_config_t;
 
+typedef struct {
+    int x;
+    int y;
+    int max_width;
+    int max_height;
+    int off_x;
+    int off_y;
+    float scale_x;
+    float scale_y;
+    int datum;
+} m5u_image_options_t;
+
 bool m5u_begin(void);
 bool m5u_begin_with_config(const m5u_config_t* config);
 void m5u_update(void);
@@ -174,6 +186,8 @@ bool m5u_display_push_image_rgb565_transparent(int x, int y, int w, int h, const
 uint16_t m5u_display_read_pixel(int x, int y);
 bool m5u_display_read_rect_rgb565(int x, int y, int w, int h, uint16_t* data);
 void m5u_display_copy_rect(int dst_x, int dst_y, int w, int h, int src_x, int src_y);
+bool m5u_display_draw_image(int format, const uint8_t* data, size_t len, const m5u_image_options_t* options);
+bool m5u_display_draw_image_file(int format, const char* path, const m5u_image_options_t* options);
 int m5u_display_count(void);
 int m5u_display_index_for_kind(int kind);
 int m5u_display_index_for_kinds(const int* kinds, size_t len);
@@ -247,6 +261,8 @@ bool m5u_display_push_image_rgb565_transparent_at(int index, int x, int y, int w
 uint16_t m5u_display_read_pixel_at(int index, int x, int y);
 bool m5u_display_read_rect_rgb565_at(int index, int x, int y, int w, int h, uint16_t* data);
 void m5u_display_copy_rect_at(int index, int dst_x, int dst_y, int w, int h, int src_x, int src_y);
+bool m5u_display_draw_image_at(int index, int format, const uint8_t* data, size_t len, const m5u_image_options_t* options);
+bool m5u_display_draw_image_file_at(int index, int format, const char* path, const m5u_image_options_t* options);
 
 bool m5u_btn_a_is_pressed(void);
 bool m5u_btn_a_was_pressed(void);

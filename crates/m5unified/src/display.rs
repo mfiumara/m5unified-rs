@@ -568,6 +568,77 @@ impl Display {
             m5unified_sys::m5u_display_copy_rect(dst.x, dst.y, size.w, size.h, src.x, src.y);
         }
     }
+
+    pub fn draw_image(
+        &mut self,
+        format: ImageFormat,
+        data: &[u8],
+        options: ImageDrawOptions,
+    ) -> Result<(), Error> {
+        validate_encoded_image_buffer(data)?;
+        let options = options.to_raw();
+        let ok = unsafe {
+            m5unified_sys::m5u_display_draw_image(
+                format.raw() as c_int,
+                data.as_ptr(),
+                data.len(),
+                &options,
+            )
+        };
+        ok.then_some(())
+            .ok_or(Error::Unavailable("display draw_image"))
+    }
+
+    pub fn draw_image_file(
+        &mut self,
+        format: ImageFormat,
+        path: &str,
+        options: ImageDrawOptions,
+    ) -> Result<(), Error> {
+        let path = CString::new(path).map_err(|_| Error::InvalidString)?;
+        let options = options.to_raw();
+        let ok = unsafe {
+            m5unified_sys::m5u_display_draw_image_file(
+                format.raw() as c_int,
+                path.as_ptr(),
+                &options,
+            )
+        };
+        ok.then_some(())
+            .ok_or(Error::Unavailable("display draw_image_file"))
+    }
+
+    pub fn draw_bmp(&mut self, data: &[u8], options: ImageDrawOptions) -> Result<(), Error> {
+        self.draw_image(ImageFormat::Bmp, data, options)
+    }
+
+    pub fn draw_jpg(&mut self, data: &[u8], options: ImageDrawOptions) -> Result<(), Error> {
+        self.draw_image(ImageFormat::Jpg, data, options)
+    }
+
+    pub fn draw_png(&mut self, data: &[u8], options: ImageDrawOptions) -> Result<(), Error> {
+        self.draw_image(ImageFormat::Png, data, options)
+    }
+
+    pub fn draw_qoi(&mut self, data: &[u8], options: ImageDrawOptions) -> Result<(), Error> {
+        self.draw_image(ImageFormat::Qoi, data, options)
+    }
+
+    pub fn draw_bmp_file(&mut self, path: &str, options: ImageDrawOptions) -> Result<(), Error> {
+        self.draw_image_file(ImageFormat::Bmp, path, options)
+    }
+
+    pub fn draw_jpg_file(&mut self, path: &str, options: ImageDrawOptions) -> Result<(), Error> {
+        self.draw_image_file(ImageFormat::Jpg, path, options)
+    }
+
+    pub fn draw_png_file(&mut self, path: &str, options: ImageDrawOptions) -> Result<(), Error> {
+        self.draw_image_file(ImageFormat::Png, path, options)
+    }
+
+    pub fn draw_qoi_file(&mut self, path: &str, options: ImageDrawOptions) -> Result<(), Error> {
+        self.draw_image_file(ImageFormat::Qoi, path, options)
+    }
 }
 
 impl core::fmt::Write for Display {
@@ -627,6 +698,13 @@ fn validate_pixel_buffer(rect: Rect, len: usize) -> Result<usize, Error> {
     Ok(required)
 }
 
+fn validate_encoded_image_buffer(data: &[u8]) -> Result<(), Error> {
+    if data.is_empty() || data.len() > u32::MAX as usize {
+        return Err(Error::InvalidBufferLength);
+    }
+    Ok(())
+}
+
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 #[repr(i32)]
 pub enum TextDatum {
@@ -654,6 +732,64 @@ impl TextDatum {
             9 => Some(Self::BottomCenter),
             10 => Some(Self::BottomRight),
             _ => None,
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum ImageFormat {
+    Bmp,
+    Jpg,
+    Png,
+    Qoi,
+}
+
+impl ImageFormat {
+    const fn raw(self) -> i32 {
+        match self {
+            Self::Bmp => 0,
+            Self::Jpg => 1,
+            Self::Png => 2,
+            Self::Qoi => 3,
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct ImageDrawOptions {
+    pub position: Point,
+    pub max_size: Size,
+    pub offset: Point,
+    pub scale_x: f32,
+    pub scale_y: f32,
+    pub datum: TextDatum,
+}
+
+impl Default for ImageDrawOptions {
+    fn default() -> Self {
+        Self {
+            position: Point { x: 0, y: 0 },
+            max_size: Size { w: 0, h: 0 },
+            offset: Point { x: 0, y: 0 },
+            scale_x: 1.0,
+            scale_y: 0.0,
+            datum: TextDatum::TopLeft,
+        }
+    }
+}
+
+impl ImageDrawOptions {
+    fn to_raw(self) -> m5unified_sys::m5u_image_options_t {
+        m5unified_sys::m5u_image_options_t {
+            x: self.position.x,
+            y: self.position.y,
+            max_width: self.max_size.w,
+            max_height: self.max_size.h,
+            off_x: self.offset.x,
+            off_y: self.offset.y,
+            scale_x: self.scale_x,
+            scale_y: self.scale_y,
+            datum: self.datum as c_int,
         }
     }
 }
@@ -1266,6 +1402,79 @@ impl DisplayRef {
                 self.index, dst.x, dst.y, size.w, size.h, src.x, src.y,
             );
         }
+    }
+
+    pub fn draw_image(
+        &mut self,
+        format: ImageFormat,
+        data: &[u8],
+        options: ImageDrawOptions,
+    ) -> Result<(), Error> {
+        validate_encoded_image_buffer(data)?;
+        let options = options.to_raw();
+        let ok = unsafe {
+            m5unified_sys::m5u_display_draw_image_at(
+                self.index,
+                format.raw() as c_int,
+                data.as_ptr(),
+                data.len(),
+                &options,
+            )
+        };
+        ok.then_some(())
+            .ok_or(Error::Unavailable("display draw_image"))
+    }
+
+    pub fn draw_image_file(
+        &mut self,
+        format: ImageFormat,
+        path: &str,
+        options: ImageDrawOptions,
+    ) -> Result<(), Error> {
+        let path = CString::new(path).map_err(|_| Error::InvalidString)?;
+        let options = options.to_raw();
+        let ok = unsafe {
+            m5unified_sys::m5u_display_draw_image_file_at(
+                self.index,
+                format.raw() as c_int,
+                path.as_ptr(),
+                &options,
+            )
+        };
+        ok.then_some(())
+            .ok_or(Error::Unavailable("display draw_image_file"))
+    }
+
+    pub fn draw_bmp(&mut self, data: &[u8], options: ImageDrawOptions) -> Result<(), Error> {
+        self.draw_image(ImageFormat::Bmp, data, options)
+    }
+
+    pub fn draw_jpg(&mut self, data: &[u8], options: ImageDrawOptions) -> Result<(), Error> {
+        self.draw_image(ImageFormat::Jpg, data, options)
+    }
+
+    pub fn draw_png(&mut self, data: &[u8], options: ImageDrawOptions) -> Result<(), Error> {
+        self.draw_image(ImageFormat::Png, data, options)
+    }
+
+    pub fn draw_qoi(&mut self, data: &[u8], options: ImageDrawOptions) -> Result<(), Error> {
+        self.draw_image(ImageFormat::Qoi, data, options)
+    }
+
+    pub fn draw_bmp_file(&mut self, path: &str, options: ImageDrawOptions) -> Result<(), Error> {
+        self.draw_image_file(ImageFormat::Bmp, path, options)
+    }
+
+    pub fn draw_jpg_file(&mut self, path: &str, options: ImageDrawOptions) -> Result<(), Error> {
+        self.draw_image_file(ImageFormat::Jpg, path, options)
+    }
+
+    pub fn draw_png_file(&mut self, path: &str, options: ImageDrawOptions) -> Result<(), Error> {
+        self.draw_image_file(ImageFormat::Png, path, options)
+    }
+
+    pub fn draw_qoi_file(&mut self, path: &str, options: ImageDrawOptions) -> Result<(), Error> {
+        self.draw_image_file(ImageFormat::Qoi, path, options)
     }
 }
 

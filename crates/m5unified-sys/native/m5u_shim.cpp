@@ -18,6 +18,7 @@
 #include <esp_err.h>
 #include <esp_vfs_fat.h>
 #include <sdmmc_cmd.h>
+#include <limits>
 #include <memory>
 #include <string>
 #include <vector>
@@ -1625,6 +1626,75 @@ void m5u_display_copy_rect(int dst_x, int dst_y, int w, int h, int src_x, int sr
     M5.Display.copyRect(dst_x, dst_y, w, h, src_x, src_y);
 }
 
+static m5u_image_options_t m5u_display_image_options(const m5u_image_options_t* options) {
+    if (options) {
+        return *options;
+    }
+    m5u_image_options_t defaults = {};
+    defaults.scale_x = 1.0f;
+    defaults.scale_y = 0.0f;
+    defaults.datum = 0;
+    return defaults;
+}
+
+static m5gfx::datum_t m5u_display_image_datum(int datum) {
+    switch (datum) {
+    case 0:
+    case 1:
+    case 2:
+    case 4:
+    case 5:
+    case 6:
+    case 8:
+    case 9:
+    case 10:
+        return (m5gfx::datum_t)datum;
+    default:
+        return m5gfx::datum_t::top_left;
+    }
+}
+
+bool m5u_display_draw_image(int format, const uint8_t* data, size_t len, const m5u_image_options_t* options) {
+    if (!data || len == 0 || len > std::numeric_limits<uint32_t>::max()) {
+        return false;
+    }
+    const auto opts = m5u_display_image_options(options);
+    const auto datum = m5u_display_image_datum(opts.datum);
+    const auto size = (uint32_t)len;
+    switch (format) {
+    case 0:
+        return M5.Display.drawBmp(data, size, opts.x, opts.y, opts.max_width, opts.max_height, opts.off_x, opts.off_y, opts.scale_x, opts.scale_y, datum);
+    case 1:
+        return M5.Display.drawJpg(data, size, opts.x, opts.y, opts.max_width, opts.max_height, opts.off_x, opts.off_y, opts.scale_x, opts.scale_y, datum);
+    case 2:
+        return M5.Display.drawPng(data, size, opts.x, opts.y, opts.max_width, opts.max_height, opts.off_x, opts.off_y, opts.scale_x, opts.scale_y, datum);
+    case 3:
+        return M5.Display.drawQoi(data, size, opts.x, opts.y, opts.max_width, opts.max_height, opts.off_x, opts.off_y, opts.scale_x, opts.scale_y, datum);
+    default:
+        return false;
+    }
+}
+
+bool m5u_display_draw_image_file(int format, const char* path, const m5u_image_options_t* options) {
+    if (!path || !*path) {
+        return false;
+    }
+    const auto opts = m5u_display_image_options(options);
+    const auto datum = m5u_display_image_datum(opts.datum);
+    switch (format) {
+    case 0:
+        return M5.Display.drawBmpFile(path, opts.x, opts.y, opts.max_width, opts.max_height, opts.off_x, opts.off_y, opts.scale_x, opts.scale_y, datum);
+    case 1:
+        return M5.Display.drawJpgFile(path, opts.x, opts.y, opts.max_width, opts.max_height, opts.off_x, opts.off_y, opts.scale_x, opts.scale_y, datum);
+    case 2:
+        return M5.Display.drawPngFile(path, opts.x, opts.y, opts.max_width, opts.max_height, opts.off_x, opts.off_y, opts.scale_x, opts.scale_y, datum);
+    case 3:
+        return M5.Display.drawQoiFile(path, opts.x, opts.y, opts.max_width, opts.max_height, opts.off_x, opts.off_y, opts.scale_x, opts.scale_y, datum);
+    default:
+        return false;
+    }
+}
+
 int m5u_display_count(void) {
     return M5.getDisplayCount();
 }
@@ -1955,6 +2025,47 @@ bool m5u_display_read_rect_rgb565_at(int index, int x, int y, int w, int h, uint
 
 void m5u_display_copy_rect_at(int index, int dst_x, int dst_y, int w, int h, int src_x, int src_y) {
     M5.Displays(index).copyRect(dst_x, dst_y, w, h, src_x, src_y);
+}
+
+bool m5u_display_draw_image_at(int index, int format, const uint8_t* data, size_t len, const m5u_image_options_t* options) {
+    if (!data || len == 0 || len > std::numeric_limits<uint32_t>::max()) {
+        return false;
+    }
+    const auto opts = m5u_display_image_options(options);
+    const auto datum = m5u_display_image_datum(opts.datum);
+    const auto size = (uint32_t)len;
+    switch (format) {
+    case 0:
+        return M5.Displays(index).drawBmp(data, size, opts.x, opts.y, opts.max_width, opts.max_height, opts.off_x, opts.off_y, opts.scale_x, opts.scale_y, datum);
+    case 1:
+        return M5.Displays(index).drawJpg(data, size, opts.x, opts.y, opts.max_width, opts.max_height, opts.off_x, opts.off_y, opts.scale_x, opts.scale_y, datum);
+    case 2:
+        return M5.Displays(index).drawPng(data, size, opts.x, opts.y, opts.max_width, opts.max_height, opts.off_x, opts.off_y, opts.scale_x, opts.scale_y, datum);
+    case 3:
+        return M5.Displays(index).drawQoi(data, size, opts.x, opts.y, opts.max_width, opts.max_height, opts.off_x, opts.off_y, opts.scale_x, opts.scale_y, datum);
+    default:
+        return false;
+    }
+}
+
+bool m5u_display_draw_image_file_at(int index, int format, const char* path, const m5u_image_options_t* options) {
+    if (!path || !*path) {
+        return false;
+    }
+    const auto opts = m5u_display_image_options(options);
+    const auto datum = m5u_display_image_datum(opts.datum);
+    switch (format) {
+    case 0:
+        return M5.Displays(index).drawBmpFile(path, opts.x, opts.y, opts.max_width, opts.max_height, opts.off_x, opts.off_y, opts.scale_x, opts.scale_y, datum);
+    case 1:
+        return M5.Displays(index).drawJpgFile(path, opts.x, opts.y, opts.max_width, opts.max_height, opts.off_x, opts.off_y, opts.scale_x, opts.scale_y, datum);
+    case 2:
+        return M5.Displays(index).drawPngFile(path, opts.x, opts.y, opts.max_width, opts.max_height, opts.off_x, opts.off_y, opts.scale_x, opts.scale_y, datum);
+    case 3:
+        return M5.Displays(index).drawQoiFile(path, opts.x, opts.y, opts.max_width, opts.max_height, opts.off_x, opts.off_y, opts.scale_x, opts.scale_y, datum);
+    default:
+        return false;
+    }
 }
 
 bool m5u_button_is_pressed(int button) { return m5u_button_state(button, 0); }

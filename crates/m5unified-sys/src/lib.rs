@@ -92,6 +92,36 @@ impl Default for m5u_config_t {
 }
 
 #[repr(C)]
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct m5u_image_options_t {
+    pub x: c_int,
+    pub y: c_int,
+    pub max_width: c_int,
+    pub max_height: c_int,
+    pub off_x: c_int,
+    pub off_y: c_int,
+    pub scale_x: c_float,
+    pub scale_y: c_float,
+    pub datum: c_int,
+}
+
+impl Default for m5u_image_options_t {
+    fn default() -> Self {
+        Self {
+            x: 0,
+            y: 0,
+            max_width: 0,
+            max_height: 0,
+            off_x: 0,
+            off_y: 0,
+            scale_x: 1.0,
+            scale_y: 0.0,
+            datum: 0,
+        }
+    }
+}
+
+#[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct m5u_mic_config_t {
     pub pin_data_in: c_int,
@@ -798,6 +828,17 @@ extern "C" {
         src_x: c_int,
         src_y: c_int,
     );
+    pub fn m5u_display_draw_image(
+        format: c_int,
+        data: *const u8,
+        len: usize,
+        options: *const m5u_image_options_t,
+    ) -> bool;
+    pub fn m5u_display_draw_image_file(
+        format: c_int,
+        path: *const c_char,
+        options: *const m5u_image_options_t,
+    ) -> bool;
     pub fn m5u_display_count() -> c_int;
     pub fn m5u_display_index_for_kind(kind: c_int) -> c_int;
     pub fn m5u_display_index_for_kinds(kinds: *const c_int, len: usize) -> c_int;
@@ -1109,6 +1150,19 @@ extern "C" {
         src_x: c_int,
         src_y: c_int,
     );
+    pub fn m5u_display_draw_image_at(
+        index: c_int,
+        format: c_int,
+        data: *const u8,
+        len: usize,
+        options: *const m5u_image_options_t,
+    ) -> bool;
+    pub fn m5u_display_draw_image_file_at(
+        index: c_int,
+        format: c_int,
+        path: *const c_char,
+        options: *const m5u_image_options_t,
+    ) -> bool;
 
     pub fn m5u_button_is_pressed(button: c_int) -> bool;
     pub fn m5u_button_was_pressed(button: c_int) -> bool;
@@ -2368,6 +2422,21 @@ mod host_stubs {
         _src_y: c_int,
     ) {
     }
+    pub unsafe fn m5u_display_draw_image(
+        format: c_int,
+        data: *const u8,
+        len: usize,
+        _options: *const m5u_image_options_t,
+    ) -> bool {
+        (0..=3).contains(&format) && !data.is_null() && len > 0 && len <= u32::MAX as usize
+    }
+    pub unsafe fn m5u_display_draw_image_file(
+        format: c_int,
+        path: *const c_char,
+        _options: *const m5u_image_options_t,
+    ) -> bool {
+        (0..=3).contains(&format) && !path.is_null() && ptr::read(path) != 0
+    }
     pub unsafe fn m5u_display_count() -> c_int {
         1
     }
@@ -2840,6 +2909,23 @@ mod host_stubs {
         _src_x: c_int,
         _src_y: c_int,
     ) {
+    }
+    pub unsafe fn m5u_display_draw_image_at(
+        _index: c_int,
+        format: c_int,
+        data: *const u8,
+        len: usize,
+        _options: *const m5u_image_options_t,
+    ) -> bool {
+        (0..=3).contains(&format) && !data.is_null() && len > 0 && len <= u32::MAX as usize
+    }
+    pub unsafe fn m5u_display_draw_image_file_at(
+        _index: c_int,
+        format: c_int,
+        path: *const c_char,
+        _options: *const m5u_image_options_t,
+    ) -> bool {
+        (0..=3).contains(&format) && !path.is_null() && ptr::read(path) != 0
     }
 
     pub unsafe fn m5u_button_is_pressed(_button: c_int) -> bool {

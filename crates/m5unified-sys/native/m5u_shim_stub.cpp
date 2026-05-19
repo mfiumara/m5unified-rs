@@ -919,6 +919,16 @@ void m5u_display_copy_rect(int dst_x, int dst_y, int w, int h, int src_x, int sr
     (void)dst_x; (void)dst_y; (void)w; (void)h; (void)src_x; (void)src_y;
 }
 
+bool m5u_display_draw_image(int format, const uint8_t* data, size_t len, const m5u_image_options_t* options) {
+    (void)options;
+    return format >= 0 && format <= 3 && data && len > 0;
+}
+
+bool m5u_display_draw_image_file(int format, const char* path, const m5u_image_options_t* options) {
+    (void)options;
+    return format >= 0 && format <= 3 && path && *path;
+}
+
 int m5u_display_count(void) {
     return 1;
 }
@@ -1224,6 +1234,16 @@ bool m5u_display_read_rect_rgb565_at(int index, int x, int y, int w, int h, uint
 
 void m5u_display_copy_rect_at(int index, int dst_x, int dst_y, int w, int h, int src_x, int src_y) {
     (void)index; (void)dst_x; (void)dst_y; (void)w; (void)h; (void)src_x; (void)src_y;
+}
+
+bool m5u_display_draw_image_at(int index, int format, const uint8_t* data, size_t len, const m5u_image_options_t* options) {
+    (void)index; (void)options;
+    return format >= 0 && format <= 3 && data && len > 0;
+}
+
+bool m5u_display_draw_image_file_at(int index, int format, const char* path, const m5u_image_options_t* options) {
+    (void)index; (void)options;
+    return format >= 0 && format <= 3 && path && *path;
 }
 
 bool m5u_button_is_pressed(int button) { return m5u_button_state(button, 0); }
