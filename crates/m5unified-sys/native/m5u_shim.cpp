@@ -24,6 +24,12 @@ static bool s_m5u_sd_owns_bus = false;
 #define M5U_HAS_AXP2101 1
 #endif
 
+#if !defined(CONFIG_IDF_TARGET) || defined(CONFIG_IDF_TARGET_ESP32)
+#define M5U_HAS_AXP192 1
+#else
+#define M5U_HAS_AXP192 0
+#endif
+
 #if defined(CONFIG_IDF_TARGET_ESP32C6)
 #define M5U_HAS_AW32001 1
 #define M5U_HAS_BQ27220 1
@@ -1565,6 +1571,14 @@ static bool m5u_has_axp2101(void) {
 #endif
 }
 
+static bool m5u_has_axp192(void) {
+#if M5U_HAS_AXP192
+    return M5.Power.getType() == m5::Power_Class::pmic_t::pmic_axp192;
+#else
+    return false;
+#endif
+}
+
 static bool m5u_has_aw32001(void) {
 #if M5U_HAS_AW32001
     return M5.Power.getType() == m5::Power_Class::pmic_t::pmic_aw32001;
@@ -1594,6 +1608,303 @@ static bool m5u_has_ip5306(void) {
     return M5.Power.getType() == m5::Power_Class::pmic_t::pmic_ip5306;
 #else
     return false;
+#endif
+}
+
+bool m5u_power_axp192_begin(void) {
+#if M5U_HAS_AXP192
+    return m5u_has_axp192() && M5.Power.Axp192.begin();
+#else
+    return false;
+#endif
+}
+
+int m5u_power_axp192_get_battery_level(void) {
+#if M5U_HAS_AXP192
+    return m5u_has_axp192() ? M5.Power.Axp192.getBatteryLevel() : -1;
+#else
+    return -1;
+#endif
+}
+
+bool m5u_power_axp192_set_battery_charge(bool enable) {
+#if M5U_HAS_AXP192
+    if (!m5u_has_axp192()) {
+        return false;
+    }
+    M5.Power.Axp192.setBatteryCharge(enable);
+    return true;
+#else
+    (void)enable;
+    return false;
+#endif
+}
+
+bool m5u_power_axp192_set_charge_current(uint16_t max_ma) {
+#if M5U_HAS_AXP192
+    if (!m5u_has_axp192()) {
+        return false;
+    }
+    M5.Power.Axp192.setChargeCurrent(max_ma);
+    return true;
+#else
+    (void)max_ma;
+    return false;
+#endif
+}
+
+bool m5u_power_axp192_set_charge_voltage(uint16_t max_mv) {
+#if M5U_HAS_AXP192
+    if (!m5u_has_axp192()) {
+        return false;
+    }
+    M5.Power.Axp192.setChargeVoltage(max_mv);
+    return true;
+#else
+    (void)max_mv;
+    return false;
+#endif
+}
+
+bool m5u_power_axp192_is_charging(void) {
+#if M5U_HAS_AXP192
+    return m5u_has_axp192() && M5.Power.Axp192.isCharging();
+#else
+    return false;
+#endif
+}
+
+bool m5u_power_axp192_set_dcdc(uint8_t channel, int voltage_mv) {
+#if M5U_HAS_AXP192
+    if (!m5u_has_axp192()) {
+        return false;
+    }
+    switch (channel) {
+    case 1: M5.Power.Axp192.setDCDC1(voltage_mv); return true;
+    case 2: M5.Power.Axp192.setDCDC2(voltage_mv); return true;
+    case 3: M5.Power.Axp192.setDCDC3(voltage_mv); return true;
+    default: return false;
+    }
+#else
+    (void)channel;
+    (void)voltage_mv;
+    return false;
+#endif
+}
+
+bool m5u_power_axp192_set_ldo(uint8_t channel, int voltage_mv) {
+#if M5U_HAS_AXP192
+    if (!m5u_has_axp192()) {
+        return false;
+    }
+    switch (channel) {
+    case 0: M5.Power.Axp192.setLDO0(voltage_mv); return true;
+    case 2: M5.Power.Axp192.setLDO2(voltage_mv); return true;
+    case 3: M5.Power.Axp192.setLDO3(voltage_mv); return true;
+    default: return false;
+    }
+#else
+    (void)channel;
+    (void)voltage_mv;
+    return false;
+#endif
+}
+
+bool m5u_power_axp192_set_gpio(uint8_t gpio_num, bool state) {
+#if M5U_HAS_AXP192
+    if (!m5u_has_axp192() || gpio_num > 4) {
+        return false;
+    }
+    M5.Power.Axp192.setGPIO(gpio_num, state);
+    return true;
+#else
+    (void)gpio_num;
+    (void)state;
+    return false;
+#endif
+}
+
+bool m5u_power_axp192_power_off(void) {
+#if M5U_HAS_AXP192
+    if (!m5u_has_axp192()) {
+        return false;
+    }
+    M5.Power.Axp192.powerOff();
+    return true;
+#else
+    return false;
+#endif
+}
+
+bool m5u_power_axp192_set_adc_state(bool enable) {
+#if M5U_HAS_AXP192
+    if (!m5u_has_axp192()) {
+        return false;
+    }
+    M5.Power.Axp192.setAdcState(enable);
+    return true;
+#else
+    (void)enable;
+    return false;
+#endif
+}
+
+bool m5u_power_axp192_set_adc_rate(uint8_t rate) {
+#if M5U_HAS_AXP192
+    if (!m5u_has_axp192()) {
+        return false;
+    }
+    M5.Power.Axp192.setAdcRate(rate);
+    return true;
+#else
+    (void)rate;
+    return false;
+#endif
+}
+
+bool m5u_power_axp192_set_exten(bool enable) {
+#if M5U_HAS_AXP192
+    if (!m5u_has_axp192()) {
+        return false;
+    }
+    M5.Power.Axp192.setEXTEN(enable);
+    return true;
+#else
+    (void)enable;
+    return false;
+#endif
+}
+
+bool m5u_power_axp192_set_backup(bool enable) {
+#if M5U_HAS_AXP192
+    if (!m5u_has_axp192()) {
+        return false;
+    }
+    M5.Power.Axp192.setBACKUP(enable);
+    return true;
+#else
+    (void)enable;
+    return false;
+#endif
+}
+
+bool m5u_power_axp192_is_acin(void) {
+#if M5U_HAS_AXP192
+    return m5u_has_axp192() && M5.Power.Axp192.isACIN();
+#else
+    return false;
+#endif
+}
+
+bool m5u_power_axp192_is_vbus(void) {
+#if M5U_HAS_AXP192
+    return m5u_has_axp192() && M5.Power.Axp192.isVBUS();
+#else
+    return false;
+#endif
+}
+
+bool m5u_power_axp192_get_bat_state(void) {
+#if M5U_HAS_AXP192
+    return m5u_has_axp192() && M5.Power.Axp192.getBatState();
+#else
+    return false;
+#endif
+}
+
+bool m5u_power_axp192_get_exten(void) {
+#if M5U_HAS_AXP192
+    return m5u_has_axp192() && M5.Power.Axp192.getEXTEN();
+#else
+    return false;
+#endif
+}
+
+float m5u_power_axp192_get_battery_voltage_v(void) {
+#if M5U_HAS_AXP192
+    return m5u_has_axp192() ? M5.Power.Axp192.getBatteryVoltage() : 0.0f;
+#else
+    return 0.0f;
+#endif
+}
+
+float m5u_power_axp192_get_battery_discharge_current_ma(void) {
+#if M5U_HAS_AXP192
+    return m5u_has_axp192() ? M5.Power.Axp192.getBatteryDischargeCurrent() : 0.0f;
+#else
+    return 0.0f;
+#endif
+}
+
+float m5u_power_axp192_get_battery_charge_current_ma(void) {
+#if M5U_HAS_AXP192
+    return m5u_has_axp192() ? M5.Power.Axp192.getBatteryChargeCurrent() : 0.0f;
+#else
+    return 0.0f;
+#endif
+}
+
+float m5u_power_axp192_get_battery_power_mw(void) {
+#if M5U_HAS_AXP192
+    return m5u_has_axp192() ? M5.Power.Axp192.getBatteryPower() : 0.0f;
+#else
+    return 0.0f;
+#endif
+}
+
+float m5u_power_axp192_get_acin_voltage_v(void) {
+#if M5U_HAS_AXP192
+    return m5u_has_axp192() ? M5.Power.Axp192.getACINVoltage() : 0.0f;
+#else
+    return 0.0f;
+#endif
+}
+
+float m5u_power_axp192_get_acin_current_ma(void) {
+#if M5U_HAS_AXP192
+    return m5u_has_axp192() ? M5.Power.Axp192.getACINCurrent() : 0.0f;
+#else
+    return 0.0f;
+#endif
+}
+
+float m5u_power_axp192_get_vbus_voltage_v(void) {
+#if M5U_HAS_AXP192
+    return m5u_has_axp192() ? M5.Power.Axp192.getVBUSVoltage() : 0.0f;
+#else
+    return 0.0f;
+#endif
+}
+
+float m5u_power_axp192_get_vbus_current_ma(void) {
+#if M5U_HAS_AXP192
+    return m5u_has_axp192() ? M5.Power.Axp192.getVBUSCurrent() : 0.0f;
+#else
+    return 0.0f;
+#endif
+}
+
+float m5u_power_axp192_get_aps_voltage_v(void) {
+#if M5U_HAS_AXP192
+    return m5u_has_axp192() ? M5.Power.Axp192.getAPSVoltage() : 0.0f;
+#else
+    return 0.0f;
+#endif
+}
+
+float m5u_power_axp192_get_internal_temperature_c(void) {
+#if M5U_HAS_AXP192
+    return m5u_has_axp192() ? M5.Power.Axp192.getInternalTemperature() : 0.0f;
+#else
+    return 0.0f;
+#endif
+}
+
+uint8_t m5u_power_axp192_get_pek_press(void) {
+#if M5U_HAS_AXP192
+    return m5u_has_axp192() ? M5.Power.Axp192.getPekPress() : 0;
+#else
+    return 0;
 #endif
 }
 

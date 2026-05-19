@@ -676,6 +676,35 @@ extern "C" {
     pub fn m5u_rtc_clear_irq();
     pub fn m5u_rtc_disable_irq();
 
+    pub fn m5u_power_axp192_begin() -> bool;
+    pub fn m5u_power_axp192_get_battery_level() -> c_int;
+    pub fn m5u_power_axp192_set_battery_charge(enable: bool) -> bool;
+    pub fn m5u_power_axp192_set_charge_current(max_ma: u16) -> bool;
+    pub fn m5u_power_axp192_set_charge_voltage(max_mv: u16) -> bool;
+    pub fn m5u_power_axp192_is_charging() -> bool;
+    pub fn m5u_power_axp192_set_dcdc(channel: u8, voltage_mv: c_int) -> bool;
+    pub fn m5u_power_axp192_set_ldo(channel: u8, voltage_mv: c_int) -> bool;
+    pub fn m5u_power_axp192_set_gpio(gpio_num: u8, state: bool) -> bool;
+    pub fn m5u_power_axp192_power_off() -> bool;
+    pub fn m5u_power_axp192_set_adc_state(enable: bool) -> bool;
+    pub fn m5u_power_axp192_set_adc_rate(rate: u8) -> bool;
+    pub fn m5u_power_axp192_set_exten(enable: bool) -> bool;
+    pub fn m5u_power_axp192_set_backup(enable: bool) -> bool;
+    pub fn m5u_power_axp192_is_acin() -> bool;
+    pub fn m5u_power_axp192_is_vbus() -> bool;
+    pub fn m5u_power_axp192_get_bat_state() -> bool;
+    pub fn m5u_power_axp192_get_exten() -> bool;
+    pub fn m5u_power_axp192_get_battery_voltage_v() -> c_float;
+    pub fn m5u_power_axp192_get_battery_discharge_current_ma() -> c_float;
+    pub fn m5u_power_axp192_get_battery_charge_current_ma() -> c_float;
+    pub fn m5u_power_axp192_get_battery_power_mw() -> c_float;
+    pub fn m5u_power_axp192_get_acin_voltage_v() -> c_float;
+    pub fn m5u_power_axp192_get_acin_current_ma() -> c_float;
+    pub fn m5u_power_axp192_get_vbus_voltage_v() -> c_float;
+    pub fn m5u_power_axp192_get_vbus_current_ma() -> c_float;
+    pub fn m5u_power_axp192_get_aps_voltage_v() -> c_float;
+    pub fn m5u_power_axp192_get_internal_temperature_c() -> c_float;
+    pub fn m5u_power_axp192_get_pek_press() -> u8;
     pub fn m5u_power_aw32001_begin() -> bool;
     pub fn m5u_power_aw32001_set_battery_charge(enable: bool) -> bool;
     pub fn m5u_power_aw32001_set_charge_current(max_ma: u16) -> bool;
@@ -1680,6 +1709,93 @@ mod host_stubs {
     pub unsafe fn m5u_rtc_clear_irq() {}
     pub unsafe fn m5u_rtc_disable_irq() {}
 
+    pub unsafe fn m5u_power_axp192_begin() -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_axp192_get_battery_level() -> c_int {
+        -1
+    }
+    pub unsafe fn m5u_power_axp192_set_battery_charge(_enable: bool) -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_axp192_set_charge_current(_max_ma: u16) -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_axp192_set_charge_voltage(_max_mv: u16) -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_axp192_is_charging() -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_axp192_set_dcdc(_channel: u8, _voltage_mv: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_axp192_set_ldo(_channel: u8, _voltage_mv: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_axp192_set_gpio(_gpio_num: u8, _state: bool) -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_axp192_power_off() -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_axp192_set_adc_state(_enable: bool) -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_axp192_set_adc_rate(_rate: u8) -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_axp192_set_exten(_enable: bool) -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_axp192_set_backup(_enable: bool) -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_axp192_is_acin() -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_axp192_is_vbus() -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_axp192_get_bat_state() -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_axp192_get_exten() -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_axp192_get_battery_voltage_v() -> c_float {
+        0.0
+    }
+    pub unsafe fn m5u_power_axp192_get_battery_discharge_current_ma() -> c_float {
+        0.0
+    }
+    pub unsafe fn m5u_power_axp192_get_battery_charge_current_ma() -> c_float {
+        0.0
+    }
+    pub unsafe fn m5u_power_axp192_get_battery_power_mw() -> c_float {
+        0.0
+    }
+    pub unsafe fn m5u_power_axp192_get_acin_voltage_v() -> c_float {
+        0.0
+    }
+    pub unsafe fn m5u_power_axp192_get_acin_current_ma() -> c_float {
+        0.0
+    }
+    pub unsafe fn m5u_power_axp192_get_vbus_voltage_v() -> c_float {
+        0.0
+    }
+    pub unsafe fn m5u_power_axp192_get_vbus_current_ma() -> c_float {
+        0.0
+    }
+    pub unsafe fn m5u_power_axp192_get_aps_voltage_v() -> c_float {
+        0.0
+    }
+    pub unsafe fn m5u_power_axp192_get_internal_temperature_c() -> c_float {
+        0.0
+    }
+    pub unsafe fn m5u_power_axp192_get_pek_press() -> u8 {
+        0
+    }
     pub unsafe fn m5u_power_aw32001_begin() -> bool {
         false
     }

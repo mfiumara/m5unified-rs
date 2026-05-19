@@ -1038,6 +1038,35 @@ bool m5u_rtc_is_enabled(void) {
     return false;
 }
 
+bool m5u_power_axp192_begin(void) { return false; }
+int m5u_power_axp192_get_battery_level(void) { return -1; }
+bool m5u_power_axp192_set_battery_charge(bool enable) { (void)enable; return false; }
+bool m5u_power_axp192_set_charge_current(uint16_t max_ma) { (void)max_ma; return false; }
+bool m5u_power_axp192_set_charge_voltage(uint16_t max_mv) { (void)max_mv; return false; }
+bool m5u_power_axp192_is_charging(void) { return false; }
+bool m5u_power_axp192_set_dcdc(uint8_t channel, int voltage_mv) { (void)channel; (void)voltage_mv; return false; }
+bool m5u_power_axp192_set_ldo(uint8_t channel, int voltage_mv) { (void)channel; (void)voltage_mv; return false; }
+bool m5u_power_axp192_set_gpio(uint8_t gpio_num, bool state) { (void)gpio_num; (void)state; return false; }
+bool m5u_power_axp192_power_off(void) { return false; }
+bool m5u_power_axp192_set_adc_state(bool enable) { (void)enable; return false; }
+bool m5u_power_axp192_set_adc_rate(uint8_t rate) { (void)rate; return false; }
+bool m5u_power_axp192_set_exten(bool enable) { (void)enable; return false; }
+bool m5u_power_axp192_set_backup(bool enable) { (void)enable; return false; }
+bool m5u_power_axp192_is_acin(void) { return false; }
+bool m5u_power_axp192_is_vbus(void) { return false; }
+bool m5u_power_axp192_get_bat_state(void) { return false; }
+bool m5u_power_axp192_get_exten(void) { return false; }
+float m5u_power_axp192_get_battery_voltage_v(void) { return 0.0f; }
+float m5u_power_axp192_get_battery_discharge_current_ma(void) { return 0.0f; }
+float m5u_power_axp192_get_battery_charge_current_ma(void) { return 0.0f; }
+float m5u_power_axp192_get_battery_power_mw(void) { return 0.0f; }
+float m5u_power_axp192_get_acin_voltage_v(void) { return 0.0f; }
+float m5u_power_axp192_get_acin_current_ma(void) { return 0.0f; }
+float m5u_power_axp192_get_vbus_voltage_v(void) { return 0.0f; }
+float m5u_power_axp192_get_vbus_current_ma(void) { return 0.0f; }
+float m5u_power_axp192_get_aps_voltage_v(void) { return 0.0f; }
+float m5u_power_axp192_get_internal_temperature_c(void) { return 0.0f; }
+uint8_t m5u_power_axp192_get_pek_press(void) { return 0; }
 bool m5u_power_aw32001_begin(void) { return false; }
 bool m5u_power_aw32001_set_battery_charge(bool enable) { (void)enable; return false; }
 bool m5u_power_aw32001_set_charge_current(uint16_t max_ma) { (void)max_ma; return false; }

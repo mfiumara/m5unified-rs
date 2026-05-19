@@ -58,10 +58,10 @@ pub use imu::{Imu, ImuAxis, ImuData, ImuKind, ImuSensorMask, Vec3};
 pub use led::{Led, LedColor, LedType};
 pub use log::{Log, LogLevel, LogTarget, RawLogCallback};
 pub use power::{
-    Aw32001, Aw32001ChargeStatus, Axp2101, Axp2101ChargeStatus, Axp2101IrqStatus, Axp2101PekPress,
-    Bq27220, ChargeState, ExtPortBusConfig, ExtPortMask, Ina226, Ina226Config,
-    Ina226ConversionTime, Ina226Mode, Ina226Sampling, Ina3221, Ip5306, Power, PowerType, Py32Pmic,
-    Py32PmicPekPress,
+    Aw32001, Aw32001ChargeStatus, Axp192, Axp192PekPress, Axp2101, Axp2101ChargeStatus,
+    Axp2101IrqStatus, Axp2101PekPress, Bq27220, ChargeState, ExtPortBusConfig, ExtPortMask, Ina226,
+    Ina226Config, Ina226ConversionTime, Ina226Mode, Ina226Sampling, Ina3221, Ip5306, Power,
+    PowerType, Py32Pmic, Py32PmicPekPress,
 };
 pub use rtc::{Date, DateTime, Rtc, Time};
 pub use sd::{
@@ -643,6 +643,47 @@ mod tests {
         m5.power.deep_sleep_us(0, false);
         m5.power.light_sleep_us(0, false);
         m5.power.power_off();
+        let axp192 = m5.power.axp192();
+        assert!(!axp192.begin());
+        assert_eq!(axp192.battery_level(), None);
+        assert!(!axp192.set_battery_charge(true));
+        assert!(!axp192.set_charge_current_ma(500));
+        assert!(!axp192.set_charge_voltage_mv(4_200));
+        assert!(!axp192.is_charging());
+        assert!(!axp192.set_dcdc1_mv(Some(3_300)));
+        assert!(!axp192.set_dcdc2_mv(Some(1_200)));
+        assert!(!axp192.set_dcdc3_mv(None));
+        assert!(!axp192.set_ldo0_mv(Some(3_300)));
+        assert!(!axp192.set_ldo2_mv(Some(3_300)));
+        assert!(!axp192.set_ldo3_mv(None));
+        assert!(!axp192.set_gpio(0, true));
+        assert!(!axp192.set_gpio0(true));
+        assert!(!axp192.set_gpio1(false));
+        assert!(!axp192.set_gpio2(true));
+        assert!(!axp192.set_gpio3(false));
+        assert!(!axp192.set_gpio4(true));
+        assert!(!axp192.set_adc_state(true));
+        assert!(!axp192.set_adc_rate(0));
+        assert!(!axp192.set_exten(true));
+        assert!(!axp192.set_backup(true));
+        assert!(!axp192.is_acin());
+        assert!(!axp192.is_vbus());
+        assert!(!axp192.battery_present());
+        assert!(!axp192.exten());
+        assert_eq!(axp192.battery_voltage_v(), 0.0);
+        assert_eq!(axp192.battery_discharge_current_ma(), 0.0);
+        assert_eq!(axp192.battery_charge_current_ma(), 0.0);
+        assert_eq!(axp192.battery_power_mw(), 0.0);
+        assert_eq!(axp192.acin_voltage_v(), 0.0);
+        assert_eq!(axp192.acin_current_ma(), 0.0);
+        assert_eq!(axp192.vbus_voltage_v(), 0.0);
+        assert_eq!(axp192.vbus_current_ma(), 0.0);
+        assert_eq!(axp192.aps_voltage_v(), 0.0);
+        assert_eq!(axp192.internal_temperature_c(), 0.0);
+        assert_eq!(axp192.pek_press(), Axp192PekPress::None);
+        assert_eq!(Axp192PekPress::Both.raw(), 3);
+        assert_eq!(Axp192PekPress::from_raw(9), Axp192PekPress::Raw(9));
+        assert!(!axp192.power_off());
         let aw = m5.power.aw32001();
         assert!(!aw.begin());
         assert!(!aw.set_battery_charge(true));

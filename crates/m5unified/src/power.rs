@@ -1,4 +1,4 @@
-//! Power-management, PMIC, sleep, and AXP2101 helpers.
+//! Power-management, PMIC, sleep, and direct PMIC helpers.
 //!
 //! The safe wrapper exposes battery and VBUS readings, output controls, sleep
 //! timers, vibration, external-port power, and direct PMIC-specific helpers.
@@ -176,6 +176,10 @@ impl Power {
         unsafe { m5unified_sys::m5u_power_light_sleep_us(micro_seconds, touch_wakeup) }
     }
 
+    pub fn axp192(&self) -> Axp192 {
+        Axp192
+    }
+
     pub fn axp2101(&self) -> Axp2101 {
         Axp2101
     }
@@ -307,6 +311,40 @@ impl ChargeState {
             Self::Discharging => 0,
             Self::Charging => 1,
             Self::Unknown => 2,
+            Self::Raw(raw) => raw,
+        }
+    }
+}
+
+/// Latched AXP192 PEK button press state.
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum Axp192PekPress {
+    None,
+    Long,
+    Short,
+    Both,
+    Raw(u8),
+}
+
+impl Axp192PekPress {
+    /// Convert the raw M5Unified AXP192 PEK state into a Rust enum.
+    pub const fn from_raw(raw: u8) -> Self {
+        match raw {
+            0 => Self::None,
+            1 => Self::Long,
+            2 => Self::Short,
+            3 => Self::Both,
+            other => Self::Raw(other),
+        }
+    }
+
+    /// Return the raw M5Unified AXP192 PEK state.
+    pub const fn raw(self) -> u8 {
+        match self {
+            Self::None => 0,
+            Self::Long => 1,
+            Self::Short => 2,
+            Self::Both => 3,
             Self::Raw(raw) => raw,
         }
     }
@@ -668,6 +706,215 @@ impl core::ops::BitAnd for ExtPortMask {
 impl core::ops::BitAndAssign for ExtPortMask {
     fn bitand_assign(&mut self, rhs: Self) {
         self.0 &= rhs.0;
+    }
+}
+
+#[derive(Debug)]
+pub struct Axp192;
+
+impl Axp192 {
+    /// Initialize the direct AXP192 backend when this board has one.
+    pub fn begin(&self) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp192_begin() }
+    }
+
+    /// Return the direct AXP192 battery level as a percentage when available.
+    pub fn battery_level(&self) -> Option<u8> {
+        let level = unsafe { m5unified_sys::m5u_power_axp192_get_battery_level() };
+        if (0..=100).contains(&level) {
+            Some(level as u8)
+        } else {
+            None
+        }
+    }
+
+    /// Enable or disable battery charging through the AXP192.
+    pub fn set_battery_charge(&self, enable: bool) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp192_set_battery_charge(enable) }
+    }
+
+    /// Set the AXP192 charge-current target in milliamps.
+    pub fn set_charge_current_ma(&self, max_ma: u16) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp192_set_charge_current(max_ma) }
+    }
+
+    /// Set the AXP192 charge-voltage target in millivolts.
+    pub fn set_charge_voltage_mv(&self, max_mv: u16) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp192_set_charge_voltage(max_mv) }
+    }
+
+    /// Return whether the AXP192 reports that the battery is charging.
+    pub fn is_charging(&self) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp192_is_charging() }
+    }
+
+    fn voltage_raw(voltage_mv: Option<u16>) -> i32 {
+        voltage_mv.map(i32::from).unwrap_or(-1)
+    }
+
+    fn set_dcdc(&self, channel: u8, voltage_mv: Option<u16>) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp192_set_dcdc(channel, Self::voltage_raw(voltage_mv)) }
+    }
+
+    fn set_ldo(&self, channel: u8, voltage_mv: Option<u16>) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp192_set_ldo(channel, Self::voltage_raw(voltage_mv)) }
+    }
+
+    /// Set DCDC1 output in millivolts, or disable it with `None`.
+    pub fn set_dcdc1_mv(&self, voltage_mv: Option<u16>) -> bool {
+        self.set_dcdc(1, voltage_mv)
+    }
+
+    /// Set DCDC2 output in millivolts, or disable it with `None`.
+    pub fn set_dcdc2_mv(&self, voltage_mv: Option<u16>) -> bool {
+        self.set_dcdc(2, voltage_mv)
+    }
+
+    /// Set DCDC3 output in millivolts, or disable it with `None`.
+    pub fn set_dcdc3_mv(&self, voltage_mv: Option<u16>) -> bool {
+        self.set_dcdc(3, voltage_mv)
+    }
+
+    /// Set LDOio0 output in millivolts, or disable it with `None`.
+    pub fn set_ldo0_mv(&self, voltage_mv: Option<u16>) -> bool {
+        self.set_ldo(0, voltage_mv)
+    }
+
+    /// Set LDO2 output in millivolts, or disable it with `None`.
+    pub fn set_ldo2_mv(&self, voltage_mv: Option<u16>) -> bool {
+        self.set_ldo(2, voltage_mv)
+    }
+
+    /// Set LDO3 output in millivolts, or disable it with `None`.
+    pub fn set_ldo3_mv(&self, voltage_mv: Option<u16>) -> bool {
+        self.set_ldo(3, voltage_mv)
+    }
+
+    /// Set one AXP192 GPIO output state.
+    pub fn set_gpio(&self, gpio_num: u8, state: bool) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp192_set_gpio(gpio_num, state) }
+    }
+
+    pub fn set_gpio0(&self, state: bool) -> bool {
+        self.set_gpio(0, state)
+    }
+
+    pub fn set_gpio1(&self, state: bool) -> bool {
+        self.set_gpio(1, state)
+    }
+
+    pub fn set_gpio2(&self, state: bool) -> bool {
+        self.set_gpio(2, state)
+    }
+
+    pub fn set_gpio3(&self, state: bool) -> bool {
+        self.set_gpio(3, state)
+    }
+
+    pub fn set_gpio4(&self, state: bool) -> bool {
+        self.set_gpio(4, state)
+    }
+
+    /// Power the board off through the AXP192.
+    pub fn power_off(&self) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp192_power_off() }
+    }
+
+    /// Enable or disable the AXP192 ADC channels.
+    pub fn set_adc_state(&self, enable: bool) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp192_set_adc_state(enable) }
+    }
+
+    /// Set the AXP192 ADC rate.
+    pub fn set_adc_rate(&self, rate: u8) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp192_set_adc_rate(rate) }
+    }
+
+    /// Enable or disable AXP192 EXTEN output.
+    pub fn set_exten(&self, enable: bool) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp192_set_exten(enable) }
+    }
+
+    /// Enable or disable AXP192 backup output.
+    pub fn set_backup(&self, enable: bool) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp192_set_backup(enable) }
+    }
+
+    /// Return whether ACIN is present.
+    pub fn is_acin(&self) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp192_is_acin() }
+    }
+
+    /// Return whether VBUS is present.
+    pub fn is_vbus(&self) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp192_is_vbus() }
+    }
+
+    /// Return whether the AXP192 reports a battery present.
+    pub fn battery_present(&self) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp192_get_bat_state() }
+    }
+
+    /// Return whether AXP192 EXTEN output is enabled.
+    pub fn exten(&self) -> bool {
+        unsafe { m5unified_sys::m5u_power_axp192_get_exten() }
+    }
+
+    /// Return battery voltage in volts.
+    pub fn battery_voltage_v(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_power_axp192_get_battery_voltage_v() }
+    }
+
+    /// Return battery discharge current in milliamps.
+    pub fn battery_discharge_current_ma(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_power_axp192_get_battery_discharge_current_ma() }
+    }
+
+    /// Return battery charge current in milliamps.
+    pub fn battery_charge_current_ma(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_power_axp192_get_battery_charge_current_ma() }
+    }
+
+    /// Return battery power in milliwatts.
+    pub fn battery_power_mw(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_power_axp192_get_battery_power_mw() }
+    }
+
+    /// Return ACIN voltage in volts.
+    pub fn acin_voltage_v(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_power_axp192_get_acin_voltage_v() }
+    }
+
+    /// Return ACIN current in milliamps.
+    pub fn acin_current_ma(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_power_axp192_get_acin_current_ma() }
+    }
+
+    /// Return VBUS voltage in volts.
+    pub fn vbus_voltage_v(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_power_axp192_get_vbus_voltage_v() }
+    }
+
+    /// Return VBUS current in milliamps.
+    pub fn vbus_current_ma(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_power_axp192_get_vbus_current_ma() }
+    }
+
+    /// Return APS voltage in volts.
+    pub fn aps_voltage_v(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_power_axp192_get_aps_voltage_v() }
+    }
+
+    /// Return internal PMIC temperature in degrees Celsius.
+    pub fn internal_temperature_c(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_power_axp192_get_internal_temperature_c() }
+    }
+
+    /// Return the latched AXP192 PEK press state.
+    ///
+    /// On supported PMICs this read clears the latched state.
+    pub fn pek_press(&self) -> Axp192PekPress {
+        Axp192PekPress::from_raw(unsafe { m5unified_sys::m5u_power_axp192_get_pek_press() })
     }
 }
 
