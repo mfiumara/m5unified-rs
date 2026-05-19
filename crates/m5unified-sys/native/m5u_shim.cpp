@@ -24,6 +24,12 @@ static bool s_m5u_sd_owns_bus = false;
 #define M5U_HAS_AXP2101 1
 #endif
 
+#if defined(CONFIG_IDF_TARGET_ESP32C6)
+#define M5U_HAS_AW32001 1
+#else
+#define M5U_HAS_AW32001 0
+#endif
+
 extern "C" {
 
 static auto m5u_apply_config(const m5u_config_t* src) {
@@ -1534,6 +1540,81 @@ static bool m5u_has_axp2101(void) {
     return M5.Power.getType() == m5::Power_Class::pmic_t::pmic_axp2101;
 #else
     return false;
+#endif
+}
+
+static bool m5u_has_aw32001(void) {
+#if M5U_HAS_AW32001
+    return M5.Power.getType() == m5::Power_Class::pmic_t::pmic_aw32001;
+#else
+    return false;
+#endif
+}
+
+bool m5u_power_aw32001_begin(void) {
+#if M5U_HAS_AW32001
+    return m5u_has_aw32001() && M5.Power.Aw32001.begin();
+#else
+    return false;
+#endif
+}
+
+bool m5u_power_aw32001_set_battery_charge(bool enable) {
+#if M5U_HAS_AW32001
+    return m5u_has_aw32001() && M5.Power.Aw32001.setBatteryCharge(enable);
+#else
+    (void)enable;
+    return false;
+#endif
+}
+
+bool m5u_power_aw32001_set_charge_current(uint16_t max_ma) {
+#if M5U_HAS_AW32001
+    return m5u_has_aw32001() && M5.Power.Aw32001.setChargeCurrent(max_ma);
+#else
+    (void)max_ma;
+    return false;
+#endif
+}
+
+bool m5u_power_aw32001_set_charge_voltage(uint16_t max_mv) {
+#if M5U_HAS_AW32001
+    return m5u_has_aw32001() && M5.Power.Aw32001.setChargeVoltage(max_mv);
+#else
+    (void)max_mv;
+    return false;
+#endif
+}
+
+bool m5u_power_aw32001_is_charging(void) {
+#if M5U_HAS_AW32001
+    return m5u_has_aw32001() && M5.Power.Aw32001.isCharging();
+#else
+    return false;
+#endif
+}
+
+uint16_t m5u_power_aw32001_get_charge_current(void) {
+#if M5U_HAS_AW32001
+    return m5u_has_aw32001() ? M5.Power.Aw32001.getChargeCurrent() : 0;
+#else
+    return 0;
+#endif
+}
+
+uint16_t m5u_power_aw32001_get_charge_voltage(void) {
+#if M5U_HAS_AW32001
+    return m5u_has_aw32001() ? M5.Power.Aw32001.getChargeVoltage() : 0;
+#else
+    return 0;
+#endif
+}
+
+int m5u_power_aw32001_get_charge_status(void) {
+#if M5U_HAS_AW32001
+    return m5u_has_aw32001() ? M5.Power.Aw32001.getChargeStatus() : -1;
+#else
+    return -1;
 #endif
 }
 

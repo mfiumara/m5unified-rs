@@ -1,7 +1,7 @@
 //! Power-management, PMIC, sleep, and AXP2101 helpers.
 //!
 //! The safe wrapper exposes battery and VBUS readings, output controls, sleep
-//! timers, vibration, external-port power, and direct AXP2101 PMIC helpers.
+//! timers, vibration, external-port power, and direct PMIC-specific helpers.
 
 use crate::{Date, Time};
 
@@ -178,6 +178,10 @@ impl Power {
 
     pub fn axp2101(&self) -> Axp2101 {
         Axp2101
+    }
+
+    pub fn aw32001(&self) -> Aw32001 {
+        Aw32001
     }
 }
 
@@ -356,6 +360,43 @@ impl Axp2101PekPress {
     }
 }
 
+/// Charge state reported directly by the AW32001 charger.
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum Aw32001ChargeStatus {
+    Unknown,
+    NotCharging,
+    PreCharge,
+    Charging,
+    ChargeDone,
+    Raw(i32),
+}
+
+impl Aw32001ChargeStatus {
+    /// Convert the raw M5Unified AW32001 charge status into a Rust enum.
+    pub const fn from_raw(raw: i32) -> Self {
+        match raw {
+            -1 => Self::Unknown,
+            0 => Self::NotCharging,
+            1 => Self::PreCharge,
+            2 => Self::Charging,
+            3 => Self::ChargeDone,
+            other => Self::Raw(other),
+        }
+    }
+
+    /// Return the raw M5Unified AW32001 charge status.
+    pub const fn raw(self) -> i32 {
+        match self {
+            Self::Unknown => -1,
+            Self::NotCharging => 0,
+            Self::PreCharge => 1,
+            Self::Charging => 2,
+            Self::ChargeDone => 3,
+            Self::Raw(raw) => raw,
+        }
+    }
+}
+
 /// External port mask for boards with independently switchable power outputs.
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct ExtPortMask(u16);
@@ -413,6 +454,55 @@ impl core::ops::BitAnd for ExtPortMask {
 impl core::ops::BitAndAssign for ExtPortMask {
     fn bitand_assign(&mut self, rhs: Self) {
         self.0 &= rhs.0;
+    }
+}
+
+#[derive(Debug)]
+pub struct Aw32001;
+
+impl Aw32001 {
+    /// Initialize the direct AW32001 backend when this board has one.
+    pub fn begin(&self) -> bool {
+        unsafe { m5unified_sys::m5u_power_aw32001_begin() }
+    }
+
+    /// Enable or disable battery charging through the AW32001.
+    pub fn set_battery_charge(&self, enable: bool) -> bool {
+        unsafe { m5unified_sys::m5u_power_aw32001_set_battery_charge(enable) }
+    }
+
+    /// Set the AW32001 charge-current target in milliamps.
+    pub fn set_charge_current_ma(&self, max_ma: u16) -> bool {
+        unsafe { m5unified_sys::m5u_power_aw32001_set_charge_current(max_ma) }
+    }
+
+    /// Set the AW32001 charge-voltage target in millivolts.
+    pub fn set_charge_voltage_mv(&self, max_mv: u16) -> bool {
+        unsafe { m5unified_sys::m5u_power_aw32001_set_charge_voltage(max_mv) }
+    }
+
+    /// Return whether the AW32001 reports that the battery is charging.
+    pub fn is_charging(&self) -> bool {
+        unsafe { m5unified_sys::m5u_power_aw32001_is_charging() }
+    }
+
+    /// Return the configured AW32001 charge current in milliamps.
+    pub fn charge_current_ma(&self) -> Option<u16> {
+        let current = unsafe { m5unified_sys::m5u_power_aw32001_get_charge_current() };
+        (current != 0).then_some(current)
+    }
+
+    /// Return the configured AW32001 charge voltage in millivolts.
+    pub fn charge_voltage_mv(&self) -> Option<u16> {
+        let voltage = unsafe { m5unified_sys::m5u_power_aw32001_get_charge_voltage() };
+        (voltage != 0).then_some(voltage)
+    }
+
+    /// Return the direct AW32001 charge status.
+    pub fn charge_status(&self) -> Aw32001ChargeStatus {
+        Aw32001ChargeStatus::from_raw(unsafe {
+            m5unified_sys::m5u_power_aw32001_get_charge_status()
+        })
     }
 }
 

@@ -58,8 +58,8 @@ pub use imu::{Imu, ImuAxis, ImuData, ImuKind, ImuSensorMask, Vec3};
 pub use led::{Led, LedColor, LedType};
 pub use log::{Log, LogLevel, LogTarget, RawLogCallback};
 pub use power::{
-    Axp2101, Axp2101ChargeStatus, Axp2101IrqStatus, Axp2101PekPress, ChargeState, ExtPortBusConfig,
-    ExtPortMask, Power, PowerType,
+    Aw32001, Aw32001ChargeStatus, Axp2101, Axp2101ChargeStatus, Axp2101IrqStatus, Axp2101PekPress,
+    ChargeState, ExtPortBusConfig, ExtPortMask, Power, PowerType,
 };
 pub use rtc::{Date, DateTime, Rtc, Time};
 pub use sd::{
@@ -641,6 +641,20 @@ mod tests {
         m5.power.deep_sleep_us(0, false);
         m5.power.light_sleep_us(0, false);
         m5.power.power_off();
+        let aw = m5.power.aw32001();
+        assert!(!aw.begin());
+        assert!(!aw.set_battery_charge(true));
+        assert!(!aw.set_charge_current_ma(100));
+        assert!(!aw.set_charge_voltage_mv(4_200));
+        assert!(!aw.is_charging());
+        assert_eq!(aw.charge_current_ma(), None);
+        assert_eq!(aw.charge_voltage_mv(), None);
+        assert_eq!(aw.charge_status(), Aw32001ChargeStatus::Unknown);
+        assert_eq!(Aw32001ChargeStatus::Charging.raw(), 2);
+        assert_eq!(
+            Aw32001ChargeStatus::from_raw(77),
+            Aw32001ChargeStatus::Raw(77)
+        );
         let axp = m5.power.axp2101();
         assert!(!axp.begin());
         assert_eq!(axp.battery_level(), None);
