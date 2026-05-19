@@ -771,11 +771,49 @@ void m5u_display_end_write(void) {
 void m5u_display_display(void) {
 }
 
+void m5u_display_display_region(int x, int y, int w, int h) {
+    (void)x; (void)y; (void)w; (void)h;
+}
+
 bool m5u_display_display_busy(void) {
     return false;
 }
 
 void m5u_display_wait_display(void) {
+}
+
+bool m5u_display_has_palette(void) {
+    return false;
+}
+
+uint32_t m5u_display_get_palette_count(void) {
+    return 0;
+}
+
+bool m5u_display_is_readable(void) {
+    return false;
+}
+
+bool m5u_display_is_epd(void) {
+    return false;
+}
+
+bool m5u_display_is_bus_shared(void) {
+    return false;
+}
+
+void m5u_display_set_auto_display(bool enable) {
+    (void)enable;
+}
+
+void m5u_display_init_dma(void) {
+}
+
+void m5u_display_wait_dma(void) {
+}
+
+bool m5u_display_dma_busy(void) {
+    return false;
 }
 
 int m5u_display_get_cursor_x(void) {
@@ -1249,6 +1287,58 @@ void m5u_display_start_write_at(int index) {
 
 void m5u_display_end_write_at(int index) {
     (void)index;
+}
+
+void m5u_display_display_at(int index) {
+    (void)index;
+}
+
+void m5u_display_display_region_at(int index, int x, int y, int w, int h) {
+    (void)index; (void)x; (void)y; (void)w; (void)h;
+}
+
+bool m5u_display_display_busy_at(int index) {
+    (void)index; return false;
+}
+
+void m5u_display_wait_display_at(int index) {
+    (void)index;
+}
+
+bool m5u_display_has_palette_at(int index) {
+    (void)index; return false;
+}
+
+uint32_t m5u_display_get_palette_count_at(int index) {
+    (void)index; return 0;
+}
+
+bool m5u_display_is_readable_at(int index) {
+    (void)index; return false;
+}
+
+bool m5u_display_is_epd_at(int index) {
+    (void)index; return false;
+}
+
+bool m5u_display_is_bus_shared_at(int index) {
+    (void)index; return false;
+}
+
+void m5u_display_set_auto_display_at(int index, bool enable) {
+    (void)index; (void)enable;
+}
+
+void m5u_display_init_dma_at(int index) {
+    (void)index;
+}
+
+void m5u_display_wait_dma_at(int index) {
+    (void)index;
+}
+
+bool m5u_display_dma_busy_at(int index) {
+    (void)index; return false;
 }
 
 void m5u_display_print_at(int index, const char* text) {

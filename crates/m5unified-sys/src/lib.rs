@@ -654,8 +654,18 @@ extern "C" {
     pub fn m5u_display_start_write();
     pub fn m5u_display_end_write();
     pub fn m5u_display_display();
+    pub fn m5u_display_display_region(x: c_int, y: c_int, w: c_int, h: c_int);
     pub fn m5u_display_display_busy() -> bool;
     pub fn m5u_display_wait_display();
+    pub fn m5u_display_has_palette() -> bool;
+    pub fn m5u_display_get_palette_count() -> u32;
+    pub fn m5u_display_is_readable() -> bool;
+    pub fn m5u_display_is_epd() -> bool;
+    pub fn m5u_display_is_bus_shared() -> bool;
+    pub fn m5u_display_set_auto_display(enable: bool);
+    pub fn m5u_display_init_dma();
+    pub fn m5u_display_wait_dma();
+    pub fn m5u_display_dma_busy() -> bool;
     pub fn m5u_display_get_cursor_x() -> c_int;
     pub fn m5u_display_get_cursor_y() -> c_int;
     pub fn m5u_display_font_height() -> c_int;
@@ -955,6 +965,19 @@ extern "C" {
     pub fn m5u_display_get_cursor_y_at(index: c_int) -> c_int;
     pub fn m5u_display_start_write_at(index: c_int);
     pub fn m5u_display_end_write_at(index: c_int);
+    pub fn m5u_display_display_at(index: c_int);
+    pub fn m5u_display_display_region_at(index: c_int, x: c_int, y: c_int, w: c_int, h: c_int);
+    pub fn m5u_display_display_busy_at(index: c_int) -> bool;
+    pub fn m5u_display_wait_display_at(index: c_int);
+    pub fn m5u_display_has_palette_at(index: c_int) -> bool;
+    pub fn m5u_display_get_palette_count_at(index: c_int) -> u32;
+    pub fn m5u_display_is_readable_at(index: c_int) -> bool;
+    pub fn m5u_display_is_epd_at(index: c_int) -> bool;
+    pub fn m5u_display_is_bus_shared_at(index: c_int) -> bool;
+    pub fn m5u_display_set_auto_display_at(index: c_int, enable: bool);
+    pub fn m5u_display_init_dma_at(index: c_int);
+    pub fn m5u_display_wait_dma_at(index: c_int);
+    pub fn m5u_display_dma_busy_at(index: c_int) -> bool;
     pub fn m5u_display_print_at(index: c_int, text: *const c_char);
     pub fn m5u_display_println_at(index: c_int, text: *const c_char);
     pub fn m5u_display_draw_string_at(
@@ -2278,10 +2301,32 @@ mod host_stubs {
     pub unsafe fn m5u_display_start_write() {}
     pub unsafe fn m5u_display_end_write() {}
     pub unsafe fn m5u_display_display() {}
+    pub unsafe fn m5u_display_display_region(_x: c_int, _y: c_int, _w: c_int, _h: c_int) {}
     pub unsafe fn m5u_display_display_busy() -> bool {
         false
     }
     pub unsafe fn m5u_display_wait_display() {}
+    pub unsafe fn m5u_display_has_palette() -> bool {
+        false
+    }
+    pub unsafe fn m5u_display_get_palette_count() -> u32 {
+        0
+    }
+    pub unsafe fn m5u_display_is_readable() -> bool {
+        false
+    }
+    pub unsafe fn m5u_display_is_epd() -> bool {
+        false
+    }
+    pub unsafe fn m5u_display_is_bus_shared() -> bool {
+        false
+    }
+    pub unsafe fn m5u_display_set_auto_display(_enable: bool) {}
+    pub unsafe fn m5u_display_init_dma() {}
+    pub unsafe fn m5u_display_wait_dma() {}
+    pub unsafe fn m5u_display_dma_busy() -> bool {
+        false
+    }
     pub unsafe fn m5u_display_get_cursor_x() -> c_int {
         0
     }
@@ -2785,6 +2830,40 @@ mod host_stubs {
     }
     pub unsafe fn m5u_display_start_write_at(_index: c_int) {}
     pub unsafe fn m5u_display_end_write_at(_index: c_int) {}
+    pub unsafe fn m5u_display_display_at(_index: c_int) {}
+    pub unsafe fn m5u_display_display_region_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _h: c_int,
+    ) {
+    }
+    pub unsafe fn m5u_display_display_busy_at(_index: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_display_wait_display_at(_index: c_int) {}
+    pub unsafe fn m5u_display_has_palette_at(_index: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_display_get_palette_count_at(_index: c_int) -> u32 {
+        0
+    }
+    pub unsafe fn m5u_display_is_readable_at(_index: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_display_is_epd_at(_index: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_display_is_bus_shared_at(_index: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_display_set_auto_display_at(_index: c_int, _enable: bool) {}
+    pub unsafe fn m5u_display_init_dma_at(_index: c_int) {}
+    pub unsafe fn m5u_display_wait_dma_at(_index: c_int) {}
+    pub unsafe fn m5u_display_dma_busy_at(_index: c_int) -> bool {
+        false
+    }
     pub unsafe fn m5u_display_print_at(_index: c_int, _text: *const c_char) {}
     pub unsafe fn m5u_display_println_at(_index: c_int, _text: *const c_char) {}
     pub unsafe fn m5u_display_draw_string_at(

@@ -257,12 +257,52 @@ impl Display {
         unsafe { m5unified_sys::m5u_display_display() }
     }
 
+    pub fn display_region(&mut self, rect: Rect) {
+        unsafe { m5unified_sys::m5u_display_display_region(rect.x, rect.y, rect.w, rect.h) }
+    }
+
     pub fn display_busy(&self) -> bool {
         unsafe { m5unified_sys::m5u_display_display_busy() }
     }
 
     pub fn wait_display(&self) {
         unsafe { m5unified_sys::m5u_display_wait_display() }
+    }
+
+    pub fn has_palette(&self) -> bool {
+        unsafe { m5unified_sys::m5u_display_has_palette() }
+    }
+
+    pub fn palette_count(&self) -> u32 {
+        unsafe { m5unified_sys::m5u_display_get_palette_count() }
+    }
+
+    pub fn is_readable(&self) -> bool {
+        unsafe { m5unified_sys::m5u_display_is_readable() }
+    }
+
+    pub fn is_epd(&self) -> bool {
+        unsafe { m5unified_sys::m5u_display_is_epd() }
+    }
+
+    pub fn is_bus_shared(&self) -> bool {
+        unsafe { m5unified_sys::m5u_display_is_bus_shared() }
+    }
+
+    pub fn set_auto_display(&mut self, enable: bool) {
+        unsafe { m5unified_sys::m5u_display_set_auto_display(enable) }
+    }
+
+    pub fn init_dma(&mut self) {
+        unsafe { m5unified_sys::m5u_display_init_dma() }
+    }
+
+    pub fn wait_dma(&self) {
+        unsafe { m5unified_sys::m5u_display_wait_dma() }
+    }
+
+    pub fn dma_busy(&self) -> bool {
+        unsafe { m5unified_sys::m5u_display_dma_busy() }
     }
 
     pub fn cursor_x(&self) -> i32 {
@@ -1311,6 +1351,60 @@ impl DisplayRef {
 
     pub fn end_write(&mut self) {
         unsafe { m5unified_sys::m5u_display_end_write_at(self.index) }
+    }
+
+    pub fn display(&mut self) {
+        unsafe { m5unified_sys::m5u_display_display_at(self.index) }
+    }
+
+    pub fn display_region(&mut self, rect: Rect) {
+        unsafe {
+            m5unified_sys::m5u_display_display_region_at(self.index, rect.x, rect.y, rect.w, rect.h)
+        }
+    }
+
+    pub fn display_busy(&self) -> bool {
+        unsafe { m5unified_sys::m5u_display_display_busy_at(self.index) }
+    }
+
+    pub fn wait_display(&self) {
+        unsafe { m5unified_sys::m5u_display_wait_display_at(self.index) }
+    }
+
+    pub fn has_palette(&self) -> bool {
+        unsafe { m5unified_sys::m5u_display_has_palette_at(self.index) }
+    }
+
+    pub fn palette_count(&self) -> u32 {
+        unsafe { m5unified_sys::m5u_display_get_palette_count_at(self.index) }
+    }
+
+    pub fn is_readable(&self) -> bool {
+        unsafe { m5unified_sys::m5u_display_is_readable_at(self.index) }
+    }
+
+    pub fn is_epd(&self) -> bool {
+        unsafe { m5unified_sys::m5u_display_is_epd_at(self.index) }
+    }
+
+    pub fn is_bus_shared(&self) -> bool {
+        unsafe { m5unified_sys::m5u_display_is_bus_shared_at(self.index) }
+    }
+
+    pub fn set_auto_display(&mut self, enable: bool) {
+        unsafe { m5unified_sys::m5u_display_set_auto_display_at(self.index, enable) }
+    }
+
+    pub fn init_dma(&mut self) {
+        unsafe { m5unified_sys::m5u_display_init_dma_at(self.index) }
+    }
+
+    pub fn wait_dma(&self) {
+        unsafe { m5unified_sys::m5u_display_wait_dma_at(self.index) }
+    }
+
+    pub fn dma_busy(&self) -> bool {
+        unsafe { m5unified_sys::m5u_display_dma_busy_at(self.index) }
     }
 
     pub fn transaction<R>(&mut self, f: impl FnOnce(&mut DisplayRef) -> R) -> R {

@@ -1451,12 +1451,52 @@ void m5u_display_display(void) {
     M5.Display.display();
 }
 
+void m5u_display_display_region(int x, int y, int w, int h) {
+    M5.Display.display(x, y, w, h);
+}
+
 bool m5u_display_display_busy(void) {
     return M5.Display.displayBusy();
 }
 
 void m5u_display_wait_display(void) {
     M5.Display.waitDisplay();
+}
+
+bool m5u_display_has_palette(void) {
+    return M5.Display.hasPalette();
+}
+
+uint32_t m5u_display_get_palette_count(void) {
+    return M5.Display.getPaletteCount();
+}
+
+bool m5u_display_is_readable(void) {
+    return M5.Display.isReadable();
+}
+
+bool m5u_display_is_epd(void) {
+    return M5.Display.isEPD();
+}
+
+bool m5u_display_is_bus_shared(void) {
+    return M5.Display.isBusShared();
+}
+
+void m5u_display_set_auto_display(bool enable) {
+    M5.Display.setAutoDisplay(enable);
+}
+
+void m5u_display_init_dma(void) {
+    M5.Display.initDMA();
+}
+
+void m5u_display_wait_dma(void) {
+    M5.Display.waitDMA();
+}
+
+bool m5u_display_dma_busy(void) {
+    return M5.Display.dmaBusy();
 }
 
 int m5u_display_get_cursor_x(void) {
@@ -2032,6 +2072,58 @@ void m5u_display_start_write_at(int index) {
 
 void m5u_display_end_write_at(int index) {
     M5.Displays(index).endWrite();
+}
+
+void m5u_display_display_at(int index) {
+    M5.Displays(index).display();
+}
+
+void m5u_display_display_region_at(int index, int x, int y, int w, int h) {
+    M5.Displays(index).display(x, y, w, h);
+}
+
+bool m5u_display_display_busy_at(int index) {
+    return M5.Displays(index).displayBusy();
+}
+
+void m5u_display_wait_display_at(int index) {
+    M5.Displays(index).waitDisplay();
+}
+
+bool m5u_display_has_palette_at(int index) {
+    return M5.Displays(index).hasPalette();
+}
+
+uint32_t m5u_display_get_palette_count_at(int index) {
+    return M5.Displays(index).getPaletteCount();
+}
+
+bool m5u_display_is_readable_at(int index) {
+    return M5.Displays(index).isReadable();
+}
+
+bool m5u_display_is_epd_at(int index) {
+    return M5.Displays(index).isEPD();
+}
+
+bool m5u_display_is_bus_shared_at(int index) {
+    return M5.Displays(index).isBusShared();
+}
+
+void m5u_display_set_auto_display_at(int index, bool enable) {
+    M5.Displays(index).setAutoDisplay(enable);
+}
+
+void m5u_display_init_dma_at(int index) {
+    M5.Displays(index).initDMA();
+}
+
+void m5u_display_wait_dma_at(int index) {
+    M5.Displays(index).waitDMA();
+}
+
+bool m5u_display_dma_busy_at(int index) {
+    return M5.Displays(index).dmaBusy();
 }
 
 void m5u_display_print_at(int index, const char* text) {
