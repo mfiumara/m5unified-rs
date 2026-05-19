@@ -38,6 +38,12 @@ static bool s_m5u_sd_owns_bus = false;
 #define M5U_HAS_INA226 0
 #endif
 
+#if !defined(CONFIG_IDF_TARGET) || defined(CONFIG_IDF_TARGET_ESP32)
+#define M5U_HAS_IP5306 1
+#else
+#define M5U_HAS_IP5306 0
+#endif
+
 #if defined(CONFIG_IDF_TARGET_ESP32S3)
 #define M5U_HAS_PY32PMIC 1
 #else
@@ -1581,6 +1587,14 @@ static bool m5u_has_py32pmic(void) {
 #endif
 }
 
+static bool m5u_has_ip5306(void) {
+#if M5U_HAS_IP5306
+    return M5.Power.getType() == m5::Power_Class::pmic_t::pmic_ip5306;
+#else
+    return false;
+#endif
+}
+
 bool m5u_power_aw32001_begin(void) {
 #if M5U_HAS_AW32001
     return m5u_has_aw32001() && M5.Power.Aw32001.begin();
@@ -1746,6 +1760,78 @@ float m5u_power_ina226_get_power_w(void) {
     return M5.Power.Ina226.getPower();
 #else
     return 0.0f;
+#endif
+}
+
+bool m5u_power_ip5306_begin(void) {
+#if M5U_HAS_IP5306
+    return m5u_has_ip5306() && M5.Power.Ip5306.begin();
+#else
+    return false;
+#endif
+}
+
+int m5u_power_ip5306_get_battery_level(void) {
+#if M5U_HAS_IP5306
+    return m5u_has_ip5306() ? M5.Power.Ip5306.getBatteryLevel() : -1;
+#else
+    return -1;
+#endif
+}
+
+bool m5u_power_ip5306_set_battery_charge(bool enable) {
+#if M5U_HAS_IP5306
+    if (!m5u_has_ip5306()) {
+        return false;
+    }
+    M5.Power.Ip5306.setBatteryCharge(enable);
+    return true;
+#else
+    (void)enable;
+    return false;
+#endif
+}
+
+bool m5u_power_ip5306_set_charge_current(uint16_t max_ma) {
+#if M5U_HAS_IP5306
+    if (!m5u_has_ip5306()) {
+        return false;
+    }
+    M5.Power.Ip5306.setChargeCurrent(max_ma);
+    return true;
+#else
+    (void)max_ma;
+    return false;
+#endif
+}
+
+bool m5u_power_ip5306_set_charge_voltage(uint16_t max_mv) {
+#if M5U_HAS_IP5306
+    if (!m5u_has_ip5306()) {
+        return false;
+    }
+    M5.Power.Ip5306.setChargeVoltage(max_mv);
+    return true;
+#else
+    (void)max_mv;
+    return false;
+#endif
+}
+
+bool m5u_power_ip5306_is_charging(void) {
+#if M5U_HAS_IP5306
+    return m5u_has_ip5306() && M5.Power.Ip5306.isCharging();
+#else
+    return false;
+#endif
+}
+
+bool m5u_power_ip5306_set_power_boost_keep_on(bool enable) {
+#if M5U_HAS_IP5306
+    return m5u_has_ip5306() && M5.Power.Ip5306.setPowerBoostKeepOn(enable);
+#else
+    (void)enable;
+    return false;
 #endif
 }
 

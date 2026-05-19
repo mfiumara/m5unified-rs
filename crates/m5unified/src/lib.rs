@@ -60,7 +60,8 @@ pub use log::{Log, LogLevel, LogTarget, RawLogCallback};
 pub use power::{
     Aw32001, Aw32001ChargeStatus, Axp2101, Axp2101ChargeStatus, Axp2101IrqStatus, Axp2101PekPress,
     Bq27220, ChargeState, ExtPortBusConfig, ExtPortMask, Ina226, Ina226Config,
-    Ina226ConversionTime, Ina226Mode, Ina226Sampling, Power, PowerType, Py32Pmic, Py32PmicPekPress,
+    Ina226ConversionTime, Ina226Mode, Ina226Sampling, Ip5306, Power, PowerType, Py32Pmic,
+    Py32PmicPekPress,
 };
 pub use rtc::{Date, DateTime, Rtc, Time};
 pub use sd::{
@@ -681,6 +682,14 @@ mod tests {
         assert_eq!(ina.shunt_voltage_v(), 0.0);
         assert_eq!(ina.shunt_current_a(), 0.0);
         assert_eq!(ina.power_w(), 0.0);
+        let ip5306 = m5.power.ip5306();
+        assert!(!ip5306.begin());
+        assert_eq!(ip5306.battery_level(), None);
+        assert!(!ip5306.set_battery_charge(true));
+        assert!(!ip5306.set_charge_current_ma(500));
+        assert!(!ip5306.set_charge_voltage_mv(4_200));
+        assert!(!ip5306.is_charging());
+        assert!(!ip5306.set_power_boost_keep_on(true));
         let py32 = m5.power.py32pmic();
         assert!(!py32.begin());
         assert!(!py32.set_ext_output(true));

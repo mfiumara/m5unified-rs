@@ -1057,6 +1057,13 @@ float m5u_power_ina226_get_bus_voltage_v(void) { return 0.0f; }
 float m5u_power_ina226_get_shunt_voltage_v(void) { return 0.0f; }
 float m5u_power_ina226_get_shunt_current_a(void) { return 0.0f; }
 float m5u_power_ina226_get_power_w(void) { return 0.0f; }
+bool m5u_power_ip5306_begin(void) { return false; }
+int m5u_power_ip5306_get_battery_level(void) { return -1; }
+bool m5u_power_ip5306_set_battery_charge(bool enable) { (void)enable; return false; }
+bool m5u_power_ip5306_set_charge_current(uint16_t max_ma) { (void)max_ma; return false; }
+bool m5u_power_ip5306_set_charge_voltage(uint16_t max_mv) { (void)max_mv; return false; }
+bool m5u_power_ip5306_is_charging(void) { return false; }
+bool m5u_power_ip5306_set_power_boost_keep_on(bool enable) { (void)enable; return false; }
 bool m5u_power_py32pmic_begin(void) { return false; }
 bool m5u_power_py32pmic_set_ext_output(bool enable) { (void)enable; return false; }
 bool m5u_power_py32pmic_set_battery_charge(bool enable) { (void)enable; return false; }

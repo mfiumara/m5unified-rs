@@ -192,6 +192,10 @@ impl Power {
         Ina226
     }
 
+    pub fn ip5306(&self) -> Ip5306 {
+        Ip5306
+    }
+
     pub fn py32pmic(&self) -> Py32Pmic {
         Py32Pmic
     }
@@ -775,6 +779,51 @@ impl Ina226 {
     /// Return measured power in watts.
     pub fn power_w(&self) -> f32 {
         unsafe { m5unified_sys::m5u_power_ina226_get_power_w() }
+    }
+}
+
+#[derive(Debug)]
+pub struct Ip5306;
+
+impl Ip5306 {
+    /// Initialize the direct IP5306 backend when this board has one.
+    pub fn begin(&self) -> bool {
+        unsafe { m5unified_sys::m5u_power_ip5306_begin() }
+    }
+
+    /// Return the direct IP5306 battery level as a percentage when available.
+    pub fn battery_level(&self) -> Option<u8> {
+        let level = unsafe { m5unified_sys::m5u_power_ip5306_get_battery_level() };
+        if (0..=100).contains(&level) {
+            Some(level as u8)
+        } else {
+            None
+        }
+    }
+
+    /// Enable or disable battery charging through the IP5306.
+    pub fn set_battery_charge(&self, enable: bool) -> bool {
+        unsafe { m5unified_sys::m5u_power_ip5306_set_battery_charge(enable) }
+    }
+
+    /// Set the IP5306 charge-current target in milliamps.
+    pub fn set_charge_current_ma(&self, max_ma: u16) -> bool {
+        unsafe { m5unified_sys::m5u_power_ip5306_set_charge_current(max_ma) }
+    }
+
+    /// Set the IP5306 charge-voltage target in millivolts.
+    pub fn set_charge_voltage_mv(&self, max_mv: u16) -> bool {
+        unsafe { m5unified_sys::m5u_power_ip5306_set_charge_voltage(max_mv) }
+    }
+
+    /// Return whether the IP5306 reports that the battery is charging.
+    pub fn is_charging(&self) -> bool {
+        unsafe { m5unified_sys::m5u_power_ip5306_is_charging() }
+    }
+
+    /// Set whether the IP5306 keeps boost output alive under low load.
+    pub fn set_power_boost_keep_on(&self, enable: bool) -> bool {
+        unsafe { m5unified_sys::m5u_power_ip5306_set_power_boost_keep_on(enable) }
     }
 }
 
