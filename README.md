@@ -1,6 +1,7 @@
 # m5unified-rs
 
 [![crates.io](https://img.shields.io/crates/v/m5unified.svg)](https://crates.io/crates/m5unified)
+[![crates.io](https://img.shields.io/crates/v/m5unified-sys.svg)](https://crates.io/crates/m5unified-sys)
 
 Rust bindings for [M5Unified](https://github.com/m5stack/M5Unified), the
 board support library used across M5Stack ESP32 devices.
