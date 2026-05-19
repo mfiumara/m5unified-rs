@@ -1051,6 +1051,12 @@ int16_t m5u_power_bq27220_get_current_ma(void) { return 0; }
 int16_t m5u_power_bq27220_get_voltage_mv(void) { return 0; }
 float m5u_power_bq27220_get_current_a(void) { return 0.0f; }
 float m5u_power_bq27220_get_voltage_v(void) { return 0.0f; }
+bool m5u_power_ina226_begin(void) { return false; }
+bool m5u_power_ina226_config(const m5u_power_ina226_config_t* config) { (void)config; return false; }
+float m5u_power_ina226_get_bus_voltage_v(void) { return 0.0f; }
+float m5u_power_ina226_get_shunt_voltage_v(void) { return 0.0f; }
+float m5u_power_ina226_get_shunt_current_a(void) { return 0.0f; }
+float m5u_power_ina226_get_power_w(void) { return 0.0f; }
 bool m5u_power_py32pmic_begin(void) { return false; }
 bool m5u_power_py32pmic_set_ext_output(bool enable) { (void)enable; return false; }
 bool m5u_power_py32pmic_set_battery_charge(bool enable) { (void)enable; return false; }

@@ -188,6 +188,10 @@ impl Power {
         Bq27220
     }
 
+    pub fn ina226(&self) -> Ina226 {
+        Ina226
+    }
+
     pub fn py32pmic(&self) -> Py32Pmic {
         Py32Pmic
     }
@@ -433,6 +437,172 @@ impl Py32PmicPekPress {
     }
 }
 
+/// INA226 sample averaging rate.
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum Ina226Sampling {
+    Rate1,
+    Rate4,
+    Rate16,
+    Rate64,
+    Rate128,
+    Rate256,
+    Rate512,
+    Rate1024,
+    Raw(u8),
+}
+
+impl Ina226Sampling {
+    pub const fn from_raw(raw: u8) -> Self {
+        match raw {
+            0 => Self::Rate1,
+            1 => Self::Rate4,
+            2 => Self::Rate16,
+            3 => Self::Rate64,
+            4 => Self::Rate128,
+            5 => Self::Rate256,
+            6 => Self::Rate512,
+            7 => Self::Rate1024,
+            other => Self::Raw(other),
+        }
+    }
+
+    pub const fn raw(self) -> u8 {
+        match self {
+            Self::Rate1 => 0,
+            Self::Rate4 => 1,
+            Self::Rate16 => 2,
+            Self::Rate64 => 3,
+            Self::Rate128 => 4,
+            Self::Rate256 => 5,
+            Self::Rate512 => 6,
+            Self::Rate1024 => 7,
+            Self::Raw(raw) => raw,
+        }
+    }
+}
+
+/// INA226 bus or shunt conversion time.
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum Ina226ConversionTime {
+    Us140,
+    Us204,
+    Us332,
+    Us588,
+    Us1100,
+    Us2116,
+    Us4156,
+    Us8244,
+    Raw(u8),
+}
+
+impl Ina226ConversionTime {
+    pub const fn from_raw(raw: u8) -> Self {
+        match raw {
+            0 => Self::Us140,
+            1 => Self::Us204,
+            2 => Self::Us332,
+            3 => Self::Us588,
+            4 => Self::Us1100,
+            5 => Self::Us2116,
+            6 => Self::Us4156,
+            7 => Self::Us8244,
+            other => Self::Raw(other),
+        }
+    }
+
+    pub const fn raw(self) -> u8 {
+        match self {
+            Self::Us140 => 0,
+            Self::Us204 => 1,
+            Self::Us332 => 2,
+            Self::Us588 => 3,
+            Self::Us1100 => 4,
+            Self::Us2116 => 5,
+            Self::Us4156 => 6,
+            Self::Us8244 => 7,
+            Self::Raw(raw) => raw,
+        }
+    }
+}
+
+/// INA226 operation mode.
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum Ina226Mode {
+    PowerDown,
+    ShuntVoltageSingle,
+    BusVoltageSingle,
+    ShuntAndBusSingle,
+    ShuntVoltage,
+    BusVoltage,
+    ShuntAndBus,
+    Raw(u8),
+}
+
+impl Ina226Mode {
+    pub const fn from_raw(raw: u8) -> Self {
+        match raw {
+            0 => Self::PowerDown,
+            1 => Self::ShuntVoltageSingle,
+            2 => Self::BusVoltageSingle,
+            3 => Self::ShuntAndBusSingle,
+            5 => Self::ShuntVoltage,
+            6 => Self::BusVoltage,
+            7 => Self::ShuntAndBus,
+            other => Self::Raw(other),
+        }
+    }
+
+    pub const fn raw(self) -> u8 {
+        match self {
+            Self::PowerDown => 0,
+            Self::ShuntVoltageSingle => 1,
+            Self::BusVoltageSingle => 2,
+            Self::ShuntAndBusSingle => 3,
+            Self::ShuntVoltage => 5,
+            Self::BusVoltage => 6,
+            Self::ShuntAndBus => 7,
+            Self::Raw(raw) => raw,
+        }
+    }
+}
+
+/// INA226 power monitor configuration.
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct Ina226Config {
+    pub shunt_res_ohm: f32,
+    pub max_expected_current_a: f32,
+    pub sampling_rate: Ina226Sampling,
+    pub shunt_conversion_time: Ina226ConversionTime,
+    pub bus_conversion_time: Ina226ConversionTime,
+    pub mode: Ina226Mode,
+}
+
+impl Ina226Config {
+    fn to_raw(self) -> m5unified_sys::m5u_power_ina226_config_t {
+        m5unified_sys::m5u_power_ina226_config_t {
+            shunt_res: self.shunt_res_ohm,
+            max_expected_current: self.max_expected_current_a,
+            sampling_rate: self.sampling_rate.raw(),
+            shunt_conversion_time: self.shunt_conversion_time.raw(),
+            bus_conversion_time: self.bus_conversion_time.raw(),
+            mode: self.mode.raw(),
+        }
+    }
+}
+
+impl Default for Ina226Config {
+    fn default() -> Self {
+        Self {
+            shunt_res_ohm: 0.1,
+            max_expected_current_a: 2.0,
+            sampling_rate: Ina226Sampling::Rate16,
+            shunt_conversion_time: Ina226ConversionTime::Us1100,
+            bus_conversion_time: Ina226ConversionTime::Us1100,
+            mode: Ina226Mode::ShuntAndBus,
+        }
+    }
+}
+
 /// External port mask for boards with independently switchable power outputs.
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct ExtPortMask(u16);
@@ -569,6 +739,42 @@ impl Bq27220 {
     /// Return battery voltage in volts.
     pub fn voltage_v(&self) -> f32 {
         unsafe { m5unified_sys::m5u_power_bq27220_get_voltage_v() }
+    }
+}
+
+#[derive(Debug)]
+pub struct Ina226;
+
+impl Ina226 {
+    /// Initialize the direct INA226 power monitor backend when this board has one.
+    pub fn begin(&self) -> bool {
+        unsafe { m5unified_sys::m5u_power_ina226_begin() }
+    }
+
+    /// Configure INA226 sampling, conversion, and calibration parameters.
+    pub fn configure(&self, config: Ina226Config) -> bool {
+        let raw = config.to_raw();
+        unsafe { m5unified_sys::m5u_power_ina226_config(&raw) }
+    }
+
+    /// Return bus voltage in volts.
+    pub fn bus_voltage_v(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_power_ina226_get_bus_voltage_v() }
+    }
+
+    /// Return shunt voltage in volts.
+    pub fn shunt_voltage_v(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_power_ina226_get_shunt_voltage_v() }
+    }
+
+    /// Return shunt current in amps.
+    pub fn shunt_current_a(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_power_ina226_get_shunt_current_a() }
+    }
+
+    /// Return measured power in watts.
+    pub fn power_w(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_power_ina226_get_power_w() }
     }
 }
 

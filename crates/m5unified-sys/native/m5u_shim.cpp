@@ -32,6 +32,12 @@ static bool s_m5u_sd_owns_bus = false;
 #define M5U_HAS_BQ27220 0
 #endif
 
+#if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32P4)
+#define M5U_HAS_INA226 1
+#else
+#define M5U_HAS_INA226 0
+#endif
+
 #if defined(CONFIG_IDF_TARGET_ESP32S3)
 #define M5U_HAS_PY32PMIC 1
 #else
@@ -1677,6 +1683,67 @@ float m5u_power_bq27220_get_current_a(void) {
 float m5u_power_bq27220_get_voltage_v(void) {
 #if M5U_HAS_BQ27220
     return m5u_has_bq27220() ? M5.Power.Bq27220.getVoltage_F() : 0.0f;
+#else
+    return 0.0f;
+#endif
+}
+
+bool m5u_power_ina226_begin(void) {
+#if M5U_HAS_INA226
+    return M5.Power.Ina226.begin();
+#else
+    return false;
+#endif
+}
+
+bool m5u_power_ina226_config(const m5u_power_ina226_config_t* config) {
+#if M5U_HAS_INA226
+    if (!config) {
+        return false;
+    }
+
+    m5::INA226_Class::config_t cfg;
+    cfg.shunt_res = config->shunt_res;
+    cfg.max_expected_current = config->max_expected_current;
+    cfg.sampling_rate = static_cast<m5::INA226_Class::Sampling>(config->sampling_rate & 0x07);
+    cfg.shunt_conversion_time = static_cast<m5::INA226_Class::ConversionTime>(config->shunt_conversion_time & 0x07);
+    cfg.bus_conversion_time = static_cast<m5::INA226_Class::ConversionTime>(config->bus_conversion_time & 0x07);
+    cfg.mode = static_cast<m5::INA226_Class::Mode>(config->mode & 0x07);
+    M5.Power.Ina226.config(cfg);
+    return true;
+#else
+    (void)config;
+    return false;
+#endif
+}
+
+float m5u_power_ina226_get_bus_voltage_v(void) {
+#if M5U_HAS_INA226
+    return M5.Power.Ina226.getBusVoltage();
+#else
+    return 0.0f;
+#endif
+}
+
+float m5u_power_ina226_get_shunt_voltage_v(void) {
+#if M5U_HAS_INA226
+    return M5.Power.Ina226.getShuntVoltage();
+#else
+    return 0.0f;
+#endif
+}
+
+float m5u_power_ina226_get_shunt_current_a(void) {
+#if M5U_HAS_INA226
+    return M5.Power.Ina226.getShuntCurrent();
+#else
+    return 0.0f;
+#endif
+}
+
+float m5u_power_ina226_get_power_w(void) {
+#if M5U_HAS_INA226
+    return M5.Power.Ina226.getPower();
 #else
     return 0.0f;
 #endif

@@ -348,6 +348,14 @@ typedef struct {
     bool enable;
     bool direction_output;
 } m5u_power_ext_port_bus_t;
+typedef struct {
+    float shunt_res;
+    float max_expected_current;
+    uint8_t sampling_rate;
+    uint8_t shunt_conversion_time;
+    uint8_t bus_conversion_time;
+    uint8_t mode;
+} m5u_power_ina226_config_t;
 bool m5u_power_begin(void);
 int m5u_power_get_type(void);
 int m5u_power_get_charge_state(void);
@@ -386,6 +394,12 @@ int16_t m5u_power_bq27220_get_current_ma(void);
 int16_t m5u_power_bq27220_get_voltage_mv(void);
 float m5u_power_bq27220_get_current_a(void);
 float m5u_power_bq27220_get_voltage_v(void);
+bool m5u_power_ina226_begin(void);
+bool m5u_power_ina226_config(const m5u_power_ina226_config_t* config);
+float m5u_power_ina226_get_bus_voltage_v(void);
+float m5u_power_ina226_get_shunt_voltage_v(void);
+float m5u_power_ina226_get_shunt_current_a(void);
+float m5u_power_ina226_get_power_w(void);
 bool m5u_power_py32pmic_begin(void);
 bool m5u_power_py32pmic_set_ext_output(bool enable);
 bool m5u_power_py32pmic_set_battery_charge(bool enable);

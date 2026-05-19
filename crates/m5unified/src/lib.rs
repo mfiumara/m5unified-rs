@@ -59,8 +59,8 @@ pub use led::{Led, LedColor, LedType};
 pub use log::{Log, LogLevel, LogTarget, RawLogCallback};
 pub use power::{
     Aw32001, Aw32001ChargeStatus, Axp2101, Axp2101ChargeStatus, Axp2101IrqStatus, Axp2101PekPress,
-    Bq27220, ChargeState, ExtPortBusConfig, ExtPortMask, Power, PowerType, Py32Pmic,
-    Py32PmicPekPress,
+    Bq27220, ChargeState, ExtPortBusConfig, ExtPortMask, Ina226, Ina226Config,
+    Ina226ConversionTime, Ina226Mode, Ina226Sampling, Power, PowerType, Py32Pmic, Py32PmicPekPress,
 };
 pub use rtc::{Date, DateTime, Rtc, Time};
 pub use sd::{
@@ -662,6 +662,25 @@ mod tests {
         assert_eq!(bq.voltage_mv(), 0);
         assert_eq!(bq.current_a(), 0.0);
         assert_eq!(bq.voltage_v(), 0.0);
+        let ina = m5.power.ina226();
+        assert!(!ina.begin());
+        let ina_config = Ina226Config {
+            shunt_res_ohm: 0.005,
+            max_expected_current_a: 2.0,
+            sampling_rate: Ina226Sampling::Rate16,
+            shunt_conversion_time: Ina226ConversionTime::Us1100,
+            bus_conversion_time: Ina226ConversionTime::Us1100,
+            mode: Ina226Mode::ShuntAndBus,
+        };
+        assert!(!ina.configure(ina_config));
+        assert_eq!(Ina226Sampling::Rate16.raw(), 2);
+        assert_eq!(Ina226ConversionTime::Us1100.raw(), 4);
+        assert_eq!(Ina226Mode::ShuntAndBus.raw(), 7);
+        assert_eq!(Ina226Mode::from_raw(4), Ina226Mode::Raw(4));
+        assert_eq!(ina.bus_voltage_v(), 0.0);
+        assert_eq!(ina.shunt_voltage_v(), 0.0);
+        assert_eq!(ina.shunt_current_a(), 0.0);
+        assert_eq!(ina.power_w(), 0.0);
         let py32 = m5.power.py32pmic();
         assert!(!py32.begin());
         assert!(!py32.set_ext_output(true));

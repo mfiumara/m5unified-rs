@@ -197,6 +197,30 @@ impl Default for m5u_power_ext_port_bus_t {
 }
 
 #[repr(C)]
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct m5u_power_ina226_config_t {
+    pub shunt_res: c_float,
+    pub max_expected_current: c_float,
+    pub sampling_rate: u8,
+    pub shunt_conversion_time: u8,
+    pub bus_conversion_time: u8,
+    pub mode: u8,
+}
+
+impl Default for m5u_power_ina226_config_t {
+    fn default() -> Self {
+        Self {
+            shunt_res: 0.1,
+            max_expected_current: 2.0,
+            sampling_rate: 0b010,
+            shunt_conversion_time: 0b100,
+            bus_conversion_time: 0b100,
+            mode: 0b111,
+        }
+    }
+}
+
+#[repr(C)]
 #[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]
 pub struct m5u_led_color_t {
     pub r: u8,
@@ -665,6 +689,12 @@ extern "C" {
     pub fn m5u_power_bq27220_get_voltage_mv() -> i16;
     pub fn m5u_power_bq27220_get_current_a() -> c_float;
     pub fn m5u_power_bq27220_get_voltage_v() -> c_float;
+    pub fn m5u_power_ina226_begin() -> bool;
+    pub fn m5u_power_ina226_config(config: *const m5u_power_ina226_config_t) -> bool;
+    pub fn m5u_power_ina226_get_bus_voltage_v() -> c_float;
+    pub fn m5u_power_ina226_get_shunt_voltage_v() -> c_float;
+    pub fn m5u_power_ina226_get_shunt_current_a() -> c_float;
+    pub fn m5u_power_ina226_get_power_w() -> c_float;
     pub fn m5u_power_py32pmic_begin() -> bool;
     pub fn m5u_power_py32pmic_set_ext_output(enable: bool) -> bool;
     pub fn m5u_power_py32pmic_set_battery_charge(enable: bool) -> bool;
@@ -1673,6 +1703,24 @@ mod host_stubs {
         0.0
     }
     pub unsafe fn m5u_power_bq27220_get_voltage_v() -> c_float {
+        0.0
+    }
+    pub unsafe fn m5u_power_ina226_begin() -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_ina226_config(_config: *const m5u_power_ina226_config_t) -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_ina226_get_bus_voltage_v() -> c_float {
+        0.0
+    }
+    pub unsafe fn m5u_power_ina226_get_shunt_voltage_v() -> c_float {
+        0.0
+    }
+    pub unsafe fn m5u_power_ina226_get_shunt_current_a() -> c_float {
+        0.0
+    }
+    pub unsafe fn m5u_power_ina226_get_power_w() -> c_float {
         0.0
     }
     pub unsafe fn m5u_power_py32pmic_begin() -> bool {
