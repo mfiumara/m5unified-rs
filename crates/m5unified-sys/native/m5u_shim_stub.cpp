@@ -764,6 +764,14 @@ void m5u_display_fill_arc(int x, int y, int r0, int r1, float angle0, float angl
     (void)x; (void)y; (void)r0; (void)r1; (void)angle0; (void)angle1; (void)color;
 }
 
+void m5u_display_draw_ellipse_arc(int x, int y, int r0x, int r1x, int r0y, int r1y, float angle0, float angle1, uint16_t color) {
+    (void)x; (void)y; (void)r0x; (void)r1x; (void)r0y; (void)r1y; (void)angle0; (void)angle1; (void)color;
+}
+
+void m5u_display_fill_ellipse_arc(int x, int y, int r0x, int r1x, int r0y, int r1y, float angle0, float angle1, uint16_t color) {
+    (void)x; (void)y; (void)r0x; (void)r1x; (void)r0y; (void)r1y; (void)angle0; (void)angle1; (void)color;
+}
+
 void m5u_display_draw_bezier3(int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color) {
     (void)x0; (void)y0; (void)x1; (void)y1; (void)x2; (void)y2; (void)color;
 }
@@ -788,12 +796,42 @@ void m5u_display_draw_gradient_line(int x0, int y0, int x1, int y1, uint16_t sta
     (void)x0; (void)y0; (void)x1; (void)y1; (void)start_color; (void)end_color;
 }
 
+void m5u_display_draw_spot(int x, int y, float radius, uint16_t color) {
+    (void)x; (void)y; (void)radius; (void)color;
+}
+
+void m5u_display_fill_smooth_circle(int x, int y, int r, uint16_t color) {
+    (void)x; (void)y; (void)r; (void)color;
+}
+
+void m5u_display_fill_smooth_round_rect(int x, int y, int w, int h, int r, uint16_t color) {
+    (void)x; (void)y; (void)w; (void)h; (void)r; (void)color;
+}
+
+void m5u_display_fill_gradient_rect(int x, int y, int w, int h, uint16_t start_color, uint16_t end_color, int style) {
+    (void)x; (void)y; (void)w; (void)h; (void)start_color; (void)end_color; (void)style;
+}
+
+void m5u_display_flood_fill(int x, int y, uint16_t color) {
+    (void)x; (void)y; (void)color;
+}
+
 void m5u_display_set_scroll_rect(int x, int y, int w, int h) {
     (void)x; (void)y; (void)w; (void)h;
 }
 
 void m5u_display_set_scroll_rect_color(int x, int y, int w, int h, uint16_t color) {
     (void)x; (void)y; (void)w; (void)h; (void)color;
+}
+
+void m5u_display_get_scroll_rect(int* x, int* y, int* w, int* h) {
+    if (x) { *x = 0; }
+    if (y) { *y = 0; }
+    if (w) { *w = 0; }
+    if (h) { *h = 0; }
+}
+
+void m5u_display_clear_scroll_rect(void) {
 }
 
 void m5u_display_scroll(int dx, int dy) {
@@ -828,11 +866,30 @@ void m5u_display_set_clip_rect(int x, int y, int w, int h) {
     (void)x; (void)y; (void)w; (void)h;
 }
 
+void m5u_display_get_clip_rect(int* x, int* y, int* w, int* h) {
+    if (x) { *x = 0; }
+    if (y) { *y = 0; }
+    if (w) { *w = 0; }
+    if (h) { *h = 0; }
+}
+
 void m5u_display_clear_clip_rect(void) {
 }
 
 uint16_t m5u_display_color888(uint8_t r, uint8_t g, uint8_t b) {
     return (uint16_t)((r & 0xF8) << 8 | (g & 0xFC) << 3 | (b >> 3));
+}
+
+void m5u_display_set_pivot(float x, float y) {
+    (void)x; (void)y;
+}
+
+float m5u_display_get_pivot_x(void) {
+    return 0.0f;
+}
+
+float m5u_display_get_pivot_y(void) {
+    return 0.0f;
 }
 
 bool m5u_display_push_image_rgb565(int x, int y, int w, int h, const uint16_t* data) {
@@ -1014,6 +1071,14 @@ void m5u_display_fill_arc_at(int index, int x, int y, int r0, int r1, float angl
     (void)index; (void)x; (void)y; (void)r0; (void)r1; (void)angle0; (void)angle1; (void)color;
 }
 
+void m5u_display_draw_ellipse_arc_at(int index, int x, int y, int r0x, int r1x, int r0y, int r1y, float angle0, float angle1, uint16_t color) {
+    (void)index; (void)x; (void)y; (void)r0x; (void)r1x; (void)r0y; (void)r1y; (void)angle0; (void)angle1; (void)color;
+}
+
+void m5u_display_fill_ellipse_arc_at(int index, int x, int y, int r0x, int r1x, int r0y, int r1y, float angle0, float angle1, uint16_t color) {
+    (void)index; (void)x; (void)y; (void)r0x; (void)r1x; (void)r0y; (void)r1y; (void)angle0; (void)angle1; (void)color;
+}
+
 void m5u_display_draw_bezier3_at(int index, int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color) {
     (void)index; (void)x0; (void)y0; (void)x1; (void)y1; (void)x2; (void)y2; (void)color;
 }
@@ -1038,12 +1103,44 @@ void m5u_display_draw_gradient_line_at(int index, int x0, int y0, int x1, int y1
     (void)index; (void)x0; (void)y0; (void)x1; (void)y1; (void)start_color; (void)end_color;
 }
 
+void m5u_display_draw_spot_at(int index, int x, int y, float radius, uint16_t color) {
+    (void)index; (void)x; (void)y; (void)radius; (void)color;
+}
+
+void m5u_display_fill_smooth_circle_at(int index, int x, int y, int r, uint16_t color) {
+    (void)index; (void)x; (void)y; (void)r; (void)color;
+}
+
+void m5u_display_fill_smooth_round_rect_at(int index, int x, int y, int w, int h, int r, uint16_t color) {
+    (void)index; (void)x; (void)y; (void)w; (void)h; (void)r; (void)color;
+}
+
+void m5u_display_fill_gradient_rect_at(int index, int x, int y, int w, int h, uint16_t start_color, uint16_t end_color, int style) {
+    (void)index; (void)x; (void)y; (void)w; (void)h; (void)start_color; (void)end_color; (void)style;
+}
+
+void m5u_display_flood_fill_at(int index, int x, int y, uint16_t color) {
+    (void)index; (void)x; (void)y; (void)color;
+}
+
 void m5u_display_set_scroll_rect_at(int index, int x, int y, int w, int h) {
     (void)index; (void)x; (void)y; (void)w; (void)h;
 }
 
 void m5u_display_set_scroll_rect_color_at(int index, int x, int y, int w, int h, uint16_t color) {
     (void)index; (void)x; (void)y; (void)w; (void)h; (void)color;
+}
+
+void m5u_display_get_scroll_rect_at(int index, int* x, int* y, int* w, int* h) {
+    (void)index;
+    if (x) { *x = 0; }
+    if (y) { *y = 0; }
+    if (w) { *w = 0; }
+    if (h) { *h = 0; }
+}
+
+void m5u_display_clear_scroll_rect_at(int index) {
+    (void)index;
 }
 
 void m5u_display_scroll_at(int index, int dx, int dy) {
@@ -1072,6 +1169,34 @@ float m5u_display_get_text_size_x_at(int index) {
 
 float m5u_display_get_text_size_y_at(int index) {
     (void)index; return 1.0f;
+}
+
+void m5u_display_set_clip_rect_at(int index, int x, int y, int w, int h) {
+    (void)index; (void)x; (void)y; (void)w; (void)h;
+}
+
+void m5u_display_get_clip_rect_at(int index, int* x, int* y, int* w, int* h) {
+    (void)index;
+    if (x) { *x = 0; }
+    if (y) { *y = 0; }
+    if (w) { *w = 0; }
+    if (h) { *h = 0; }
+}
+
+void m5u_display_clear_clip_rect_at(int index) {
+    (void)index;
+}
+
+void m5u_display_set_pivot_at(int index, float x, float y) {
+    (void)index; (void)x; (void)y;
+}
+
+float m5u_display_get_pivot_x_at(int index) {
+    (void)index; return 0.0f;
+}
+
+float m5u_display_get_pivot_y_at(int index) {
+    (void)index; return 0.0f;
 }
 
 bool m5u_display_push_image_rgb565_at(int index, int x, int y, int w, int h, const uint16_t* data) {

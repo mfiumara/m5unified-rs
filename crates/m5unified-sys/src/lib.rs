@@ -661,6 +661,28 @@ extern "C" {
         angle1: c_float,
         color: u16,
     );
+    pub fn m5u_display_draw_ellipse_arc(
+        x: c_int,
+        y: c_int,
+        r0x: c_int,
+        r1x: c_int,
+        r0y: c_int,
+        r1y: c_int,
+        angle0: c_float,
+        angle1: c_float,
+        color: u16,
+    );
+    pub fn m5u_display_fill_ellipse_arc(
+        x: c_int,
+        y: c_int,
+        r0x: c_int,
+        r1x: c_int,
+        r0y: c_int,
+        r1y: c_int,
+        angle0: c_float,
+        angle1: c_float,
+        color: u16,
+    );
     pub fn m5u_display_draw_bezier3(
         x0: c_int,
         y0: c_int,
@@ -707,8 +729,30 @@ extern "C" {
         start_color: u16,
         end_color: u16,
     );
+    pub fn m5u_display_draw_spot(x: c_int, y: c_int, radius: c_float, color: u16);
+    pub fn m5u_display_fill_smooth_circle(x: c_int, y: c_int, r: c_int, color: u16);
+    pub fn m5u_display_fill_smooth_round_rect(
+        x: c_int,
+        y: c_int,
+        w: c_int,
+        h: c_int,
+        r: c_int,
+        color: u16,
+    );
+    pub fn m5u_display_fill_gradient_rect(
+        x: c_int,
+        y: c_int,
+        w: c_int,
+        h: c_int,
+        start_color: u16,
+        end_color: u16,
+        style: c_int,
+    );
+    pub fn m5u_display_flood_fill(x: c_int, y: c_int, color: u16);
     pub fn m5u_display_set_scroll_rect(x: c_int, y: c_int, w: c_int, h: c_int);
     pub fn m5u_display_set_scroll_rect_color(x: c_int, y: c_int, w: c_int, h: c_int, color: u16);
+    pub fn m5u_display_get_scroll_rect(x: *mut c_int, y: *mut c_int, w: *mut c_int, h: *mut c_int);
+    pub fn m5u_display_clear_scroll_rect();
     pub fn m5u_display_scroll(dx: c_int, dy: c_int);
     pub fn m5u_display_text_width(text: *const c_char) -> c_int;
     pub fn m5u_display_get_text_datum() -> c_int;
@@ -717,8 +761,12 @@ extern "C" {
     pub fn m5u_display_get_text_size_x() -> c_float;
     pub fn m5u_display_get_text_size_y() -> c_float;
     pub fn m5u_display_set_clip_rect(x: c_int, y: c_int, w: c_int, h: c_int);
+    pub fn m5u_display_get_clip_rect(x: *mut c_int, y: *mut c_int, w: *mut c_int, h: *mut c_int);
     pub fn m5u_display_clear_clip_rect();
     pub fn m5u_display_color888(r: u8, g: u8, b: u8) -> u16;
+    pub fn m5u_display_set_pivot(x: c_float, y: c_float);
+    pub fn m5u_display_get_pivot_x() -> c_float;
+    pub fn m5u_display_get_pivot_y() -> c_float;
     pub fn m5u_display_push_image_rgb565(
         x: c_int,
         y: c_int,
@@ -880,6 +928,30 @@ extern "C" {
         angle1: c_float,
         color: u16,
     );
+    pub fn m5u_display_draw_ellipse_arc_at(
+        index: c_int,
+        x: c_int,
+        y: c_int,
+        r0x: c_int,
+        r1x: c_int,
+        r0y: c_int,
+        r1y: c_int,
+        angle0: c_float,
+        angle1: c_float,
+        color: u16,
+    );
+    pub fn m5u_display_fill_ellipse_arc_at(
+        index: c_int,
+        x: c_int,
+        y: c_int,
+        r0x: c_int,
+        r1x: c_int,
+        r0y: c_int,
+        r1y: c_int,
+        angle0: c_float,
+        angle1: c_float,
+        color: u16,
+    );
     pub fn m5u_display_draw_bezier3_at(
         index: c_int,
         x0: c_int,
@@ -938,6 +1010,34 @@ extern "C" {
         start_color: u16,
         end_color: u16,
     );
+    pub fn m5u_display_draw_spot_at(index: c_int, x: c_int, y: c_int, radius: c_float, color: u16);
+    pub fn m5u_display_fill_smooth_circle_at(
+        index: c_int,
+        x: c_int,
+        y: c_int,
+        r: c_int,
+        color: u16,
+    );
+    pub fn m5u_display_fill_smooth_round_rect_at(
+        index: c_int,
+        x: c_int,
+        y: c_int,
+        w: c_int,
+        h: c_int,
+        r: c_int,
+        color: u16,
+    );
+    pub fn m5u_display_fill_gradient_rect_at(
+        index: c_int,
+        x: c_int,
+        y: c_int,
+        w: c_int,
+        h: c_int,
+        start_color: u16,
+        end_color: u16,
+        style: c_int,
+    );
+    pub fn m5u_display_flood_fill_at(index: c_int, x: c_int, y: c_int, color: u16);
     pub fn m5u_display_set_scroll_rect_at(index: c_int, x: c_int, y: c_int, w: c_int, h: c_int);
     pub fn m5u_display_set_scroll_rect_color_at(
         index: c_int,
@@ -947,6 +1047,14 @@ extern "C" {
         h: c_int,
         color: u16,
     );
+    pub fn m5u_display_get_scroll_rect_at(
+        index: c_int,
+        x: *mut c_int,
+        y: *mut c_int,
+        w: *mut c_int,
+        h: *mut c_int,
+    );
+    pub fn m5u_display_clear_scroll_rect_at(index: c_int);
     pub fn m5u_display_scroll_at(index: c_int, dx: c_int, dy: c_int);
     pub fn m5u_display_text_width_at(index: c_int, text: *const c_char) -> c_int;
     pub fn m5u_display_get_text_datum_at(index: c_int) -> c_int;
@@ -954,6 +1062,18 @@ extern "C" {
     pub fn m5u_display_get_text_padding_at(index: c_int) -> u32;
     pub fn m5u_display_get_text_size_x_at(index: c_int) -> c_float;
     pub fn m5u_display_get_text_size_y_at(index: c_int) -> c_float;
+    pub fn m5u_display_set_clip_rect_at(index: c_int, x: c_int, y: c_int, w: c_int, h: c_int);
+    pub fn m5u_display_get_clip_rect_at(
+        index: c_int,
+        x: *mut c_int,
+        y: *mut c_int,
+        w: *mut c_int,
+        h: *mut c_int,
+    );
+    pub fn m5u_display_clear_clip_rect_at(index: c_int);
+    pub fn m5u_display_set_pivot_at(index: c_int, x: c_float, y: c_float);
+    pub fn m5u_display_get_pivot_x_at(index: c_int) -> c_float;
+    pub fn m5u_display_get_pivot_y_at(index: c_int) -> c_float;
     pub fn m5u_display_push_image_rgb565_at(
         index: c_int,
         x: c_int,
@@ -2018,6 +2138,30 @@ mod host_stubs {
         _color: u16,
     ) {
     }
+    pub unsafe fn m5u_display_draw_ellipse_arc(
+        _x: c_int,
+        _y: c_int,
+        _r0x: c_int,
+        _r1x: c_int,
+        _r0y: c_int,
+        _r1y: c_int,
+        _angle0: c_float,
+        _angle1: c_float,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_fill_ellipse_arc(
+        _x: c_int,
+        _y: c_int,
+        _r0x: c_int,
+        _r1x: c_int,
+        _r0y: c_int,
+        _r1y: c_int,
+        _angle0: c_float,
+        _angle1: c_float,
+        _color: u16,
+    ) {
+    }
     pub unsafe fn m5u_display_draw_bezier3(
         _x0: c_int,
         _y0: c_int,
@@ -2076,6 +2220,28 @@ mod host_stubs {
         _end_color: u16,
     ) {
     }
+    pub unsafe fn m5u_display_draw_spot(_x: c_int, _y: c_int, _radius: c_float, _color: u16) {}
+    pub unsafe fn m5u_display_fill_smooth_circle(_x: c_int, _y: c_int, _r: c_int, _color: u16) {}
+    pub unsafe fn m5u_display_fill_smooth_round_rect(
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _h: c_int,
+        _r: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_fill_gradient_rect(
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _h: c_int,
+        _start_color: u16,
+        _end_color: u16,
+        _style: c_int,
+    ) {
+    }
+    pub unsafe fn m5u_display_flood_fill(_x: c_int, _y: c_int, _color: u16) {}
     pub unsafe fn m5u_display_set_scroll_rect(_x: c_int, _y: c_int, _w: c_int, _h: c_int) {}
     pub unsafe fn m5u_display_set_scroll_rect_color(
         _x: c_int,
@@ -2085,6 +2251,26 @@ mod host_stubs {
         _color: u16,
     ) {
     }
+    pub unsafe fn m5u_display_get_scroll_rect(
+        x: *mut c_int,
+        y: *mut c_int,
+        w: *mut c_int,
+        h: *mut c_int,
+    ) {
+        if !x.is_null() {
+            ptr::write(x, 0);
+        }
+        if !y.is_null() {
+            ptr::write(y, 0);
+        }
+        if !w.is_null() {
+            ptr::write(w, 0);
+        }
+        if !h.is_null() {
+            ptr::write(h, 0);
+        }
+    }
+    pub unsafe fn m5u_display_clear_scroll_rect() {}
     pub unsafe fn m5u_display_scroll(_dx: c_int, _dy: c_int) {}
     pub unsafe fn m5u_display_text_width(_text: *const c_char) -> c_int {
         0
@@ -2103,9 +2289,35 @@ mod host_stubs {
         1.0
     }
     pub unsafe fn m5u_display_set_clip_rect(_x: c_int, _y: c_int, _w: c_int, _h: c_int) {}
+    pub unsafe fn m5u_display_get_clip_rect(
+        x: *mut c_int,
+        y: *mut c_int,
+        w: *mut c_int,
+        h: *mut c_int,
+    ) {
+        if !x.is_null() {
+            ptr::write(x, 0);
+        }
+        if !y.is_null() {
+            ptr::write(y, 0);
+        }
+        if !w.is_null() {
+            ptr::write(w, 0);
+        }
+        if !h.is_null() {
+            ptr::write(h, 0);
+        }
+    }
     pub unsafe fn m5u_display_clear_clip_rect() {}
     pub unsafe fn m5u_display_color888(r: u8, g: u8, b: u8) -> u16 {
         ((u16::from(r & 0xF8)) << 8) | ((u16::from(g & 0xFC)) << 3) | u16::from(b >> 3)
+    }
+    pub unsafe fn m5u_display_set_pivot(_x: c_float, _y: c_float) {}
+    pub unsafe fn m5u_display_get_pivot_x() -> c_float {
+        0.0
+    }
+    pub unsafe fn m5u_display_get_pivot_y() -> c_float {
+        0.0
     }
     pub unsafe fn m5u_display_push_image_rgb565(
         _x: c_int,
@@ -2357,6 +2569,32 @@ mod host_stubs {
         _color: u16,
     ) {
     }
+    pub unsafe fn m5u_display_draw_ellipse_arc_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _r0x: c_int,
+        _r1x: c_int,
+        _r0y: c_int,
+        _r1y: c_int,
+        _angle0: c_float,
+        _angle1: c_float,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_fill_ellipse_arc_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _r0x: c_int,
+        _r1x: c_int,
+        _r0y: c_int,
+        _r1y: c_int,
+        _angle0: c_float,
+        _angle1: c_float,
+        _color: u16,
+    ) {
+    }
     pub unsafe fn m5u_display_draw_bezier3_at(
         _index: c_int,
         _x0: c_int,
@@ -2421,6 +2659,44 @@ mod host_stubs {
         _end_color: u16,
     ) {
     }
+    pub unsafe fn m5u_display_draw_spot_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _radius: c_float,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_fill_smooth_circle_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _r: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_fill_smooth_round_rect_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _h: c_int,
+        _r: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_fill_gradient_rect_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _h: c_int,
+        _start_color: u16,
+        _end_color: u16,
+        _style: c_int,
+    ) {
+    }
+    pub unsafe fn m5u_display_flood_fill_at(_index: c_int, _x: c_int, _y: c_int, _color: u16) {}
     pub unsafe fn m5u_display_set_scroll_rect_at(
         _index: c_int,
         _x: c_int,
@@ -2438,6 +2714,27 @@ mod host_stubs {
         _color: u16,
     ) {
     }
+    pub unsafe fn m5u_display_get_scroll_rect_at(
+        _index: c_int,
+        x: *mut c_int,
+        y: *mut c_int,
+        w: *mut c_int,
+        h: *mut c_int,
+    ) {
+        if !x.is_null() {
+            ptr::write(x, 0);
+        }
+        if !y.is_null() {
+            ptr::write(y, 0);
+        }
+        if !w.is_null() {
+            ptr::write(w, 0);
+        }
+        if !h.is_null() {
+            ptr::write(h, 0);
+        }
+    }
+    pub unsafe fn m5u_display_clear_scroll_rect_at(_index: c_int) {}
     pub unsafe fn m5u_display_scroll_at(_index: c_int, _dx: c_int, _dy: c_int) {}
     pub unsafe fn m5u_display_text_width_at(_index: c_int, _text: *const c_char) -> c_int {
         0
@@ -2454,6 +2751,42 @@ mod host_stubs {
     }
     pub unsafe fn m5u_display_get_text_size_y_at(_index: c_int) -> c_float {
         1.0
+    }
+    pub unsafe fn m5u_display_set_clip_rect_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _h: c_int,
+    ) {
+    }
+    pub unsafe fn m5u_display_get_clip_rect_at(
+        _index: c_int,
+        x: *mut c_int,
+        y: *mut c_int,
+        w: *mut c_int,
+        h: *mut c_int,
+    ) {
+        if !x.is_null() {
+            ptr::write(x, 0);
+        }
+        if !y.is_null() {
+            ptr::write(y, 0);
+        }
+        if !w.is_null() {
+            ptr::write(w, 0);
+        }
+        if !h.is_null() {
+            ptr::write(h, 0);
+        }
+    }
+    pub unsafe fn m5u_display_clear_clip_rect_at(_index: c_int) {}
+    pub unsafe fn m5u_display_set_pivot_at(_index: c_int, _x: c_float, _y: c_float) {}
+    pub unsafe fn m5u_display_get_pivot_x_at(_index: c_int) -> c_float {
+        0.0
+    }
+    pub unsafe fn m5u_display_get_pivot_y_at(_index: c_int) -> c_float {
+        0.0
     }
     pub unsafe fn m5u_display_push_image_rgb565_at(
         _index: c_int,

@@ -273,6 +273,38 @@ impl Display {
         }
     }
 
+    pub fn draw_ellipse_arc(
+        &mut self,
+        center: Point,
+        inner: Size,
+        outer: Size,
+        angle0: f32,
+        angle1: f32,
+        color: u16,
+    ) {
+        unsafe {
+            m5unified_sys::m5u_display_draw_ellipse_arc(
+                center.x, center.y, inner.w, outer.w, inner.h, outer.h, angle0, angle1, color,
+            )
+        }
+    }
+
+    pub fn fill_ellipse_arc(
+        &mut self,
+        center: Point,
+        inner: Size,
+        outer: Size,
+        angle0: f32,
+        angle1: f32,
+        color: u16,
+    ) {
+        unsafe {
+            m5unified_sys::m5u_display_fill_ellipse_arc(
+                center.x, center.y, inner.w, outer.w, inner.h, outer.h, angle0, angle1, color,
+            )
+        }
+    }
+
     pub fn draw_quadratic_bezier(&mut self, p0: Point, p1: Point, p2: Point, color: u16) {
         unsafe {
             m5unified_sys::m5u_display_draw_bezier3(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, color);
@@ -328,6 +360,54 @@ impl Display {
         }
     }
 
+    pub fn draw_spot(&mut self, center: Point, radius: f32, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_draw_spot(center.x, center.y, radius, color);
+        }
+    }
+
+    pub fn fill_smooth_circle(&mut self, center: Point, radius: i32, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_fill_smooth_circle(center.x, center.y, radius, color);
+        }
+    }
+
+    pub fn fill_smooth_round_rect(&mut self, rect: Rect, radius: i32, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_fill_smooth_round_rect(
+                rect.x, rect.y, rect.w, rect.h, radius, color,
+            );
+        }
+    }
+
+    pub fn fill_gradient_rect(
+        &mut self,
+        rect: Rect,
+        start_color: u16,
+        end_color: u16,
+        style: GradientFillStyle,
+    ) {
+        unsafe {
+            m5unified_sys::m5u_display_fill_gradient_rect(
+                rect.x,
+                rect.y,
+                rect.w,
+                rect.h,
+                start_color,
+                end_color,
+                style.raw() as c_int,
+            );
+        }
+    }
+
+    pub fn flood_fill(&mut self, point: Point, color: u16) {
+        unsafe { m5unified_sys::m5u_display_flood_fill(point.x, point.y, color) }
+    }
+
+    pub fn paint(&mut self, point: Point, color: u16) {
+        self.flood_fill(point, color);
+    }
+
     pub fn set_scroll_rect(&mut self, rect: Rect) {
         unsafe { m5unified_sys::m5u_display_set_scroll_rect(rect.x, rect.y, rect.w, rect.h) }
     }
@@ -336,6 +416,23 @@ impl Display {
         unsafe {
             m5unified_sys::m5u_display_set_scroll_rect_color(rect.x, rect.y, rect.w, rect.h, color);
         }
+    }
+
+    pub fn scroll_rect(&self) -> Rect {
+        let mut rect = Rect::default();
+        unsafe {
+            m5unified_sys::m5u_display_get_scroll_rect(
+                &mut rect.x,
+                &mut rect.y,
+                &mut rect.w,
+                &mut rect.h,
+            );
+        }
+        rect
+    }
+
+    pub fn clear_scroll_rect(&mut self) {
+        unsafe { m5unified_sys::m5u_display_clear_scroll_rect() }
     }
 
     pub fn scroll(&mut self, dx: i32, dy: i32) {
@@ -362,12 +459,41 @@ impl Display {
         unsafe { m5unified_sys::m5u_display_set_clip_rect(rect.x, rect.y, rect.w, rect.h) }
     }
 
+    pub fn clip_rect(&self) -> Rect {
+        let mut rect = Rect::default();
+        unsafe {
+            m5unified_sys::m5u_display_get_clip_rect(
+                &mut rect.x,
+                &mut rect.y,
+                &mut rect.w,
+                &mut rect.h,
+            );
+        }
+        rect
+    }
+
     pub fn clear_clip_rect(&mut self) {
         unsafe { m5unified_sys::m5u_display_clear_clip_rect() }
     }
 
     pub fn color888(&self, r: u8, g: u8, b: u8) -> u16 {
         unsafe { m5unified_sys::m5u_display_color888(r, g, b) }
+    }
+
+    pub fn set_pivot(&mut self, x: f32, y: f32) {
+        unsafe { m5unified_sys::m5u_display_set_pivot(x, y) }
+    }
+
+    pub fn pivot_x(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_display_get_pivot_x() }
+    }
+
+    pub fn pivot_y(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_display_get_pivot_y() }
+    }
+
+    pub fn pivot(&self) -> (f32, f32) {
+        (self.pivot_x(), self.pivot_y())
     }
 
     pub fn push_image_rgb565(&mut self, rect: Rect, pixels: &[u16]) -> Result<(), Error> {
@@ -475,7 +601,7 @@ pub struct Size {
     pub h: i32,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]
 pub struct Rect {
     pub x: i32,
     pub y: i32,
@@ -547,6 +673,23 @@ impl EpdMode {
             Self::Text => 2,
             Self::Fast => 3,
             Self::Fastest => 4,
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum GradientFillStyle {
+    HorizontalLinear,
+    VerticalLinear,
+    RadialCenter,
+}
+
+impl GradientFillStyle {
+    const fn raw(self) -> i32 {
+        match self {
+            Self::HorizontalLinear => 0,
+            Self::VerticalLinear => 1,
+            Self::RadialCenter => 2,
         }
     }
 }
@@ -804,6 +947,40 @@ impl DisplayRef {
         }
     }
 
+    pub fn draw_ellipse_arc(
+        &mut self,
+        center: Point,
+        inner: Size,
+        outer: Size,
+        angle0: f32,
+        angle1: f32,
+        color: u16,
+    ) {
+        unsafe {
+            m5unified_sys::m5u_display_draw_ellipse_arc_at(
+                self.index, center.x, center.y, inner.w, outer.w, inner.h, outer.h, angle0, angle1,
+                color,
+            );
+        }
+    }
+
+    pub fn fill_ellipse_arc(
+        &mut self,
+        center: Point,
+        inner: Size,
+        outer: Size,
+        angle0: f32,
+        angle1: f32,
+        color: u16,
+    ) {
+        unsafe {
+            m5unified_sys::m5u_display_fill_ellipse_arc_at(
+                self.index, center.x, center.y, inner.w, outer.w, inner.h, outer.h, angle0, angle1,
+                color,
+            );
+        }
+    }
+
     pub fn draw_quadratic_bezier(&mut self, p0: Point, p1: Point, p2: Point, color: u16) {
         unsafe {
             m5unified_sys::m5u_display_draw_bezier3_at(
@@ -864,6 +1041,57 @@ impl DisplayRef {
         }
     }
 
+    pub fn draw_spot(&mut self, center: Point, radius: f32, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_draw_spot_at(self.index, center.x, center.y, radius, color);
+        }
+    }
+
+    pub fn fill_smooth_circle(&mut self, center: Point, radius: i32, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_fill_smooth_circle_at(
+                self.index, center.x, center.y, radius, color,
+            );
+        }
+    }
+
+    pub fn fill_smooth_round_rect(&mut self, rect: Rect, radius: i32, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_fill_smooth_round_rect_at(
+                self.index, rect.x, rect.y, rect.w, rect.h, radius, color,
+            );
+        }
+    }
+
+    pub fn fill_gradient_rect(
+        &mut self,
+        rect: Rect,
+        start_color: u16,
+        end_color: u16,
+        style: GradientFillStyle,
+    ) {
+        unsafe {
+            m5unified_sys::m5u_display_fill_gradient_rect_at(
+                self.index,
+                rect.x,
+                rect.y,
+                rect.w,
+                rect.h,
+                start_color,
+                end_color,
+                style.raw() as c_int,
+            );
+        }
+    }
+
+    pub fn flood_fill(&mut self, point: Point, color: u16) {
+        unsafe { m5unified_sys::m5u_display_flood_fill_at(self.index, point.x, point.y, color) }
+    }
+
+    pub fn paint(&mut self, point: Point, color: u16) {
+        self.flood_fill(point, color);
+    }
+
     pub fn set_scroll_rect(&mut self, rect: Rect) {
         unsafe {
             m5unified_sys::m5u_display_set_scroll_rect_at(
@@ -878,6 +1106,24 @@ impl DisplayRef {
                 self.index, rect.x, rect.y, rect.w, rect.h, color,
             );
         }
+    }
+
+    pub fn scroll_rect(&self) -> Rect {
+        let mut rect = Rect::default();
+        unsafe {
+            m5unified_sys::m5u_display_get_scroll_rect_at(
+                self.index,
+                &mut rect.x,
+                &mut rect.y,
+                &mut rect.w,
+                &mut rect.h,
+            );
+        }
+        rect
+    }
+
+    pub fn clear_scroll_rect(&mut self) {
+        unsafe { m5unified_sys::m5u_display_clear_scroll_rect_at(self.index) }
     }
 
     pub fn scroll(&mut self, dx: i32, dy: i32) {
@@ -902,6 +1148,46 @@ impl DisplayRef {
 
     pub fn text_size_y(&self) -> f32 {
         unsafe { m5unified_sys::m5u_display_get_text_size_y_at(self.index) }
+    }
+
+    pub fn set_clip_rect(&mut self, rect: Rect) {
+        unsafe {
+            m5unified_sys::m5u_display_set_clip_rect_at(self.index, rect.x, rect.y, rect.w, rect.h);
+        }
+    }
+
+    pub fn clip_rect(&self) -> Rect {
+        let mut rect = Rect::default();
+        unsafe {
+            m5unified_sys::m5u_display_get_clip_rect_at(
+                self.index,
+                &mut rect.x,
+                &mut rect.y,
+                &mut rect.w,
+                &mut rect.h,
+            );
+        }
+        rect
+    }
+
+    pub fn clear_clip_rect(&mut self) {
+        unsafe { m5unified_sys::m5u_display_clear_clip_rect_at(self.index) }
+    }
+
+    pub fn set_pivot(&mut self, x: f32, y: f32) {
+        unsafe { m5unified_sys::m5u_display_set_pivot_at(self.index, x, y) }
+    }
+
+    pub fn pivot_x(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_display_get_pivot_x_at(self.index) }
+    }
+
+    pub fn pivot_y(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_display_get_pivot_y_at(self.index) }
+    }
+
+    pub fn pivot(&self) -> (f32, f32) {
+        (self.pivot_x(), self.pivot_y())
     }
 
     pub fn push_image_rgb565(&mut self, rect: Rect, pixels: &[u16]) -> Result<(), Error> {

@@ -51,8 +51,8 @@ pub use audio::{
 pub use buttons::{Button, ButtonId, ButtonState, Buttons};
 pub use config::{ExternalDisplayConfig, ExternalSpeakerConfig, M5UnifiedConfig};
 pub use display::{
-    colors, Color565, Display, DisplayFont, DisplayKind, DisplayRef, EpdMode, Point, Rect, Size,
-    TextDatum,
+    colors, Color565, Display, DisplayFont, DisplayKind, DisplayRef, EpdMode, GradientFillStyle,
+    Point, Rect, Size, TextDatum,
 };
 pub use error::Error;
 pub use i2c::{I2cBus, I2cDevice};
@@ -200,6 +200,12 @@ mod tests {
             w: 2,
             h: 2,
         };
+        let scroll_rect = Rect {
+            x: 0,
+            y: 0,
+            w: 16,
+            h: 16,
+        };
         let image = [colors::RED, colors::GREEN, colors::BLUE, colors::WHITE];
         m5.display.draw_triangle(p0, p1, p2, colors::YELLOW);
         m5.display.fill_triangle(p0, p1, p2, colors::CYAN);
@@ -209,6 +215,22 @@ mod tests {
             .draw_arc(Point { x: 40, y: 40 }, 8, 12, 0.0, 90.0, colors::GREEN);
         m5.display
             .fill_arc(Point { x: 45, y: 45 }, 6, 10, 90.0, 180.0, colors::BLUE);
+        m5.display.draw_ellipse_arc(
+            Point { x: 50, y: 50 },
+            Size { w: 4, h: 6 },
+            Size { w: 8, h: 12 },
+            0.0,
+            180.0,
+            colors::WHITE,
+        );
+        m5.display.fill_ellipse_arc(
+            Point { x: 55, y: 55 },
+            Size { w: 3, h: 5 },
+            Size { w: 7, h: 11 },
+            180.0,
+            270.0,
+            colors::RED,
+        );
         m5.display.draw_quadratic_bezier(p0, p1, p2, colors::WHITE);
         m5.display.draw_cubic_bezier(p0, p1, p2, p3, colors::WHITE);
         m5.display
@@ -219,14 +241,30 @@ mod tests {
             .draw_wedge_line(line_start, line_end, 0.5, 2.0, colors::CYAN);
         m5.display
             .draw_gradient_line(line_start, line_end, colors::RED, colors::BLUE);
-        let scroll_rect = Rect {
-            x: 0,
-            y: 0,
-            w: 16,
-            h: 16,
-        };
+        m5.display
+            .draw_spot(Point { x: 12, y: 12 }, 2.5, colors::WHITE);
+        m5.display
+            .fill_smooth_circle(Point { x: 14, y: 14 }, 4, colors::GREEN);
+        m5.display
+            .fill_smooth_round_rect(image_rect, 2, colors::BLUE);
+        m5.display.fill_gradient_rect(
+            scroll_rect,
+            colors::RED,
+            colors::BLUE,
+            GradientFillStyle::HorizontalLinear,
+        );
+        m5.display.fill_gradient_rect(
+            scroll_rect,
+            colors::RED,
+            colors::BLUE,
+            GradientFillStyle::RadialCenter,
+        );
+        m5.display.flood_fill(Point { x: 0, y: 0 }, colors::BLACK);
+        m5.display.paint(Point { x: 1, y: 1 }, colors::BLACK);
         m5.display.set_scroll_rect(scroll_rect);
         m5.display.set_scroll_rect_color(scroll_rect, colors::BLACK);
+        assert_eq!(m5.display.scroll_rect(), Rect::default());
+        m5.display.clear_scroll_rect();
         m5.display.scroll(1, -1);
         assert_eq!(m5.display.cursor_x(), 0);
         assert_eq!(m5.display.text_width("host").unwrap(), 0);
@@ -235,6 +273,11 @@ mod tests {
         assert_eq!(m5.display.text_padding(), 0);
         assert_eq!(m5.display.text_size_x(), 1.0);
         assert_eq!(m5.display.text_size_y(), 1.0);
+        m5.display.set_clip_rect(scroll_rect);
+        assert_eq!(m5.display.clip_rect(), Rect::default());
+        m5.display.clear_clip_rect();
+        m5.display.set_pivot(1.0, 2.0);
+        assert_eq!(m5.display.pivot(), (0.0, 0.0));
         assert_eq!(m5.display.push_image_rgb565(image_rect, &image), Ok(()));
         assert_eq!(
             m5.display
@@ -269,14 +312,43 @@ mod tests {
         display.fill_ellipse(32, 32, 6, 3, colors::RED);
         display.draw_arc(Point { x: 40, y: 40 }, 8, 12, 0.0, 90.0, colors::GREEN);
         display.fill_arc(Point { x: 45, y: 45 }, 6, 10, 90.0, 180.0, colors::BLUE);
+        display.draw_ellipse_arc(
+            Point { x: 50, y: 50 },
+            Size { w: 4, h: 6 },
+            Size { w: 8, h: 12 },
+            0.0,
+            180.0,
+            colors::WHITE,
+        );
+        display.fill_ellipse_arc(
+            Point { x: 55, y: 55 },
+            Size { w: 3, h: 5 },
+            Size { w: 7, h: 11 },
+            180.0,
+            270.0,
+            colors::RED,
+        );
         display.draw_quadratic_bezier(p0, p1, p2, colors::WHITE);
         display.draw_cubic_bezier(p0, p1, p2, p3, colors::WHITE);
         display.draw_smooth_line(line_start, line_end, colors::CYAN);
         display.draw_wide_line(line_start, line_end, 1.5, colors::CYAN);
         display.draw_wedge_line(line_start, line_end, 0.5, 2.0, colors::CYAN);
         display.draw_gradient_line(line_start, line_end, colors::RED, colors::BLUE);
+        display.draw_spot(Point { x: 12, y: 12 }, 2.5, colors::WHITE);
+        display.fill_smooth_circle(Point { x: 14, y: 14 }, 4, colors::GREEN);
+        display.fill_smooth_round_rect(image_rect, 2, colors::BLUE);
+        display.fill_gradient_rect(
+            scroll_rect,
+            colors::RED,
+            colors::BLUE,
+            GradientFillStyle::VerticalLinear,
+        );
+        display.flood_fill(Point { x: 0, y: 0 }, colors::BLACK);
+        display.paint(Point { x: 1, y: 1 }, colors::BLACK);
         display.set_scroll_rect(scroll_rect);
         display.set_scroll_rect_color(scroll_rect, colors::BLACK);
+        assert_eq!(display.scroll_rect(), Rect::default());
+        display.clear_scroll_rect();
         display.scroll(1, -1);
         assert_eq!(display.cursor_x(), 0);
         assert_eq!(display.cursor_y(), 0);
@@ -286,6 +358,11 @@ mod tests {
         assert_eq!(display.text_padding(), 0);
         assert_eq!(display.text_size_x(), 1.0);
         assert_eq!(display.text_size_y(), 1.0);
+        display.set_clip_rect(scroll_rect);
+        assert_eq!(display.clip_rect(), Rect::default());
+        display.clear_clip_rect();
+        display.set_pivot(1.0, 2.0);
+        assert_eq!(display.pivot(), (0.0, 0.0));
         assert_eq!(display.push_image_rgb565(image_rect, &image), Ok(()));
         assert_eq!(
             display.push_image_rgb565_transparent(image_rect, &image, colors::BLACK),

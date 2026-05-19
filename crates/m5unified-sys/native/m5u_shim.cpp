@@ -1438,6 +1438,14 @@ void m5u_display_fill_arc(int x, int y, int r0, int r1, float angle0, float angl
     M5.Display.fillArc(x, y, r0, r1, angle0, angle1, color);
 }
 
+void m5u_display_draw_ellipse_arc(int x, int y, int r0x, int r1x, int r0y, int r1y, float angle0, float angle1, uint16_t color) {
+    M5.Display.drawEllipseArc(x, y, r0x, r1x, r0y, r1y, angle0, angle1, color);
+}
+
+void m5u_display_fill_ellipse_arc(int x, int y, int r0x, int r1x, int r0y, int r1y, float angle0, float angle1, uint16_t color) {
+    M5.Display.fillEllipseArc(x, y, r0x, r1x, r0y, r1y, angle0, angle1, color);
+}
+
 void m5u_display_draw_bezier3(int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color) {
     M5.Display.drawBezier(x0, y0, x1, y1, x2, y2, color);
 }
@@ -1462,12 +1470,63 @@ void m5u_display_draw_gradient_line(int x0, int y0, int x1, int y1, uint16_t sta
     M5.Display.drawGradientLine(x0, y0, x1, y1, start_color, end_color);
 }
 
+void m5u_display_draw_spot(int x, int y, float radius, uint16_t color) {
+    M5.Display.drawSpot(x, y, radius, color);
+}
+
+void m5u_display_fill_smooth_circle(int x, int y, int r, uint16_t color) {
+    M5.Display.fillSmoothCircle(x, y, r, color);
+}
+
+void m5u_display_fill_smooth_round_rect(int x, int y, int w, int h, int r, uint16_t color) {
+    M5.Display.fillSmoothRoundRect(x, y, w, h, r, color);
+}
+
+static m5gfx::fill_style_t m5u_display_gradient_style(int style) {
+    switch (style) {
+    case 0:
+        return m5gfx::HLINEAR;
+    case 1:
+        return m5gfx::VLINEAR;
+    case 2:
+    default:
+        return m5gfx::RADIAL;
+    }
+}
+
+void m5u_display_fill_gradient_rect(int x, int y, int w, int h, uint16_t start_color, uint16_t end_color, int style) {
+    if (w <= 0 || h <= 0) {
+        return;
+    }
+    M5.Display.fillGradientRect(x, y, (uint32_t)w, (uint32_t)h, start_color, end_color, m5u_display_gradient_style(style));
+}
+
+void m5u_display_flood_fill(int x, int y, uint16_t color) {
+    M5.Display.floodFill(x, y, color);
+}
+
 void m5u_display_set_scroll_rect(int x, int y, int w, int h) {
     M5.Display.setScrollRect(x, y, w, h);
 }
 
 void m5u_display_set_scroll_rect_color(int x, int y, int w, int h, uint16_t color) {
     M5.Display.setScrollRect(x, y, w, h, color);
+}
+
+void m5u_display_get_scroll_rect(int* x, int* y, int* w, int* h) {
+    int32_t rx = 0;
+    int32_t ry = 0;
+    int32_t rw = 0;
+    int32_t rh = 0;
+    M5.Display.getScrollRect(&rx, &ry, &rw, &rh);
+    if (x) { *x = (int)rx; }
+    if (y) { *y = (int)ry; }
+    if (w) { *w = (int)rw; }
+    if (h) { *h = (int)rh; }
+}
+
+void m5u_display_clear_scroll_rect(void) {
+    M5.Display.clearScrollRect();
 }
 
 void m5u_display_scroll(int dx, int dy) {
@@ -1502,12 +1561,36 @@ void m5u_display_set_clip_rect(int x, int y, int w, int h) {
     M5.Display.setClipRect(x, y, w, h);
 }
 
+void m5u_display_get_clip_rect(int* x, int* y, int* w, int* h) {
+    int32_t rx = 0;
+    int32_t ry = 0;
+    int32_t rw = 0;
+    int32_t rh = 0;
+    M5.Display.getClipRect(&rx, &ry, &rw, &rh);
+    if (x) { *x = (int)rx; }
+    if (y) { *y = (int)ry; }
+    if (w) { *w = (int)rw; }
+    if (h) { *h = (int)rh; }
+}
+
 void m5u_display_clear_clip_rect(void) {
     M5.Display.clearClipRect();
 }
 
 uint16_t m5u_display_color888(uint8_t r, uint8_t g, uint8_t b) {
     return M5.Display.color888(r, g, b);
+}
+
+void m5u_display_set_pivot(float x, float y) {
+    M5.Display.setPivot(x, y);
+}
+
+float m5u_display_get_pivot_x(void) {
+    return M5.Display.getPivotX();
+}
+
+float m5u_display_get_pivot_y(void) {
+    return M5.Display.getPivotY();
 }
 
 bool m5u_display_push_image_rgb565(int x, int y, int w, int h, const uint16_t* data) {
@@ -1703,6 +1786,14 @@ void m5u_display_fill_arc_at(int index, int x, int y, int r0, int r1, float angl
     M5.Displays(index).fillArc(x, y, r0, r1, angle0, angle1, color);
 }
 
+void m5u_display_draw_ellipse_arc_at(int index, int x, int y, int r0x, int r1x, int r0y, int r1y, float angle0, float angle1, uint16_t color) {
+    M5.Displays(index).drawEllipseArc(x, y, r0x, r1x, r0y, r1y, angle0, angle1, color);
+}
+
+void m5u_display_fill_ellipse_arc_at(int index, int x, int y, int r0x, int r1x, int r0y, int r1y, float angle0, float angle1, uint16_t color) {
+    M5.Displays(index).fillEllipseArc(x, y, r0x, r1x, r0y, r1y, angle0, angle1, color);
+}
+
 void m5u_display_draw_bezier3_at(int index, int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color) {
     M5.Displays(index).drawBezier(x0, y0, x1, y1, x2, y2, color);
 }
@@ -1727,12 +1818,51 @@ void m5u_display_draw_gradient_line_at(int index, int x0, int y0, int x1, int y1
     M5.Displays(index).drawGradientLine(x0, y0, x1, y1, start_color, end_color);
 }
 
+void m5u_display_draw_spot_at(int index, int x, int y, float radius, uint16_t color) {
+    M5.Displays(index).drawSpot(x, y, radius, color);
+}
+
+void m5u_display_fill_smooth_circle_at(int index, int x, int y, int r, uint16_t color) {
+    M5.Displays(index).fillSmoothCircle(x, y, r, color);
+}
+
+void m5u_display_fill_smooth_round_rect_at(int index, int x, int y, int w, int h, int r, uint16_t color) {
+    M5.Displays(index).fillSmoothRoundRect(x, y, w, h, r, color);
+}
+
+void m5u_display_fill_gradient_rect_at(int index, int x, int y, int w, int h, uint16_t start_color, uint16_t end_color, int style) {
+    if (w <= 0 || h <= 0) {
+        return;
+    }
+    M5.Displays(index).fillGradientRect(x, y, (uint32_t)w, (uint32_t)h, start_color, end_color, m5u_display_gradient_style(style));
+}
+
+void m5u_display_flood_fill_at(int index, int x, int y, uint16_t color) {
+    M5.Displays(index).floodFill(x, y, color);
+}
+
 void m5u_display_set_scroll_rect_at(int index, int x, int y, int w, int h) {
     M5.Displays(index).setScrollRect(x, y, w, h);
 }
 
 void m5u_display_set_scroll_rect_color_at(int index, int x, int y, int w, int h, uint16_t color) {
     M5.Displays(index).setScrollRect(x, y, w, h, color);
+}
+
+void m5u_display_get_scroll_rect_at(int index, int* x, int* y, int* w, int* h) {
+    int32_t rx = 0;
+    int32_t ry = 0;
+    int32_t rw = 0;
+    int32_t rh = 0;
+    M5.Displays(index).getScrollRect(&rx, &ry, &rw, &rh);
+    if (x) { *x = (int)rx; }
+    if (y) { *y = (int)ry; }
+    if (w) { *w = (int)rw; }
+    if (h) { *h = (int)rh; }
+}
+
+void m5u_display_clear_scroll_rect_at(int index) {
+    M5.Displays(index).clearScrollRect();
 }
 
 void m5u_display_scroll_at(int index, int dx, int dy) {
@@ -1761,6 +1891,38 @@ float m5u_display_get_text_size_x_at(int index) {
 
 float m5u_display_get_text_size_y_at(int index) {
     return M5.Displays(index).getTextSizeY();
+}
+
+void m5u_display_set_clip_rect_at(int index, int x, int y, int w, int h) {
+    M5.Displays(index).setClipRect(x, y, w, h);
+}
+
+void m5u_display_get_clip_rect_at(int index, int* x, int* y, int* w, int* h) {
+    int32_t rx = 0;
+    int32_t ry = 0;
+    int32_t rw = 0;
+    int32_t rh = 0;
+    M5.Displays(index).getClipRect(&rx, &ry, &rw, &rh);
+    if (x) { *x = (int)rx; }
+    if (y) { *y = (int)ry; }
+    if (w) { *w = (int)rw; }
+    if (h) { *h = (int)rh; }
+}
+
+void m5u_display_clear_clip_rect_at(int index) {
+    M5.Displays(index).clearClipRect();
+}
+
+void m5u_display_set_pivot_at(int index, float x, float y) {
+    M5.Displays(index).setPivot(x, y);
+}
+
+float m5u_display_get_pivot_x_at(int index) {
+    return M5.Displays(index).getPivotX();
+}
+
+float m5u_display_get_pivot_y_at(int index) {
+    return M5.Displays(index).getPivotY();
 }
 
 bool m5u_display_push_image_rgb565_at(int index, int x, int y, int w, int h, const uint16_t* data) {
