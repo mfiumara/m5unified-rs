@@ -519,6 +519,11 @@ mod tests {
     #[test]
     fn display_and_rtc_example_helpers_compile_on_host() {
         let mut m5 = M5Unified::begin().expect("host stub begin should succeed");
+        assert!(m5.rtc.begin());
+        assert!(m5.rtc.init());
+        assert!(m5.rtc.begin_for_board(Board::M5AtomS3Lite));
+        assert!(m5.rtc.init_for_board(Board::M5AtomS3Lite));
+        assert!(m5.rtc.is_enabled());
         assert!(m5.display.set_font(DisplayFont::Ascii8x16));
         assert!(m5.display.set_font(DisplayFont::LgfxJapanGothic12));
         assert!(m5.display.set_font(DisplayFont::DejaVu18));

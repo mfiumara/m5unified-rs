@@ -614,6 +614,14 @@ bool m5u_touch_get_raw(int index, int* x, int* y) {
     return true;
 }
 
+bool m5u_rtc_begin(void) {
+    return M5.Rtc.begin();
+}
+
+bool m5u_rtc_begin_for_board(int board) {
+    return M5.Rtc.begin(nullptr, (m5::board_t)board);
+}
+
 bool m5u_rtc_get_datetime(int* year, int* month, int* day, int* hour, int* minute, int* second) {
     m5::rtc_datetime_t dt;
     if (!M5.Rtc.getDateTime(&dt)) { return false; }

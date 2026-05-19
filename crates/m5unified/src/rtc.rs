@@ -3,6 +3,8 @@
 //! This module provides typed date, time, and date-time structs plus wrappers
 //! for RTC status, setters, system-time sync, timer IRQs, and alarm IRQs.
 
+use crate::Board;
+
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct Date {
     pub year: i32,
@@ -128,6 +130,22 @@ impl DateTime {
 pub struct Rtc;
 
 impl Rtc {
+    pub fn begin(&mut self) -> bool {
+        unsafe { m5unified_sys::m5u_rtc_begin() }
+    }
+
+    pub fn begin_for_board(&mut self, board: Board) -> bool {
+        unsafe { m5unified_sys::m5u_rtc_begin_for_board(board.raw()) }
+    }
+
+    pub fn init(&mut self) -> bool {
+        self.begin()
+    }
+
+    pub fn init_for_board(&mut self, board: Board) -> bool {
+        self.begin_for_board(board)
+    }
+
     pub fn get_datetime(&self) -> Option<DateTime> {
         let mut raw = m5unified_sys::m5u_rtc_datetime_t::default();
         unsafe { m5unified_sys::m5u_rtc_get_datetime_detail(&mut raw) }

@@ -409,6 +409,8 @@ extern "C" {
     pub fn m5u_touch_get(index: c_int, x: *mut c_int, y: *mut c_int) -> bool;
     pub fn m5u_touch_get_raw(index: c_int, x: *mut c_int, y: *mut c_int) -> bool;
 
+    pub fn m5u_rtc_begin() -> bool;
+    pub fn m5u_rtc_begin_for_board(board: c_int) -> bool;
     pub fn m5u_rtc_is_enabled() -> bool;
     pub fn m5u_rtc_get_volt_low() -> bool;
     pub fn m5u_rtc_get_datetime(
@@ -1194,6 +1196,12 @@ mod host_stubs {
         false
     }
 
+    pub unsafe fn m5u_rtc_begin() -> bool {
+        true
+    }
+    pub unsafe fn m5u_rtc_begin_for_board(_board: c_int) -> bool {
+        true
+    }
     pub unsafe fn m5u_rtc_is_enabled() -> bool {
         true
     }

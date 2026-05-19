@@ -333,6 +333,8 @@ typedef struct {
     int second;
 } m5u_rtc_datetime_t;
 
+bool m5u_rtc_begin(void);
+bool m5u_rtc_begin_for_board(int board);
 bool m5u_rtc_is_enabled(void);
 bool m5u_rtc_get_volt_low(void);
 bool m5u_rtc_get_datetime(int* year, int* month, int* day, int* hour, int* minute, int* second);
