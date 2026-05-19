@@ -1418,6 +1418,58 @@ void m5u_display_fill_triangle(int x0, int y0, int x1, int y1, int x2, int y2, u
     M5.Display.fillTriangle(x0, y0, x1, y1, x2, y2, color);
 }
 
+void m5u_display_draw_ellipse(int x, int y, int rx, int ry, uint16_t color) {
+    M5.Display.drawEllipse(x, y, rx, ry, color);
+}
+
+void m5u_display_fill_ellipse(int x, int y, int rx, int ry, uint16_t color) {
+    M5.Display.fillEllipse(x, y, rx, ry, color);
+}
+
+void m5u_display_draw_arc(int x, int y, int r0, int r1, float angle0, float angle1, uint16_t color) {
+    M5.Display.drawArc(x, y, r0, r1, angle0, angle1, color);
+}
+
+void m5u_display_fill_arc(int x, int y, int r0, int r1, float angle0, float angle1, uint16_t color) {
+    M5.Display.fillArc(x, y, r0, r1, angle0, angle1, color);
+}
+
+void m5u_display_set_scroll_rect(int x, int y, int w, int h) {
+    M5.Display.setScrollRect(x, y, w, h);
+}
+
+void m5u_display_set_scroll_rect_color(int x, int y, int w, int h, uint16_t color) {
+    M5.Display.setScrollRect(x, y, w, h, color);
+}
+
+void m5u_display_scroll(int dx, int dy) {
+    M5.Display.scroll(dx, dy);
+}
+
+int m5u_display_text_width(const char* text) {
+    return text ? M5.Display.textWidth(text) : 0;
+}
+
+int m5u_display_get_text_datum(void) {
+    return (int)M5.Display.getTextDatum();
+}
+
+void m5u_display_set_text_padding(uint32_t padding) {
+    M5.Display.setTextPadding(padding);
+}
+
+uint32_t m5u_display_get_text_padding(void) {
+    return M5.Display.getTextPadding();
+}
+
+float m5u_display_get_text_size_x(void) {
+    return M5.Display.getTextSizeX();
+}
+
+float m5u_display_get_text_size_y(void) {
+    return M5.Display.getTextSizeY();
+}
+
 void m5u_display_set_clip_rect(int x, int y, int w, int h) {
     M5.Display.setClipRect(x, y, w, h);
 }
@@ -1565,6 +1617,58 @@ void m5u_display_draw_triangle_at(int index, int x0, int y0, int x1, int y1, int
 
 void m5u_display_fill_triangle_at(int index, int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color) {
     M5.Displays(index).fillTriangle(x0, y0, x1, y1, x2, y2, color);
+}
+
+void m5u_display_draw_ellipse_at(int index, int x, int y, int rx, int ry, uint16_t color) {
+    M5.Displays(index).drawEllipse(x, y, rx, ry, color);
+}
+
+void m5u_display_fill_ellipse_at(int index, int x, int y, int rx, int ry, uint16_t color) {
+    M5.Displays(index).fillEllipse(x, y, rx, ry, color);
+}
+
+void m5u_display_draw_arc_at(int index, int x, int y, int r0, int r1, float angle0, float angle1, uint16_t color) {
+    M5.Displays(index).drawArc(x, y, r0, r1, angle0, angle1, color);
+}
+
+void m5u_display_fill_arc_at(int index, int x, int y, int r0, int r1, float angle0, float angle1, uint16_t color) {
+    M5.Displays(index).fillArc(x, y, r0, r1, angle0, angle1, color);
+}
+
+void m5u_display_set_scroll_rect_at(int index, int x, int y, int w, int h) {
+    M5.Displays(index).setScrollRect(x, y, w, h);
+}
+
+void m5u_display_set_scroll_rect_color_at(int index, int x, int y, int w, int h, uint16_t color) {
+    M5.Displays(index).setScrollRect(x, y, w, h, color);
+}
+
+void m5u_display_scroll_at(int index, int dx, int dy) {
+    M5.Displays(index).scroll(dx, dy);
+}
+
+int m5u_display_text_width_at(int index, const char* text) {
+    return text ? M5.Displays(index).textWidth(text) : 0;
+}
+
+int m5u_display_get_text_datum_at(int index) {
+    return (int)M5.Displays(index).getTextDatum();
+}
+
+void m5u_display_set_text_padding_at(int index, uint32_t padding) {
+    M5.Displays(index).setTextPadding(padding);
+}
+
+uint32_t m5u_display_get_text_padding_at(int index) {
+    return M5.Displays(index).getTextPadding();
+}
+
+float m5u_display_get_text_size_x_at(int index) {
+    return M5.Displays(index).getTextSizeX();
+}
+
+float m5u_display_get_text_size_y_at(int index) {
+    return M5.Displays(index).getTextSizeY();
 }
 
 bool m5u_button_is_pressed(int button) { return m5u_button_state(button, 0); }

@@ -175,9 +175,18 @@ impl Display {
         unsafe { m5unified_sys::m5u_display_set_text_datum(datum as c_int) }
     }
 
+    pub fn text_datum(&self) -> Option<TextDatum> {
+        TextDatum::from_raw(unsafe { m5unified_sys::m5u_display_get_text_datum() as i32 })
+    }
+
     pub fn draw_string(&mut self, text: &str, x: i32, y: i32) -> Result<i32, Error> {
         let text = CString::new(text).map_err(|_| Error::InvalidString)?;
         Ok(unsafe { m5unified_sys::m5u_display_draw_string(text.as_ptr(), x, y) as i32 })
+    }
+
+    pub fn text_width(&self, text: &str) -> Result<i32, Error> {
+        let text = CString::new(text).map_err(|_| Error::InvalidString)?;
+        Ok(unsafe { m5unified_sys::m5u_display_text_width(text.as_ptr()) as i32 })
     }
 
     pub fn draw_pixel(&mut self, x: i32, y: i32, color: u16) {
@@ -222,6 +231,72 @@ impl Display {
         unsafe {
             m5unified_sys::m5u_display_fill_triangle(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, color);
         }
+    }
+
+    pub fn draw_ellipse(&mut self, x: i32, y: i32, rx: i32, ry: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_draw_ellipse(x, y, rx, ry, color) }
+    }
+
+    pub fn fill_ellipse(&mut self, x: i32, y: i32, rx: i32, ry: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_fill_ellipse(x, y, rx, ry, color) }
+    }
+
+    pub fn draw_arc(
+        &mut self,
+        center: Point,
+        r0: i32,
+        r1: i32,
+        angle0: f32,
+        angle1: f32,
+        color: u16,
+    ) {
+        unsafe {
+            m5unified_sys::m5u_display_draw_arc(center.x, center.y, r0, r1, angle0, angle1, color)
+        }
+    }
+
+    pub fn fill_arc(
+        &mut self,
+        center: Point,
+        r0: i32,
+        r1: i32,
+        angle0: f32,
+        angle1: f32,
+        color: u16,
+    ) {
+        unsafe {
+            m5unified_sys::m5u_display_fill_arc(center.x, center.y, r0, r1, angle0, angle1, color)
+        }
+    }
+
+    pub fn set_scroll_rect(&mut self, rect: Rect) {
+        unsafe { m5unified_sys::m5u_display_set_scroll_rect(rect.x, rect.y, rect.w, rect.h) }
+    }
+
+    pub fn set_scroll_rect_color(&mut self, rect: Rect, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_set_scroll_rect_color(rect.x, rect.y, rect.w, rect.h, color);
+        }
+    }
+
+    pub fn scroll(&mut self, dx: i32, dy: i32) {
+        unsafe { m5unified_sys::m5u_display_scroll(dx, dy) }
+    }
+
+    pub fn set_text_padding(&mut self, padding: u32) {
+        unsafe { m5unified_sys::m5u_display_set_text_padding(padding) }
+    }
+
+    pub fn text_padding(&self) -> u32 {
+        unsafe { m5unified_sys::m5u_display_get_text_padding() }
+    }
+
+    pub fn text_size_x(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_display_get_text_size_x() }
+    }
+
+    pub fn text_size_y(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_display_get_text_size_y() }
     }
 
     pub fn set_clip_rect(&mut self, rect: Rect) {
@@ -277,6 +352,7 @@ pub struct Rect {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[repr(i32)]
 pub enum TextDatum {
     TopLeft = 0,
     TopCenter = 1,
@@ -287,6 +363,23 @@ pub enum TextDatum {
     BottomLeft = 8,
     BottomCenter = 9,
     BottomRight = 10,
+}
+
+impl TextDatum {
+    const fn from_raw(raw: i32) -> Option<Self> {
+        match raw {
+            0 => Some(Self::TopLeft),
+            1 => Some(Self::TopCenter),
+            2 => Some(Self::TopRight),
+            4 => Some(Self::MiddleLeft),
+            5 => Some(Self::MiddleCenter),
+            6 => Some(Self::MiddleRight),
+            8 => Some(Self::BottomLeft),
+            9 => Some(Self::BottomCenter),
+            10 => Some(Self::BottomRight),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -440,6 +533,11 @@ impl DisplayRef {
         })
     }
 
+    pub fn text_width(&self, text: &str) -> Result<i32, Error> {
+        let text = CString::new(text).map_err(|_| Error::InvalidString)?;
+        Ok(unsafe { m5unified_sys::m5u_display_text_width_at(self.index, text.as_ptr()) as i32 })
+    }
+
     pub fn draw_line(&mut self, x0: i32, y0: i32, x1: i32, y1: i32, color: u16) {
         unsafe { m5unified_sys::m5u_display_draw_line_at(self.index, x0, y0, x1, y1, color) }
     }
@@ -506,6 +604,86 @@ impl DisplayRef {
                 self.index, p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, color,
             );
         }
+    }
+
+    pub fn draw_ellipse(&mut self, x: i32, y: i32, rx: i32, ry: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_draw_ellipse_at(self.index, x, y, rx, ry, color) }
+    }
+
+    pub fn fill_ellipse(&mut self, x: i32, y: i32, rx: i32, ry: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_fill_ellipse_at(self.index, x, y, rx, ry, color) }
+    }
+
+    pub fn draw_arc(
+        &mut self,
+        center: Point,
+        r0: i32,
+        r1: i32,
+        angle0: f32,
+        angle1: f32,
+        color: u16,
+    ) {
+        unsafe {
+            m5unified_sys::m5u_display_draw_arc_at(
+                self.index, center.x, center.y, r0, r1, angle0, angle1, color,
+            );
+        }
+    }
+
+    pub fn fill_arc(
+        &mut self,
+        center: Point,
+        r0: i32,
+        r1: i32,
+        angle0: f32,
+        angle1: f32,
+        color: u16,
+    ) {
+        unsafe {
+            m5unified_sys::m5u_display_fill_arc_at(
+                self.index, center.x, center.y, r0, r1, angle0, angle1, color,
+            );
+        }
+    }
+
+    pub fn set_scroll_rect(&mut self, rect: Rect) {
+        unsafe {
+            m5unified_sys::m5u_display_set_scroll_rect_at(
+                self.index, rect.x, rect.y, rect.w, rect.h,
+            );
+        }
+    }
+
+    pub fn set_scroll_rect_color(&mut self, rect: Rect, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_set_scroll_rect_color_at(
+                self.index, rect.x, rect.y, rect.w, rect.h, color,
+            );
+        }
+    }
+
+    pub fn scroll(&mut self, dx: i32, dy: i32) {
+        unsafe { m5unified_sys::m5u_display_scroll_at(self.index, dx, dy) }
+    }
+
+    pub fn text_datum(&self) -> Option<TextDatum> {
+        TextDatum::from_raw(unsafe { m5unified_sys::m5u_display_get_text_datum_at(self.index) })
+    }
+
+    pub fn set_text_padding(&mut self, padding: u32) {
+        unsafe { m5unified_sys::m5u_display_set_text_padding_at(self.index, padding) }
+    }
+
+    pub fn text_padding(&self) -> u32 {
+        unsafe { m5unified_sys::m5u_display_get_text_padding_at(self.index) }
+    }
+
+    pub fn text_size_x(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_display_get_text_size_x_at(self.index) }
+    }
+
+    pub fn text_size_y(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_display_get_text_size_y_at(self.index) }
     }
 }
 

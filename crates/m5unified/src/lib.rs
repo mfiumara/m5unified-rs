@@ -193,6 +193,27 @@ mod tests {
         let p2 = Point { x: 10, y: 18 };
         m5.display.draw_triangle(p0, p1, p2, colors::YELLOW);
         m5.display.fill_triangle(p0, p1, p2, colors::CYAN);
+        m5.display.draw_ellipse(30, 30, 8, 4, colors::WHITE);
+        m5.display.fill_ellipse(32, 32, 6, 3, colors::RED);
+        m5.display
+            .draw_arc(Point { x: 40, y: 40 }, 8, 12, 0.0, 90.0, colors::GREEN);
+        m5.display
+            .fill_arc(Point { x: 45, y: 45 }, 6, 10, 90.0, 180.0, colors::BLUE);
+        let scroll_rect = Rect {
+            x: 0,
+            y: 0,
+            w: 16,
+            h: 16,
+        };
+        m5.display.set_scroll_rect(scroll_rect);
+        m5.display.set_scroll_rect_color(scroll_rect, colors::BLACK);
+        m5.display.scroll(1, -1);
+        assert_eq!(m5.display.text_width("host").unwrap(), 0);
+        assert_eq!(m5.display.text_datum(), Some(TextDatum::TopLeft));
+        m5.display.set_text_padding(12);
+        assert_eq!(m5.display.text_padding(), 0);
+        assert_eq!(m5.display.text_size_x(), 1.0);
+        assert_eq!(m5.display.text_size_y(), 1.0);
         let mut display = m5.displays(0).expect("host stub display should exist");
         display.draw_pixel(1, 1, colors::WHITE);
         display.write_pixel(2, 2, colors::RED);
@@ -204,12 +225,31 @@ mod tests {
         display.fill_round_rect(10, 10, 20, 12, 3, colors::RED);
         display.draw_triangle(p0, p1, p2, colors::YELLOW);
         display.fill_triangle(p0, p1, p2, colors::CYAN);
+        display.draw_ellipse(30, 30, 8, 4, colors::WHITE);
+        display.fill_ellipse(32, 32, 6, 3, colors::RED);
+        display.draw_arc(Point { x: 40, y: 40 }, 8, 12, 0.0, 90.0, colors::GREEN);
+        display.fill_arc(Point { x: 45, y: 45 }, 6, 10, 90.0, 180.0, colors::BLUE);
+        display.set_scroll_rect(scroll_rect);
+        display.set_scroll_rect_color(scroll_rect, colors::BLACK);
+        display.scroll(1, -1);
+        assert_eq!(display.text_width("host").unwrap(), 0);
+        assert_eq!(display.text_datum(), Some(TextDatum::TopLeft));
+        display.set_text_padding(12);
+        assert_eq!(display.text_padding(), 0);
+        assert_eq!(display.text_size_x(), 1.0);
+        assert_eq!(display.text_size_y(), 1.0);
     }
 
     #[test]
     fn invalid_strings_are_rejected_before_ffi() {
         let mut m5 = M5Unified::begin().expect("host stub begin should succeed");
         assert_eq!(m5.display.print("bad\0string"), Err(Error::InvalidString));
+        assert_eq!(
+            m5.display.text_width("bad\0string"),
+            Err(Error::InvalidString)
+        );
+        let display = m5.displays(0).expect("host stub display should exist");
+        assert_eq!(display.text_width("bad\0string"), Err(Error::InvalidString));
     }
 
     #[test]

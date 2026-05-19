@@ -744,6 +744,58 @@ void m5u_display_fill_triangle(int x0, int y0, int x1, int y1, int x2, int y2, u
     (void)x0; (void)y0; (void)x1; (void)y1; (void)x2; (void)y2; (void)color;
 }
 
+void m5u_display_draw_ellipse(int x, int y, int rx, int ry, uint16_t color) {
+    (void)x; (void)y; (void)rx; (void)ry; (void)color;
+}
+
+void m5u_display_fill_ellipse(int x, int y, int rx, int ry, uint16_t color) {
+    (void)x; (void)y; (void)rx; (void)ry; (void)color;
+}
+
+void m5u_display_draw_arc(int x, int y, int r0, int r1, float angle0, float angle1, uint16_t color) {
+    (void)x; (void)y; (void)r0; (void)r1; (void)angle0; (void)angle1; (void)color;
+}
+
+void m5u_display_fill_arc(int x, int y, int r0, int r1, float angle0, float angle1, uint16_t color) {
+    (void)x; (void)y; (void)r0; (void)r1; (void)angle0; (void)angle1; (void)color;
+}
+
+void m5u_display_set_scroll_rect(int x, int y, int w, int h) {
+    (void)x; (void)y; (void)w; (void)h;
+}
+
+void m5u_display_set_scroll_rect_color(int x, int y, int w, int h, uint16_t color) {
+    (void)x; (void)y; (void)w; (void)h; (void)color;
+}
+
+void m5u_display_scroll(int dx, int dy) {
+    (void)dx; (void)dy;
+}
+
+int m5u_display_text_width(const char* text) {
+    (void)text; return 0;
+}
+
+int m5u_display_get_text_datum(void) {
+    return 0;
+}
+
+void m5u_display_set_text_padding(uint32_t padding) {
+    (void)padding;
+}
+
+uint32_t m5u_display_get_text_padding(void) {
+    return 0;
+}
+
+float m5u_display_get_text_size_x(void) {
+    return 1.0f;
+}
+
+float m5u_display_get_text_size_y(void) {
+    return 1.0f;
+}
+
 void m5u_display_set_clip_rect(int x, int y, int w, int h) {
     (void)x; (void)y; (void)w; (void)h;
 }
@@ -881,6 +933,58 @@ void m5u_display_draw_triangle_at(int index, int x0, int y0, int x1, int y1, int
 
 void m5u_display_fill_triangle_at(int index, int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color) {
     (void)index; (void)x0; (void)y0; (void)x1; (void)y1; (void)x2; (void)y2; (void)color;
+}
+
+void m5u_display_draw_ellipse_at(int index, int x, int y, int rx, int ry, uint16_t color) {
+    (void)index; (void)x; (void)y; (void)rx; (void)ry; (void)color;
+}
+
+void m5u_display_fill_ellipse_at(int index, int x, int y, int rx, int ry, uint16_t color) {
+    (void)index; (void)x; (void)y; (void)rx; (void)ry; (void)color;
+}
+
+void m5u_display_draw_arc_at(int index, int x, int y, int r0, int r1, float angle0, float angle1, uint16_t color) {
+    (void)index; (void)x; (void)y; (void)r0; (void)r1; (void)angle0; (void)angle1; (void)color;
+}
+
+void m5u_display_fill_arc_at(int index, int x, int y, int r0, int r1, float angle0, float angle1, uint16_t color) {
+    (void)index; (void)x; (void)y; (void)r0; (void)r1; (void)angle0; (void)angle1; (void)color;
+}
+
+void m5u_display_set_scroll_rect_at(int index, int x, int y, int w, int h) {
+    (void)index; (void)x; (void)y; (void)w; (void)h;
+}
+
+void m5u_display_set_scroll_rect_color_at(int index, int x, int y, int w, int h, uint16_t color) {
+    (void)index; (void)x; (void)y; (void)w; (void)h; (void)color;
+}
+
+void m5u_display_scroll_at(int index, int dx, int dy) {
+    (void)index; (void)dx; (void)dy;
+}
+
+int m5u_display_text_width_at(int index, const char* text) {
+    (void)index; (void)text; return 0;
+}
+
+int m5u_display_get_text_datum_at(int index) {
+    (void)index; return 0;
+}
+
+void m5u_display_set_text_padding_at(int index, uint32_t padding) {
+    (void)index; (void)padding;
+}
+
+uint32_t m5u_display_get_text_padding_at(int index) {
+    (void)index; return 0;
+}
+
+float m5u_display_get_text_size_x_at(int index) {
+    (void)index; return 1.0f;
+}
+
+float m5u_display_get_text_size_y_at(int index) {
+    (void)index; return 1.0f;
 }
 
 bool m5u_button_is_pressed(int button) { return m5u_button_state(button, 0); }

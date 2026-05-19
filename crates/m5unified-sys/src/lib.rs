@@ -640,6 +640,35 @@ extern "C" {
         y2: c_int,
         color: u16,
     );
+    pub fn m5u_display_draw_ellipse(x: c_int, y: c_int, rx: c_int, ry: c_int, color: u16);
+    pub fn m5u_display_fill_ellipse(x: c_int, y: c_int, rx: c_int, ry: c_int, color: u16);
+    pub fn m5u_display_draw_arc(
+        x: c_int,
+        y: c_int,
+        r0: c_int,
+        r1: c_int,
+        angle0: c_float,
+        angle1: c_float,
+        color: u16,
+    );
+    pub fn m5u_display_fill_arc(
+        x: c_int,
+        y: c_int,
+        r0: c_int,
+        r1: c_int,
+        angle0: c_float,
+        angle1: c_float,
+        color: u16,
+    );
+    pub fn m5u_display_set_scroll_rect(x: c_int, y: c_int, w: c_int, h: c_int);
+    pub fn m5u_display_set_scroll_rect_color(x: c_int, y: c_int, w: c_int, h: c_int, color: u16);
+    pub fn m5u_display_scroll(dx: c_int, dy: c_int);
+    pub fn m5u_display_text_width(text: *const c_char) -> c_int;
+    pub fn m5u_display_get_text_datum() -> c_int;
+    pub fn m5u_display_set_text_padding(padding: u32);
+    pub fn m5u_display_get_text_padding() -> u32;
+    pub fn m5u_display_get_text_size_x() -> c_float;
+    pub fn m5u_display_get_text_size_y() -> c_float;
     pub fn m5u_display_set_clip_rect(x: c_int, y: c_int, w: c_int, h: c_int);
     pub fn m5u_display_clear_clip_rect();
     pub fn m5u_display_color888(r: u8, g: u8, b: u8) -> u16;
@@ -735,6 +764,58 @@ extern "C" {
         y2: c_int,
         color: u16,
     );
+    pub fn m5u_display_draw_ellipse_at(
+        index: c_int,
+        x: c_int,
+        y: c_int,
+        rx: c_int,
+        ry: c_int,
+        color: u16,
+    );
+    pub fn m5u_display_fill_ellipse_at(
+        index: c_int,
+        x: c_int,
+        y: c_int,
+        rx: c_int,
+        ry: c_int,
+        color: u16,
+    );
+    pub fn m5u_display_draw_arc_at(
+        index: c_int,
+        x: c_int,
+        y: c_int,
+        r0: c_int,
+        r1: c_int,
+        angle0: c_float,
+        angle1: c_float,
+        color: u16,
+    );
+    pub fn m5u_display_fill_arc_at(
+        index: c_int,
+        x: c_int,
+        y: c_int,
+        r0: c_int,
+        r1: c_int,
+        angle0: c_float,
+        angle1: c_float,
+        color: u16,
+    );
+    pub fn m5u_display_set_scroll_rect_at(index: c_int, x: c_int, y: c_int, w: c_int, h: c_int);
+    pub fn m5u_display_set_scroll_rect_color_at(
+        index: c_int,
+        x: c_int,
+        y: c_int,
+        w: c_int,
+        h: c_int,
+        color: u16,
+    );
+    pub fn m5u_display_scroll_at(index: c_int, dx: c_int, dy: c_int);
+    pub fn m5u_display_text_width_at(index: c_int, text: *const c_char) -> c_int;
+    pub fn m5u_display_get_text_datum_at(index: c_int) -> c_int;
+    pub fn m5u_display_set_text_padding_at(index: c_int, padding: u32);
+    pub fn m5u_display_get_text_padding_at(index: c_int) -> u32;
+    pub fn m5u_display_get_text_size_x_at(index: c_int) -> c_float;
+    pub fn m5u_display_get_text_size_y_at(index: c_int) -> c_float;
 
     pub fn m5u_button_is_pressed(button: c_int) -> bool;
     pub fn m5u_button_was_pressed(button: c_int) -> bool;
@@ -1718,6 +1799,68 @@ mod host_stubs {
         _color: u16,
     ) {
     }
+    pub unsafe fn m5u_display_draw_ellipse(
+        _x: c_int,
+        _y: c_int,
+        _rx: c_int,
+        _ry: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_fill_ellipse(
+        _x: c_int,
+        _y: c_int,
+        _rx: c_int,
+        _ry: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_draw_arc(
+        _x: c_int,
+        _y: c_int,
+        _r0: c_int,
+        _r1: c_int,
+        _angle0: c_float,
+        _angle1: c_float,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_fill_arc(
+        _x: c_int,
+        _y: c_int,
+        _r0: c_int,
+        _r1: c_int,
+        _angle0: c_float,
+        _angle1: c_float,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_set_scroll_rect(_x: c_int, _y: c_int, _w: c_int, _h: c_int) {}
+    pub unsafe fn m5u_display_set_scroll_rect_color(
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _h: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_scroll(_dx: c_int, _dy: c_int) {}
+    pub unsafe fn m5u_display_text_width(_text: *const c_char) -> c_int {
+        0
+    }
+    pub unsafe fn m5u_display_get_text_datum() -> c_int {
+        0
+    }
+    pub unsafe fn m5u_display_set_text_padding(_padding: u32) {}
+    pub unsafe fn m5u_display_get_text_padding() -> u32 {
+        0
+    }
+    pub unsafe fn m5u_display_get_text_size_x() -> c_float {
+        1.0
+    }
+    pub unsafe fn m5u_display_get_text_size_y() -> c_float {
+        1.0
+    }
     pub unsafe fn m5u_display_set_clip_rect(_x: c_int, _y: c_int, _w: c_int, _h: c_int) {}
     pub unsafe fn m5u_display_clear_clip_rect() {}
     pub unsafe fn m5u_display_color888(r: u8, g: u8, b: u8) -> u16 {
@@ -1877,6 +2020,80 @@ mod host_stubs {
         _y2: c_int,
         _color: u16,
     ) {
+    }
+    pub unsafe fn m5u_display_draw_ellipse_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _rx: c_int,
+        _ry: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_fill_ellipse_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _rx: c_int,
+        _ry: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_draw_arc_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _r0: c_int,
+        _r1: c_int,
+        _angle0: c_float,
+        _angle1: c_float,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_fill_arc_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _r0: c_int,
+        _r1: c_int,
+        _angle0: c_float,
+        _angle1: c_float,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_set_scroll_rect_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _h: c_int,
+    ) {
+    }
+    pub unsafe fn m5u_display_set_scroll_rect_color_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _h: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_scroll_at(_index: c_int, _dx: c_int, _dy: c_int) {}
+    pub unsafe fn m5u_display_text_width_at(_index: c_int, _text: *const c_char) -> c_int {
+        0
+    }
+    pub unsafe fn m5u_display_get_text_datum_at(_index: c_int) -> c_int {
+        0
+    }
+    pub unsafe fn m5u_display_set_text_padding_at(_index: c_int, _padding: u32) {}
+    pub unsafe fn m5u_display_get_text_padding_at(_index: c_int) -> u32 {
+        0
+    }
+    pub unsafe fn m5u_display_get_text_size_x_at(_index: c_int) -> c_float {
+        1.0
+    }
+    pub unsafe fn m5u_display_get_text_size_y_at(_index: c_int) -> c_float {
+        1.0
     }
 
     pub unsafe fn m5u_button_is_pressed(_button: c_int) -> bool {
