@@ -1291,6 +1291,70 @@ void m5u_display_set_brightness(uint8_t brightness) {
     M5.Display.setBrightness(brightness);
 }
 
+uint8_t m5u_display_get_brightness(void) {
+    return M5.Display.getBrightness();
+}
+
+void m5u_display_sleep(void) {
+    M5.Display.sleep();
+}
+
+void m5u_display_wakeup(void) {
+    M5.Display.wakeup();
+}
+
+void m5u_display_power_save(bool enable) {
+    M5.Display.powerSave(enable);
+}
+
+void m5u_display_invert_display(bool invert) {
+    M5.Display.invertDisplay(invert);
+}
+
+bool m5u_display_get_invert(void) {
+    return M5.Display.getInvert();
+}
+
+void m5u_display_set_swap_bytes(bool swap) {
+    M5.Display.setSwapBytes(swap);
+}
+
+bool m5u_display_get_swap_bytes(void) {
+    return M5.Display.getSwapBytes();
+}
+
+void m5u_display_set_color_depth(int depth) {
+    M5.Display.setColorDepth((m5gfx::color_depth_t)depth);
+}
+
+int m5u_display_get_color_depth(void) {
+    return (int)M5.Display.getColorDepth();
+}
+
+void m5u_display_set_addr_window(int x, int y, int w, int h) {
+    M5.Display.setAddrWindow(x, y, w, h);
+}
+
+void m5u_display_write_color(uint16_t color, uint32_t length) {
+    M5.Display.writeColor(color, length);
+}
+
+void m5u_display_push_block(uint16_t color, uint32_t length) {
+    M5.Display.pushBlock(color, length);
+}
+
+void m5u_display_progress_bar(int x, int y, int w, int h, uint8_t value) {
+    M5.Display.progressBar(x, y, w, h, value);
+}
+
+void m5u_display_push_state(void) {
+    M5.Display.pushState();
+}
+
+void m5u_display_pop_state(void) {
+    M5.Display.popState();
+}
+
 void m5u_display_set_epd_fastest(void) {
     M5.Display.setEpdMode(m5gfx::epd_fastest);
 }
@@ -1780,6 +1844,74 @@ int m5u_display_get_rotation_at(int index) {
 
 void m5u_display_set_rotation_at(int index, int rotation) {
     M5.Displays(index).setRotation(rotation);
+}
+
+void m5u_display_set_brightness_at(int index, uint8_t brightness) {
+    M5.Displays(index).setBrightness(brightness);
+}
+
+uint8_t m5u_display_get_brightness_at(int index) {
+    return M5.Displays(index).getBrightness();
+}
+
+void m5u_display_sleep_at(int index) {
+    M5.Displays(index).sleep();
+}
+
+void m5u_display_wakeup_at(int index) {
+    M5.Displays(index).wakeup();
+}
+
+void m5u_display_power_save_at(int index, bool enable) {
+    M5.Displays(index).powerSave(enable);
+}
+
+void m5u_display_invert_display_at(int index, bool invert) {
+    M5.Displays(index).invertDisplay(invert);
+}
+
+bool m5u_display_get_invert_at(int index) {
+    return M5.Displays(index).getInvert();
+}
+
+void m5u_display_set_swap_bytes_at(int index, bool swap) {
+    M5.Displays(index).setSwapBytes(swap);
+}
+
+bool m5u_display_get_swap_bytes_at(int index) {
+    return M5.Displays(index).getSwapBytes();
+}
+
+void m5u_display_set_color_depth_at(int index, int depth) {
+    M5.Displays(index).setColorDepth((m5gfx::color_depth_t)depth);
+}
+
+int m5u_display_get_color_depth_at(int index) {
+    return (int)M5.Displays(index).getColorDepth();
+}
+
+void m5u_display_set_addr_window_at(int index, int x, int y, int w, int h) {
+    M5.Displays(index).setAddrWindow(x, y, w, h);
+}
+
+void m5u_display_write_color_at(int index, uint16_t color, uint32_t length) {
+    M5.Displays(index).writeColor(color, length);
+}
+
+void m5u_display_push_block_at(int index, uint16_t color, uint32_t length) {
+    M5.Displays(index).pushBlock(color, length);
+}
+
+void m5u_display_progress_bar_at(int index, int x, int y, int w, int h, uint8_t value) {
+    M5.Displays(index).progressBar(x, y, w, h, value);
+}
+
+void m5u_display_push_state_at(int index) {
+    M5.Displays(index).pushState();
+}
+
+void m5u_display_pop_state_at(int index) {
+    M5.Displays(index).popState();
 }
 
 void m5u_display_set_color_at(int index, uint16_t color) {

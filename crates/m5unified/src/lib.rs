@@ -51,8 +51,8 @@ pub use audio::{
 pub use buttons::{Button, ButtonId, ButtonState, Buttons};
 pub use config::{ExternalDisplayConfig, ExternalSpeakerConfig, M5UnifiedConfig};
 pub use display::{
-    colors, Color565, Display, DisplayFont, DisplayKind, DisplayRef, EpdMode, GradientFillStyle,
-    ImageDrawOptions, ImageFormat, Point, QrCodeOptions, Rect, Size, TextDatum,
+    colors, Color565, ColorDepth, Display, DisplayFont, DisplayKind, DisplayRef, EpdMode,
+    GradientFillStyle, ImageDrawOptions, ImageFormat, Point, QrCodeOptions, Rect, Size, TextDatum,
 };
 pub use error::Error;
 pub use i2c::{I2cBus, I2cDevice};
@@ -206,6 +206,9 @@ mod tests {
             w: 16,
             h: 16,
         };
+        assert_eq!(ColorDepth::RGB565_2BYTE.raw(), 16);
+        assert_eq!(ColorDepth::RGB565_2BYTE.bits(), 16);
+        assert!(!ColorDepth::RGB565_2BYTE.has_palette());
         let image = [colors::RED, colors::GREEN, colors::BLUE, colors::WHITE];
         let encoded_image = [0xFF_u8];
         let image_options = ImageDrawOptions {
@@ -276,6 +279,24 @@ mod tests {
         m5.display.clear_scroll_rect();
         m5.display.scroll(1, -1);
         assert_eq!(m5.display.cursor_x(), 0);
+        m5.display.set_brightness(64);
+        assert_eq!(m5.display.brightness(), 0);
+        m5.display.sleep();
+        m5.display.wakeup();
+        m5.display.power_save(true);
+        m5.display.power_save(false);
+        m5.display.invert_display(true);
+        assert!(!m5.display.inverted());
+        m5.display.set_swap_bytes(true);
+        assert!(!m5.display.swap_bytes());
+        m5.display.set_color_depth(ColorDepth::RGB565_2BYTE);
+        assert_eq!(m5.display.color_depth(), ColorDepth::RGB565_2BYTE);
+        m5.display.set_addr_window(scroll_rect);
+        m5.display.write_color(colors::WHITE, 2);
+        m5.display.push_block(colors::BLACK, 2);
+        m5.display.progress_bar(scroll_rect, 50);
+        m5.display.push_state();
+        m5.display.pop_state();
         assert_eq!(m5.display.font_width(), 6);
         assert_eq!(m5.display.draw_center_string("center", 20, 20), Ok(0));
         assert_eq!(m5.display.draw_right_string("right", 20, 30), Ok(0));
@@ -406,6 +427,24 @@ mod tests {
         display.scroll(1, -1);
         assert_eq!(display.cursor_x(), 0);
         assert_eq!(display.cursor_y(), 0);
+        display.set_brightness(64);
+        assert_eq!(display.brightness(), 0);
+        display.sleep();
+        display.wakeup();
+        display.power_save(true);
+        display.power_save(false);
+        display.invert_display(true);
+        assert!(!display.inverted());
+        display.set_swap_bytes(true);
+        assert!(!display.swap_bytes());
+        display.set_color_depth(ColorDepth::RGB565_2BYTE);
+        assert_eq!(display.color_depth(), ColorDepth::RGB565_2BYTE);
+        display.set_addr_window(scroll_rect);
+        display.write_color(colors::WHITE, 2);
+        display.push_block(colors::BLACK, 2);
+        display.progress_bar(scroll_rect, 50);
+        display.push_state();
+        display.pop_state();
         assert_eq!(display.font_width(), 6);
         assert_eq!(display.draw_center_string("center", 20, 20), Ok(0));
         assert_eq!(display.draw_right_string("right", 20, 30), Ok(0));

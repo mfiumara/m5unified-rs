@@ -614,6 +614,22 @@ extern "C" {
 
     pub fn m5u_display_get_rotation() -> c_int;
     pub fn m5u_display_set_brightness(brightness: u8);
+    pub fn m5u_display_get_brightness() -> u8;
+    pub fn m5u_display_sleep();
+    pub fn m5u_display_wakeup();
+    pub fn m5u_display_power_save(enable: bool);
+    pub fn m5u_display_invert_display(invert: bool);
+    pub fn m5u_display_get_invert() -> bool;
+    pub fn m5u_display_set_swap_bytes(swap: bool);
+    pub fn m5u_display_get_swap_bytes() -> bool;
+    pub fn m5u_display_set_color_depth(depth: c_int);
+    pub fn m5u_display_get_color_depth() -> c_int;
+    pub fn m5u_display_set_addr_window(x: c_int, y: c_int, w: c_int, h: c_int);
+    pub fn m5u_display_write_color(color: u16, length: u32);
+    pub fn m5u_display_push_block(color: u16, length: u32);
+    pub fn m5u_display_progress_bar(x: c_int, y: c_int, w: c_int, h: c_int, value: u8);
+    pub fn m5u_display_push_state();
+    pub fn m5u_display_pop_state();
     pub fn m5u_display_set_epd_fastest();
     pub fn m5u_display_set_epd_mode(mode: c_int);
     pub fn m5u_display_set_text_scroll(scroll: bool);
@@ -865,6 +881,30 @@ extern "C" {
     pub fn m5u_display_set_text_color_at(index: c_int, fg: u16, bg: u16);
     pub fn m5u_display_get_rotation_at(index: c_int) -> c_int;
     pub fn m5u_display_set_rotation_at(index: c_int, rotation: c_int);
+    pub fn m5u_display_set_brightness_at(index: c_int, brightness: u8);
+    pub fn m5u_display_get_brightness_at(index: c_int) -> u8;
+    pub fn m5u_display_sleep_at(index: c_int);
+    pub fn m5u_display_wakeup_at(index: c_int);
+    pub fn m5u_display_power_save_at(index: c_int, enable: bool);
+    pub fn m5u_display_invert_display_at(index: c_int, invert: bool);
+    pub fn m5u_display_get_invert_at(index: c_int) -> bool;
+    pub fn m5u_display_set_swap_bytes_at(index: c_int, swap: bool);
+    pub fn m5u_display_get_swap_bytes_at(index: c_int) -> bool;
+    pub fn m5u_display_set_color_depth_at(index: c_int, depth: c_int);
+    pub fn m5u_display_get_color_depth_at(index: c_int) -> c_int;
+    pub fn m5u_display_set_addr_window_at(index: c_int, x: c_int, y: c_int, w: c_int, h: c_int);
+    pub fn m5u_display_write_color_at(index: c_int, color: u16, length: u32);
+    pub fn m5u_display_push_block_at(index: c_int, color: u16, length: u32);
+    pub fn m5u_display_progress_bar_at(
+        index: c_int,
+        x: c_int,
+        y: c_int,
+        w: c_int,
+        h: c_int,
+        value: u8,
+    );
+    pub fn m5u_display_push_state_at(index: c_int);
+    pub fn m5u_display_pop_state_at(index: c_int);
     pub fn m5u_display_set_color_at(index: c_int, color: u16);
     pub fn m5u_display_get_cursor_x_at(index: c_int) -> c_int;
     pub fn m5u_display_get_cursor_y_at(index: c_int) -> c_int;
@@ -2128,6 +2168,31 @@ mod host_stubs {
         0
     }
     pub unsafe fn m5u_display_set_brightness(_brightness: u8) {}
+    pub unsafe fn m5u_display_get_brightness() -> u8 {
+        0
+    }
+    pub unsafe fn m5u_display_sleep() {}
+    pub unsafe fn m5u_display_wakeup() {}
+    pub unsafe fn m5u_display_power_save(_enable: bool) {}
+    pub unsafe fn m5u_display_invert_display(_invert: bool) {}
+    pub unsafe fn m5u_display_get_invert() -> bool {
+        false
+    }
+    pub unsafe fn m5u_display_set_swap_bytes(_swap: bool) {}
+    pub unsafe fn m5u_display_get_swap_bytes() -> bool {
+        false
+    }
+    pub unsafe fn m5u_display_set_color_depth(_depth: c_int) {}
+    pub unsafe fn m5u_display_get_color_depth() -> c_int {
+        16
+    }
+    pub unsafe fn m5u_display_set_addr_window(_x: c_int, _y: c_int, _w: c_int, _h: c_int) {}
+    pub unsafe fn m5u_display_write_color(_color: u16, _length: u32) {}
+    pub unsafe fn m5u_display_push_block(_color: u16, _length: u32) {}
+    pub unsafe fn m5u_display_progress_bar(_x: c_int, _y: c_int, _w: c_int, _h: c_int, _value: u8) {
+    }
+    pub unsafe fn m5u_display_push_state() {}
+    pub unsafe fn m5u_display_pop_state() {}
     pub unsafe fn m5u_display_set_epd_fastest() {}
     pub unsafe fn m5u_display_set_epd_mode(_mode: c_int) {}
     pub unsafe fn m5u_display_set_text_scroll(_scroll: bool) {}
@@ -2550,6 +2615,46 @@ mod host_stubs {
         0
     }
     pub unsafe fn m5u_display_set_rotation_at(_index: c_int, _rotation: c_int) {}
+    pub unsafe fn m5u_display_set_brightness_at(_index: c_int, _brightness: u8) {}
+    pub unsafe fn m5u_display_get_brightness_at(_index: c_int) -> u8 {
+        0
+    }
+    pub unsafe fn m5u_display_sleep_at(_index: c_int) {}
+    pub unsafe fn m5u_display_wakeup_at(_index: c_int) {}
+    pub unsafe fn m5u_display_power_save_at(_index: c_int, _enable: bool) {}
+    pub unsafe fn m5u_display_invert_display_at(_index: c_int, _invert: bool) {}
+    pub unsafe fn m5u_display_get_invert_at(_index: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_display_set_swap_bytes_at(_index: c_int, _swap: bool) {}
+    pub unsafe fn m5u_display_get_swap_bytes_at(_index: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_display_set_color_depth_at(_index: c_int, _depth: c_int) {}
+    pub unsafe fn m5u_display_get_color_depth_at(_index: c_int) -> c_int {
+        16
+    }
+    pub unsafe fn m5u_display_set_addr_window_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _h: c_int,
+    ) {
+    }
+    pub unsafe fn m5u_display_write_color_at(_index: c_int, _color: u16, _length: u32) {}
+    pub unsafe fn m5u_display_push_block_at(_index: c_int, _color: u16, _length: u32) {}
+    pub unsafe fn m5u_display_progress_bar_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _h: c_int,
+        _value: u8,
+    ) {
+    }
+    pub unsafe fn m5u_display_push_state_at(_index: c_int) {}
+    pub unsafe fn m5u_display_pop_state_at(_index: c_int) {}
     pub unsafe fn m5u_display_set_color_at(_index: c_int, _color: u16) {}
     pub unsafe fn m5u_display_get_cursor_x_at(_index: c_int) -> c_int {
         0

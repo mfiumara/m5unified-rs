@@ -645,6 +645,66 @@ void m5u_display_set_brightness(uint8_t brightness) {
     (void)brightness;
 }
 
+uint8_t m5u_display_get_brightness(void) {
+    return 0;
+}
+
+void m5u_display_sleep(void) {
+}
+
+void m5u_display_wakeup(void) {
+}
+
+void m5u_display_power_save(bool enable) {
+    (void)enable;
+}
+
+void m5u_display_invert_display(bool invert) {
+    (void)invert;
+}
+
+bool m5u_display_get_invert(void) {
+    return false;
+}
+
+void m5u_display_set_swap_bytes(bool swap) {
+    (void)swap;
+}
+
+bool m5u_display_get_swap_bytes(void) {
+    return false;
+}
+
+void m5u_display_set_color_depth(int depth) {
+    (void)depth;
+}
+
+int m5u_display_get_color_depth(void) {
+    return 16;
+}
+
+void m5u_display_set_addr_window(int x, int y, int w, int h) {
+    (void)x; (void)y; (void)w; (void)h;
+}
+
+void m5u_display_write_color(uint16_t color, uint32_t length) {
+    (void)color; (void)length;
+}
+
+void m5u_display_push_block(uint16_t color, uint32_t length) {
+    (void)color; (void)length;
+}
+
+void m5u_display_progress_bar(int x, int y, int w, int h, uint8_t value) {
+    (void)x; (void)y; (void)w; (void)h; (void)value;
+}
+
+void m5u_display_push_state(void) {
+}
+
+void m5u_display_pop_state(void) {
+}
+
 void m5u_display_set_epd_fastest(void) {
 }
 
@@ -1003,6 +1063,74 @@ int m5u_display_get_rotation_at(int index) {
 
 void m5u_display_set_rotation_at(int index, int rotation) {
     (void)index; (void)rotation;
+}
+
+void m5u_display_set_brightness_at(int index, uint8_t brightness) {
+    (void)index; (void)brightness;
+}
+
+uint8_t m5u_display_get_brightness_at(int index) {
+    (void)index; return 0;
+}
+
+void m5u_display_sleep_at(int index) {
+    (void)index;
+}
+
+void m5u_display_wakeup_at(int index) {
+    (void)index;
+}
+
+void m5u_display_power_save_at(int index, bool enable) {
+    (void)index; (void)enable;
+}
+
+void m5u_display_invert_display_at(int index, bool invert) {
+    (void)index; (void)invert;
+}
+
+bool m5u_display_get_invert_at(int index) {
+    (void)index; return false;
+}
+
+void m5u_display_set_swap_bytes_at(int index, bool swap) {
+    (void)index; (void)swap;
+}
+
+bool m5u_display_get_swap_bytes_at(int index) {
+    (void)index; return false;
+}
+
+void m5u_display_set_color_depth_at(int index, int depth) {
+    (void)index; (void)depth;
+}
+
+int m5u_display_get_color_depth_at(int index) {
+    (void)index; return 16;
+}
+
+void m5u_display_set_addr_window_at(int index, int x, int y, int w, int h) {
+    (void)index; (void)x; (void)y; (void)w; (void)h;
+}
+
+void m5u_display_write_color_at(int index, uint16_t color, uint32_t length) {
+    (void)index; (void)color; (void)length;
+}
+
+void m5u_display_push_block_at(int index, uint16_t color, uint32_t length) {
+    (void)index; (void)color; (void)length;
+}
+
+void m5u_display_progress_bar_at(int index, int x, int y, int w, int h, uint8_t value) {
+    (void)index; (void)x; (void)y; (void)w; (void)h; (void)value;
+}
+
+void m5u_display_push_state_at(int index) {
+    (void)index;
+}
+
+void m5u_display_pop_state_at(int index) {
+    (void)index;
 }
 
 void m5u_display_set_color_at(int index, uint16_t color) {

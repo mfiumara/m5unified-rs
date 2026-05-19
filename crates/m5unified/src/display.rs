@@ -108,6 +108,72 @@ impl Display {
         unsafe { m5unified_sys::m5u_display_set_brightness(brightness) }
     }
 
+    pub fn brightness(&self) -> u8 {
+        unsafe { m5unified_sys::m5u_display_get_brightness() }
+    }
+
+    pub fn sleep(&mut self) {
+        unsafe { m5unified_sys::m5u_display_sleep() }
+    }
+
+    pub fn wakeup(&mut self) {
+        unsafe { m5unified_sys::m5u_display_wakeup() }
+    }
+
+    pub fn power_save(&mut self, enable: bool) {
+        unsafe { m5unified_sys::m5u_display_power_save(enable) }
+    }
+
+    pub fn invert_display(&mut self, invert: bool) {
+        unsafe { m5unified_sys::m5u_display_invert_display(invert) }
+    }
+
+    pub fn inverted(&self) -> bool {
+        unsafe { m5unified_sys::m5u_display_get_invert() }
+    }
+
+    pub fn set_swap_bytes(&mut self, swap: bool) {
+        unsafe { m5unified_sys::m5u_display_set_swap_bytes(swap) }
+    }
+
+    pub fn swap_bytes(&self) -> bool {
+        unsafe { m5unified_sys::m5u_display_get_swap_bytes() }
+    }
+
+    pub fn set_color_depth(&mut self, depth: ColorDepth) {
+        unsafe { m5unified_sys::m5u_display_set_color_depth(depth.raw() as c_int) }
+    }
+
+    pub fn color_depth(&self) -> ColorDepth {
+        ColorDepth::new(unsafe { m5unified_sys::m5u_display_get_color_depth() as u16 })
+    }
+
+    pub fn set_addr_window(&mut self, rect: Rect) {
+        unsafe { m5unified_sys::m5u_display_set_addr_window(rect.x, rect.y, rect.w, rect.h) }
+    }
+
+    pub fn write_color(&mut self, color: u16, length: u32) {
+        unsafe { m5unified_sys::m5u_display_write_color(color, length) }
+    }
+
+    pub fn push_block(&mut self, color: u16, length: u32) {
+        unsafe { m5unified_sys::m5u_display_push_block(color, length) }
+    }
+
+    pub fn progress_bar(&mut self, rect: Rect, value: u8) {
+        unsafe {
+            m5unified_sys::m5u_display_progress_bar(rect.x, rect.y, rect.w, rect.h, value);
+        }
+    }
+
+    pub fn push_state(&mut self) {
+        unsafe { m5unified_sys::m5u_display_push_state() }
+    }
+
+    pub fn pop_state(&mut self) {
+        unsafe { m5unified_sys::m5u_display_pop_state() }
+    }
+
     pub fn set_epd_fastest(&mut self) {
         self.set_epd_mode(EpdMode::Fastest);
     }
@@ -707,6 +773,50 @@ impl Color565 {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct ColorDepth(pub u16);
+
+impl ColorDepth {
+    pub const BIT_MASK: u16 = 0x00FF;
+    pub const HAS_PALETTE: u16 = 0x0800;
+    pub const NONSWAPPED: u16 = 0x0100;
+    pub const ALTERNATE: u16 = 0x1000;
+
+    pub const GRAYSCALE_1BIT: Self = Self(1);
+    pub const GRAYSCALE_2BIT: Self = Self(2);
+    pub const GRAYSCALE_4BIT: Self = Self(4);
+    pub const GRAYSCALE_8BIT: Self = Self(8 | Self::ALTERNATE);
+    pub const PALETTE_1BIT: Self = Self(1 | Self::HAS_PALETTE);
+    pub const PALETTE_2BIT: Self = Self(2 | Self::HAS_PALETTE);
+    pub const PALETTE_4BIT: Self = Self(4 | Self::HAS_PALETTE);
+    pub const PALETTE_8BIT: Self = Self(8 | Self::HAS_PALETTE);
+    pub const RGB332_1BYTE: Self = Self(8);
+    pub const RGB565_2BYTE: Self = Self(16);
+    pub const RGB666_3BYTE: Self = Self(24 | Self::ALTERNATE);
+    pub const RGB888_3BYTE: Self = Self(24);
+    pub const ARGB8888_4BYTE: Self = Self(32);
+    pub const RGB565_NONSWAPPED: Self = Self(16 | Self::NONSWAPPED);
+    pub const RGB666_NONSWAPPED: Self = Self(24 | Self::NONSWAPPED | Self::ALTERNATE);
+    pub const RGB888_NONSWAPPED: Self = Self(24 | Self::NONSWAPPED);
+    pub const ARGB8888_NONSWAPPED: Self = Self(32 | Self::NONSWAPPED);
+
+    pub const fn new(raw: u16) -> Self {
+        Self(raw)
+    }
+
+    pub const fn raw(self) -> u16 {
+        self.0
+    }
+
+    pub const fn bits(self) -> u8 {
+        (self.0 & Self::BIT_MASK) as u8
+    }
+
+    pub const fn has_palette(self) -> bool {
+        self.0 & Self::HAS_PALETTE != 0
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct Point {
     pub x: i32,
     pub y: i32,
@@ -987,6 +1097,82 @@ impl DisplayRef {
         unsafe {
             m5unified_sys::m5u_display_set_rotation_at(self.index, rotation as c_int);
         }
+    }
+
+    pub fn set_brightness(&mut self, brightness: u8) {
+        unsafe { m5unified_sys::m5u_display_set_brightness_at(self.index, brightness) }
+    }
+
+    pub fn brightness(&self) -> u8 {
+        unsafe { m5unified_sys::m5u_display_get_brightness_at(self.index) }
+    }
+
+    pub fn sleep(&mut self) {
+        unsafe { m5unified_sys::m5u_display_sleep_at(self.index) }
+    }
+
+    pub fn wakeup(&mut self) {
+        unsafe { m5unified_sys::m5u_display_wakeup_at(self.index) }
+    }
+
+    pub fn power_save(&mut self, enable: bool) {
+        unsafe { m5unified_sys::m5u_display_power_save_at(self.index, enable) }
+    }
+
+    pub fn invert_display(&mut self, invert: bool) {
+        unsafe { m5unified_sys::m5u_display_invert_display_at(self.index, invert) }
+    }
+
+    pub fn inverted(&self) -> bool {
+        unsafe { m5unified_sys::m5u_display_get_invert_at(self.index) }
+    }
+
+    pub fn set_swap_bytes(&mut self, swap: bool) {
+        unsafe { m5unified_sys::m5u_display_set_swap_bytes_at(self.index, swap) }
+    }
+
+    pub fn swap_bytes(&self) -> bool {
+        unsafe { m5unified_sys::m5u_display_get_swap_bytes_at(self.index) }
+    }
+
+    pub fn set_color_depth(&mut self, depth: ColorDepth) {
+        unsafe { m5unified_sys::m5u_display_set_color_depth_at(self.index, depth.raw() as c_int) }
+    }
+
+    pub fn color_depth(&self) -> ColorDepth {
+        ColorDepth::new(unsafe { m5unified_sys::m5u_display_get_color_depth_at(self.index) as u16 })
+    }
+
+    pub fn set_addr_window(&mut self, rect: Rect) {
+        unsafe {
+            m5unified_sys::m5u_display_set_addr_window_at(
+                self.index, rect.x, rect.y, rect.w, rect.h,
+            );
+        }
+    }
+
+    pub fn write_color(&mut self, color: u16, length: u32) {
+        unsafe { m5unified_sys::m5u_display_write_color_at(self.index, color, length) }
+    }
+
+    pub fn push_block(&mut self, color: u16, length: u32) {
+        unsafe { m5unified_sys::m5u_display_push_block_at(self.index, color, length) }
+    }
+
+    pub fn progress_bar(&mut self, rect: Rect, value: u8) {
+        unsafe {
+            m5unified_sys::m5u_display_progress_bar_at(
+                self.index, rect.x, rect.y, rect.w, rect.h, value,
+            );
+        }
+    }
+
+    pub fn push_state(&mut self) {
+        unsafe { m5unified_sys::m5u_display_push_state_at(self.index) }
+    }
+
+    pub fn pop_state(&mut self) {
+        unsafe { m5unified_sys::m5u_display_pop_state_at(self.index) }
     }
 
     pub fn set_color(&mut self, color: u16) {
