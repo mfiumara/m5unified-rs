@@ -359,6 +359,17 @@ extern "C" {
     pub fn m5u_io_expander_reset_irq(index: usize) -> bool;
     pub fn m5u_io_expander_disable_irq(index: usize) -> bool;
     pub fn m5u_io_expander_enable_irq(index: usize) -> bool;
+    pub fn m5u_pi4ioe5v6408_begin() -> bool;
+    pub fn m5u_pi4ioe5v6408_set_direction(pin: u8, output: bool) -> bool;
+    pub fn m5u_pi4ioe5v6408_enable_pull(pin: u8, enable: bool) -> bool;
+    pub fn m5u_pi4ioe5v6408_set_pull_mode(pin: u8, pull_up: bool) -> bool;
+    pub fn m5u_pi4ioe5v6408_set_high_impedance(pin: u8, enable: bool) -> bool;
+    pub fn m5u_pi4ioe5v6408_get_write_value(pin: u8) -> bool;
+    pub fn m5u_pi4ioe5v6408_digital_write(pin: u8, level: bool) -> bool;
+    pub fn m5u_pi4ioe5v6408_digital_read(pin: u8) -> bool;
+    pub fn m5u_pi4ioe5v6408_reset_irq();
+    pub fn m5u_pi4ioe5v6408_disable_irq();
+    pub fn m5u_pi4ioe5v6408_enable_irq();
 
     pub fn m5u_i2c_set_port(bus: c_int, port_num: c_int, pin_sda: c_int, pin_scl: c_int);
     pub fn m5u_i2c_begin(bus: c_int) -> bool;
@@ -979,6 +990,33 @@ mod host_stubs {
     pub unsafe fn m5u_io_expander_enable_irq(_index: usize) -> bool {
         false
     }
+    pub unsafe fn m5u_pi4ioe5v6408_begin() -> bool {
+        false
+    }
+    pub unsafe fn m5u_pi4ioe5v6408_set_direction(_pin: u8, _output: bool) -> bool {
+        false
+    }
+    pub unsafe fn m5u_pi4ioe5v6408_enable_pull(_pin: u8, _enable: bool) -> bool {
+        false
+    }
+    pub unsafe fn m5u_pi4ioe5v6408_set_pull_mode(_pin: u8, _pull_up: bool) -> bool {
+        false
+    }
+    pub unsafe fn m5u_pi4ioe5v6408_set_high_impedance(_pin: u8, _enable: bool) -> bool {
+        false
+    }
+    pub unsafe fn m5u_pi4ioe5v6408_get_write_value(_pin: u8) -> bool {
+        false
+    }
+    pub unsafe fn m5u_pi4ioe5v6408_digital_write(_pin: u8, _level: bool) -> bool {
+        false
+    }
+    pub unsafe fn m5u_pi4ioe5v6408_digital_read(_pin: u8) -> bool {
+        false
+    }
+    pub unsafe fn m5u_pi4ioe5v6408_reset_irq() {}
+    pub unsafe fn m5u_pi4ioe5v6408_disable_irq() {}
+    pub unsafe fn m5u_pi4ioe5v6408_enable_irq() {}
 
     pub unsafe fn m5u_i2c_set_port(
         _bus: c_int,

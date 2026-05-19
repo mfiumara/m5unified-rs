@@ -60,7 +60,7 @@ pub use imu::{
     Imu, ImuAxis, ImuConvertParams, ImuData, ImuDevice, ImuDeviceKind, ImuKind, ImuRawData,
     ImuSensorMask, RawVec3, Vec3,
 };
-pub use io_expander::IoExpander;
+pub use io_expander::{IoExpander, Pi4ioe5v6408};
 pub use led::{Led, LedColor, LedType};
 pub use log::{Log, LogLevel, LogTarget, RawLogCallback};
 pub use power::{
@@ -384,6 +384,18 @@ mod tests {
         assert!(!io_expander.reset_irq());
         assert!(!io_expander.disable_irq());
         assert!(!io_expander.enable_irq());
+        let mut pi4ioe5v6408 = m5.pi4ioe5v6408();
+        assert!(!pi4ioe5v6408.begin());
+        assert!(!pi4ioe5v6408.set_direction(0, true));
+        assert!(!pi4ioe5v6408.enable_pull(0, true));
+        assert!(!pi4ioe5v6408.set_pull_mode(0, true));
+        assert!(!pi4ioe5v6408.set_high_impedance(0, false));
+        assert!(!pi4ioe5v6408.write_value(0));
+        assert!(!pi4ioe5v6408.digital_write(0, true));
+        assert!(!pi4ioe5v6408.digital_read(0));
+        pi4ioe5v6408.reset_irq();
+        pi4ioe5v6408.disable_irq();
+        pi4ioe5v6408.enable_irq();
         m5.ex_i2c.set_port(0, 1, 2);
         assert!(!m5.ex_i2c.begin());
         assert!(!m5.ex_i2c.begin_with_port(0, 1, 2));

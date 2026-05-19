@@ -56,6 +56,17 @@ bool m5u_io_expander_digital_read(size_t index, uint8_t pin);
 bool m5u_io_expander_reset_irq(size_t index);
 bool m5u_io_expander_disable_irq(size_t index);
 bool m5u_io_expander_enable_irq(size_t index);
+bool m5u_pi4ioe5v6408_begin(void);
+bool m5u_pi4ioe5v6408_set_direction(uint8_t pin, bool output);
+bool m5u_pi4ioe5v6408_enable_pull(uint8_t pin, bool enable);
+bool m5u_pi4ioe5v6408_set_pull_mode(uint8_t pin, bool pull_up);
+bool m5u_pi4ioe5v6408_set_high_impedance(uint8_t pin, bool enable);
+bool m5u_pi4ioe5v6408_get_write_value(uint8_t pin);
+bool m5u_pi4ioe5v6408_digital_write(uint8_t pin, bool level);
+bool m5u_pi4ioe5v6408_digital_read(uint8_t pin);
+void m5u_pi4ioe5v6408_reset_irq(void);
+void m5u_pi4ioe5v6408_disable_irq(void);
+void m5u_pi4ioe5v6408_enable_irq(void);
 
 void m5u_i2c_set_port(int bus, int port_num, int pin_sda, int pin_scl);
 bool m5u_i2c_begin(int bus);

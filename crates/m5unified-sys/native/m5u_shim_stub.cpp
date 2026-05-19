@@ -87,6 +87,17 @@ bool m5u_io_expander_digital_read(size_t index, uint8_t pin) { (void)index; (voi
 bool m5u_io_expander_reset_irq(size_t index) { (void)index; return false; }
 bool m5u_io_expander_disable_irq(size_t index) { (void)index; return false; }
 bool m5u_io_expander_enable_irq(size_t index) { (void)index; return false; }
+bool m5u_pi4ioe5v6408_begin(void) { return false; }
+bool m5u_pi4ioe5v6408_set_direction(uint8_t pin, bool output) { (void)pin; (void)output; return false; }
+bool m5u_pi4ioe5v6408_enable_pull(uint8_t pin, bool enable) { (void)pin; (void)enable; return false; }
+bool m5u_pi4ioe5v6408_set_pull_mode(uint8_t pin, bool pull_up) { (void)pin; (void)pull_up; return false; }
+bool m5u_pi4ioe5v6408_set_high_impedance(uint8_t pin, bool enable) { (void)pin; (void)enable; return false; }
+bool m5u_pi4ioe5v6408_get_write_value(uint8_t pin) { (void)pin; return false; }
+bool m5u_pi4ioe5v6408_digital_write(uint8_t pin, bool level) { (void)pin; (void)level; return false; }
+bool m5u_pi4ioe5v6408_digital_read(uint8_t pin) { (void)pin; return false; }
+void m5u_pi4ioe5v6408_reset_irq(void) {}
+void m5u_pi4ioe5v6408_disable_irq(void) {}
+void m5u_pi4ioe5v6408_enable_irq(void) {}
 
 void m5u_i2c_set_port(int bus, int port_num, int pin_sda, int pin_scl) {
     (void)bus; (void)port_num; (void)pin_sda; (void)pin_scl;

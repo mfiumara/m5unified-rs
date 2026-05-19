@@ -1,6 +1,7 @@
 #include "m5u_shim.h"
 
 #include <M5Unified.h>
+#include <utility/PI4IOE5V6408_Class.hpp>
 #include <utility/imu/AK8963_Class.hpp>
 #include <utility/imu/BMI270_Class.hpp>
 #include <utility/imu/BMM150_Class.hpp>
@@ -295,6 +296,75 @@ bool m5u_io_expander_enable_irq(size_t index) {
     }
     io_expander->enableIrq();
     return true;
+}
+
+static m5::PI4IOE5V6408_Class& m5u_pi4ioe5v6408(void) {
+    static m5::PI4IOE5V6408_Class io_expander;
+    return io_expander;
+}
+
+bool m5u_pi4ioe5v6408_begin(void) {
+    return m5u_pi4ioe5v6408().begin();
+}
+
+bool m5u_pi4ioe5v6408_set_direction(uint8_t pin, bool output) {
+    if (pin >= 8) {
+        return false;
+    }
+    m5u_pi4ioe5v6408().setDirection(pin, output);
+    return true;
+}
+
+bool m5u_pi4ioe5v6408_enable_pull(uint8_t pin, bool enable) {
+    if (pin >= 8) {
+        return false;
+    }
+    m5u_pi4ioe5v6408().enablePull(pin, enable);
+    return true;
+}
+
+bool m5u_pi4ioe5v6408_set_pull_mode(uint8_t pin, bool pull_up) {
+    if (pin >= 8) {
+        return false;
+    }
+    m5u_pi4ioe5v6408().setPullMode(pin, pull_up);
+    return true;
+}
+
+bool m5u_pi4ioe5v6408_set_high_impedance(uint8_t pin, bool enable) {
+    if (pin >= 8) {
+        return false;
+    }
+    m5u_pi4ioe5v6408().setHighImpedance(pin, enable);
+    return true;
+}
+
+bool m5u_pi4ioe5v6408_get_write_value(uint8_t pin) {
+    return pin < 8 && m5u_pi4ioe5v6408().getWriteValue(pin);
+}
+
+bool m5u_pi4ioe5v6408_digital_write(uint8_t pin, bool level) {
+    if (pin >= 8) {
+        return false;
+    }
+    m5u_pi4ioe5v6408().digitalWrite(pin, level);
+    return true;
+}
+
+bool m5u_pi4ioe5v6408_digital_read(uint8_t pin) {
+    return pin < 8 && m5u_pi4ioe5v6408().digitalRead(pin);
+}
+
+void m5u_pi4ioe5v6408_reset_irq(void) {
+    m5u_pi4ioe5v6408().resetIrq();
+}
+
+void m5u_pi4ioe5v6408_disable_irq(void) {
+    m5u_pi4ioe5v6408().disableIrq();
+}
+
+void m5u_pi4ioe5v6408_enable_irq(void) {
+    m5u_pi4ioe5v6408().enableIrq();
 }
 
 static m5::I2C_Class* m5u_i2c_for_bus(int bus) {
