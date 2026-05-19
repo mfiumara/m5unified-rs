@@ -61,7 +61,10 @@ pub use imu::{
     ImuSensorMask, RawVec3, Vec3,
 };
 pub use io_expander::{IoExpander, Pi4ioe5v6408};
-pub use led::{Led, LedColor, LedPowerHub, LedType};
+pub use led::{
+    Led, LedColor, LedPowerHub, LedStrip, LedStripColorOrder, LedStripConfig, LedStripRmtConfig,
+    LedType,
+};
 pub use log::{Log, LogLevel, LogTarget, RawLogCallback};
 pub use power::{
     Aw32001, Aw32001ChargeStatus, Axp192, Axp192PekPress, Axp2101, Axp2101ChargeStatus,
@@ -348,6 +351,27 @@ mod tests {
         power_hub.set_color(0, LedColor::WHITE);
         power_hub.set_colors(0, &[LedColor::RED, LedColor::GREEN]);
         power_hub.display();
+        let mut strip = m5.led.strip();
+        assert_eq!(LedStripColorOrder::from_raw(2), LedStripColorOrder::Grb);
+        assert_eq!(LedStripColorOrder::Bgr.raw(), 5);
+        assert_eq!(
+            LedStripConfig::default(),
+            LedStripConfig {
+                led_count: 1,
+                color_order: LedStripColorOrder::Grb,
+                byte_per_led: 3
+            }
+        );
+        assert_eq!(LedStripRmtConfig::new(5).pin_data, 5);
+        assert!(!strip.set_config(LedStripConfig::default()));
+        assert!(!strip.set_rmt_bus_config(LedStripRmtConfig::new(5)));
+        assert!(!strip.begin());
+        assert_eq!(strip.count(), 0);
+        assert_eq!(strip.led_type(0), LedType::Unknown);
+        strip.set_brightness(64);
+        strip.set_color(0, LedColor::WHITE);
+        strip.set_colors(0, &[LedColor::RED, LedColor::GREEN]);
+        strip.display();
     }
 
     #[test]

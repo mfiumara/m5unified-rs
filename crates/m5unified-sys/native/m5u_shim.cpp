@@ -8,6 +8,7 @@
 #include <utility/imu/MPU6886_Class.hpp>
 #include <utility/imu/SH200Q_Class.hpp>
 #include <utility/led/LED_PowerHub_Class.hpp>
+#include <utility/led/LED_Strip_Class.hpp>
 #include <utility/rtc/PCF8563_Class.hpp>
 #include <utility/rtc/RTC_PowerHub_Class.hpp>
 #include <utility/rtc/RX8130_Class.hpp>
@@ -17,6 +18,7 @@
 #include <esp_err.h>
 #include <esp_vfs_fat.h>
 #include <sdmmc_cmd.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -66,6 +68,12 @@ static bool s_m5u_sd_owns_bus = false;
 #define M5U_HAS_PY32PMIC 1
 #else
 #define M5U_HAS_PY32PMIC 0
+#endif
+
+#if defined(M5UNIFIED_RMT_VERSION) && M5UNIFIED_RMT_VERSION == 2
+#define M5U_HAS_LED_STRIP_RMT 1
+#else
+#define M5U_HAS_LED_STRIP_RMT 0
 #endif
 
 extern "C" {
@@ -3237,6 +3245,147 @@ void m5u_led_power_hub_display(void) {
 int m5u_led_power_hub_get_type(size_t index) {
 #if defined(CONFIG_IDF_TARGET_ESP32S3)
     return (int)m5u_led_power_hub().getLedType(index);
+#else
+    (void)index;
+    return 0;
+#endif
+}
+
+#if M5U_HAS_LED_STRIP_RMT
+static m5::LED_Strip_Class& m5u_led_strip(void) {
+    static m5::LED_Strip_Class led;
+    return led;
+}
+
+static std::shared_ptr<m5::LedBus_RMT>& m5u_led_strip_rmt_bus(void) {
+    static std::shared_ptr<m5::LedBus_RMT> bus;
+    return bus;
+}
+
+static m5::LED_Strip_Class::config_t::color_order_t m5u_led_strip_color_order(int color_order) {
+    using color_order_t = m5::LED_Strip_Class::config_t::color_order_t;
+    switch (color_order) {
+        case 0: return color_order_t::color_order_rgb;
+        case 1: return color_order_t::color_order_rbg;
+        case 2: return color_order_t::color_order_grb;
+        case 3: return color_order_t::color_order_gbr;
+        case 4: return color_order_t::color_order_brg;
+        case 5: return color_order_t::color_order_bgr;
+        default: return color_order_t::color_order_grb;
+    }
+}
+#endif
+
+bool m5u_led_strip_set_config(const m5u_led_strip_config_t* config) {
+#if M5U_HAS_LED_STRIP_RMT
+    if (!config) {
+        return false;
+    }
+    m5::LED_Strip_Class::config_t cfg;
+    cfg.led_count = config->led_count;
+    cfg.color_order = m5u_led_strip_color_order(config->color_order);
+    cfg.byte_per_led = config->byte_per_led;
+    m5u_led_strip().setConfig(cfg);
+    return true;
+#else
+    (void)config;
+    return false;
+#endif
+}
+
+bool m5u_led_strip_set_rmt_bus_config(const m5u_led_strip_rmt_config_t* config) {
+#if M5U_HAS_LED_STRIP_RMT
+    if (!config) {
+        return false;
+    }
+    auto& bus = m5u_led_strip_rmt_bus();
+    if (bus) {
+        bus->release();
+    }
+    bus = std::make_shared<m5::LedBus_RMT>();
+    auto cfg = bus->config();
+    cfg.frequency = config->frequency;
+    cfg.t0h_ns = config->t0h_ns;
+    cfg.t0l_ns = config->t0l_ns;
+    cfg.t1h_ns = config->t1h_ns;
+    cfg.t1l_ns = config->t1l_ns;
+    cfg.reset_us = config->reset_us;
+    cfg.pin_data = config->pin_data;
+    bus->setConfig(cfg);
+    m5u_led_strip().setBus(bus);
+    return true;
+#else
+    (void)config;
+    return false;
+#endif
+}
+
+bool m5u_led_strip_begin(void) {
+#if M5U_HAS_LED_STRIP_RMT
+    return m5u_led_strip().begin();
+#else
+    return false;
+#endif
+}
+
+size_t m5u_led_strip_count(void) {
+#if M5U_HAS_LED_STRIP_RMT
+    return m5u_led_strip().getCount();
+#else
+    return 0;
+#endif
+}
+
+void m5u_led_strip_set_brightness(uint8_t brightness) {
+#if M5U_HAS_LED_STRIP_RMT
+    m5u_led_strip().setBrightness(brightness);
+#else
+    (void)brightness;
+#endif
+}
+
+void m5u_led_strip_set_color_rgb(size_t index, uint8_t r, uint8_t g, uint8_t b) {
+#if M5U_HAS_LED_STRIP_RMT
+    if (index < m5u_led_strip().getCount()) {
+        RGBColor color{r, g, b};
+        m5u_led_strip().setColors(&color, index, 1);
+    }
+#else
+    (void)index; (void)r; (void)g; (void)b;
+#endif
+}
+
+void m5u_led_strip_set_colors_rgb(const m5u_led_color_t* colors, size_t index, size_t length) {
+#if M5U_HAS_LED_STRIP_RMT
+    auto& led = m5u_led_strip();
+    const size_t count = led.getCount();
+    if (!colors || !length || index >= count) {
+        return;
+    }
+    const size_t available = count - index;
+    if (length > available) {
+        length = available;
+    }
+    std::vector<RGBColor> rgb;
+    rgb.reserve(length);
+    for (size_t i = 0; i < length; ++i) {
+        rgb.push_back(RGBColor{colors[i].r, colors[i].g, colors[i].b});
+    }
+    led.setColors(rgb.data(), index, length);
+#else
+    (void)colors; (void)index; (void)length;
+#endif
+}
+
+void m5u_led_strip_display(void) {
+#if M5U_HAS_LED_STRIP_RMT
+    m5u_led_strip().display();
+#endif
+}
+
+int m5u_led_strip_get_type(size_t index) {
+#if M5U_HAS_LED_STRIP_RMT
+    return (int)m5u_led_strip().getLedType(index);
 #else
     (void)index;
     return 0;

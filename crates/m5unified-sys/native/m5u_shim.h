@@ -564,6 +564,20 @@ typedef struct {
     uint8_t g;
     uint8_t b;
 } m5u_led_color_t;
+typedef struct {
+    size_t led_count;
+    int color_order;
+    uint8_t byte_per_led;
+} m5u_led_strip_config_t;
+typedef struct {
+    uint32_t frequency;
+    uint16_t t0h_ns;
+    uint16_t t0l_ns;
+    uint16_t t1h_ns;
+    uint16_t t1l_ns;
+    uint16_t reset_us;
+    int8_t pin_data;
+} m5u_led_strip_rmt_config_t;
 bool m5u_led_begin(void);
 void m5u_led_display(void);
 void m5u_led_set_auto_display(bool enable);
@@ -581,6 +595,15 @@ void m5u_led_power_hub_set_color_rgb(size_t index, uint8_t r, uint8_t g, uint8_t
 void m5u_led_power_hub_set_colors_rgb(const m5u_led_color_t* colors, size_t index, size_t length);
 void m5u_led_power_hub_display(void);
 int m5u_led_power_hub_get_type(size_t index);
+bool m5u_led_strip_set_config(const m5u_led_strip_config_t* config);
+bool m5u_led_strip_set_rmt_bus_config(const m5u_led_strip_rmt_config_t* config);
+bool m5u_led_strip_begin(void);
+size_t m5u_led_strip_count(void);
+void m5u_led_strip_set_brightness(uint8_t brightness);
+void m5u_led_strip_set_color_rgb(size_t index, uint8_t r, uint8_t g, uint8_t b);
+void m5u_led_strip_set_colors_rgb(const m5u_led_color_t* colors, size_t index, size_t length);
+void m5u_led_strip_display(void);
+int m5u_led_strip_get_type(size_t index);
 
 void m5u_log_print(const char* text);
 void m5u_log_println(const char* text);

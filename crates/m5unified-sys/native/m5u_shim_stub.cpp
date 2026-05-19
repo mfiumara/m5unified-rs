@@ -1338,6 +1338,41 @@ int m5u_led_power_hub_get_type(size_t index) {
     (void)index; return 0;
 }
 
+bool m5u_led_strip_set_config(const m5u_led_strip_config_t* config) {
+    (void)config; return false;
+}
+
+bool m5u_led_strip_set_rmt_bus_config(const m5u_led_strip_rmt_config_t* config) {
+    (void)config; return false;
+}
+
+bool m5u_led_strip_begin(void) {
+    return false;
+}
+
+size_t m5u_led_strip_count(void) {
+    return 0;
+}
+
+void m5u_led_strip_set_brightness(uint8_t brightness) {
+    (void)brightness;
+}
+
+void m5u_led_strip_set_color_rgb(size_t index, uint8_t r, uint8_t g, uint8_t b) {
+    (void)index; (void)r; (void)g; (void)b;
+}
+
+void m5u_led_strip_set_colors_rgb(const m5u_led_color_t* colors, size_t index, size_t length) {
+    (void)colors; (void)index; (void)length;
+}
+
+void m5u_led_strip_display(void) {
+}
+
+int m5u_led_strip_get_type(size_t index) {
+    (void)index; return 0;
+}
+
 void m5u_log_print(const char* text) {
     (void)text;
 }

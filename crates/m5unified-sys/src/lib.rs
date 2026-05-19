@@ -229,6 +229,50 @@ pub struct m5u_led_color_t {
 }
 
 #[repr(C)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct m5u_led_strip_config_t {
+    pub led_count: usize,
+    pub color_order: c_int,
+    pub byte_per_led: u8,
+}
+
+impl Default for m5u_led_strip_config_t {
+    fn default() -> Self {
+        Self {
+            led_count: 1,
+            color_order: 2,
+            byte_per_led: 3,
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct m5u_led_strip_rmt_config_t {
+    pub frequency: u32,
+    pub t0h_ns: u16,
+    pub t0l_ns: u16,
+    pub t1h_ns: u16,
+    pub t1l_ns: u16,
+    pub reset_us: u16,
+    pub pin_data: i8,
+}
+
+impl Default for m5u_led_strip_rmt_config_t {
+    fn default() -> Self {
+        Self {
+            frequency: 10_000_000,
+            t0h_ns: 300,
+            t0l_ns: 900,
+            t1h_ns: 900,
+            t1l_ns: 300,
+            reset_us: 280,
+            pin_data: -1,
+        }
+    }
+}
+
+#[repr(C)]
 #[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]
 pub struct m5u_touch_detail_t {
     pub x: c_int,
@@ -899,6 +943,19 @@ extern "C" {
     );
     pub fn m5u_led_power_hub_display();
     pub fn m5u_led_power_hub_get_type(index: usize) -> c_int;
+    pub fn m5u_led_strip_set_config(config: *const m5u_led_strip_config_t) -> bool;
+    pub fn m5u_led_strip_set_rmt_bus_config(config: *const m5u_led_strip_rmt_config_t) -> bool;
+    pub fn m5u_led_strip_begin() -> bool;
+    pub fn m5u_led_strip_count() -> usize;
+    pub fn m5u_led_strip_set_brightness(brightness: u8);
+    pub fn m5u_led_strip_set_color_rgb(index: usize, r: u8, g: u8, b: u8);
+    pub fn m5u_led_strip_set_colors_rgb(
+        colors: *const m5u_led_color_t,
+        index: usize,
+        length: usize,
+    );
+    pub fn m5u_led_strip_display();
+    pub fn m5u_led_strip_get_type(index: usize) -> c_int;
 
     pub fn m5u_log_print(text: *const c_char);
     pub fn m5u_log_println(text: *const c_char);
@@ -2345,6 +2402,32 @@ mod host_stubs {
     }
     pub unsafe fn m5u_led_power_hub_display() {}
     pub unsafe fn m5u_led_power_hub_get_type(_index: usize) -> c_int {
+        0
+    }
+    pub unsafe fn m5u_led_strip_set_config(_config: *const m5u_led_strip_config_t) -> bool {
+        false
+    }
+    pub unsafe fn m5u_led_strip_set_rmt_bus_config(
+        _config: *const m5u_led_strip_rmt_config_t,
+    ) -> bool {
+        false
+    }
+    pub unsafe fn m5u_led_strip_begin() -> bool {
+        false
+    }
+    pub unsafe fn m5u_led_strip_count() -> usize {
+        0
+    }
+    pub unsafe fn m5u_led_strip_set_brightness(_brightness: u8) {}
+    pub unsafe fn m5u_led_strip_set_color_rgb(_index: usize, _r: u8, _g: u8, _b: u8) {}
+    pub unsafe fn m5u_led_strip_set_colors_rgb(
+        _colors: *const m5u_led_color_t,
+        _index: usize,
+        _length: usize,
+    ) {
+    }
+    pub unsafe fn m5u_led_strip_display() {}
+    pub unsafe fn m5u_led_strip_get_type(_index: usize) -> c_int {
         0
     }
 
