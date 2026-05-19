@@ -1335,8 +1335,52 @@ void m5u_display_set_addr_window(int x, int y, int w, int h) {
     M5.Display.setAddrWindow(x, y, w, h);
 }
 
+void m5u_display_set_window(int xs, int ys, int xe, int ye) {
+    M5.Display.setWindow(xs, ys, xe, ye);
+}
+
+void m5u_display_begin_transaction(void) {
+    M5.Display.beginTransaction();
+}
+
+void m5u_display_end_transaction(void) {
+    M5.Display.endTransaction();
+}
+
+uint32_t m5u_display_get_start_count(void) {
+    return M5.Display.getStartCount();
+}
+
+int m5u_display_get_scan_line(void) {
+    return M5.Display.getScanLine();
+}
+
+void m5u_display_set_raw_color(uint32_t color) {
+    M5.Display.setRawColor(color);
+}
+
+uint32_t m5u_display_get_raw_color(void) {
+    return M5.Display.getRawColor();
+}
+
 void m5u_display_write_color(uint16_t color, uint32_t length) {
     M5.Display.writeColor(color, length);
+}
+
+void m5u_display_draw_pixel_current(int x, int y) {
+    M5.Display.drawPixel(x, y);
+}
+
+void m5u_display_write_pixel_current(int x, int y) {
+    M5.Display.writePixel(x, y);
+}
+
+void m5u_display_write_fill_rect(int x, int y, int w, int h, uint16_t color) {
+    M5.Display.writeFillRect(x, y, w, h, color);
+}
+
+void m5u_display_write_fill_rect_preclipped(int x, int y, int w, int h, uint16_t color) {
+    M5.Display.writeFillRectPreclipped(x, y, w, h, color);
 }
 
 void m5u_display_push_block(uint16_t color, uint32_t length) {
@@ -1427,8 +1471,12 @@ int m5u_display_font_height(void) {
     return M5.Display.fontHeight();
 }
 
-uint16_t m5u_display_get_base_color(void) {
+uint32_t m5u_display_get_base_color(void) {
     return M5.Display.getBaseColor();
+}
+
+void m5u_display_set_base_color(uint32_t color) {
+    M5.Display.setBaseColor(color);
 }
 
 void m5u_display_set_color(uint16_t color) {
@@ -1670,7 +1718,7 @@ void m5u_display_clear_clip_rect(void) {
     M5.Display.clearClipRect();
 }
 
-uint16_t m5u_display_color888(uint8_t r, uint8_t g, uint8_t b) {
+uint32_t m5u_display_color888(uint8_t r, uint8_t g, uint8_t b) {
     return M5.Display.color888(r, g, b);
 }
 
@@ -1894,8 +1942,52 @@ void m5u_display_set_addr_window_at(int index, int x, int y, int w, int h) {
     M5.Displays(index).setAddrWindow(x, y, w, h);
 }
 
+void m5u_display_set_window_at(int index, int xs, int ys, int xe, int ye) {
+    M5.Displays(index).setWindow(xs, ys, xe, ye);
+}
+
+void m5u_display_begin_transaction_at(int index) {
+    M5.Displays(index).beginTransaction();
+}
+
+void m5u_display_end_transaction_at(int index) {
+    M5.Displays(index).endTransaction();
+}
+
+uint32_t m5u_display_get_start_count_at(int index) {
+    return M5.Displays(index).getStartCount();
+}
+
+int m5u_display_get_scan_line_at(int index) {
+    return M5.Displays(index).getScanLine();
+}
+
+void m5u_display_set_raw_color_at(int index, uint32_t color) {
+    M5.Displays(index).setRawColor(color);
+}
+
+uint32_t m5u_display_get_raw_color_at(int index) {
+    return M5.Displays(index).getRawColor();
+}
+
 void m5u_display_write_color_at(int index, uint16_t color, uint32_t length) {
     M5.Displays(index).writeColor(color, length);
+}
+
+void m5u_display_draw_pixel_current_at(int index, int x, int y) {
+    M5.Displays(index).drawPixel(x, y);
+}
+
+void m5u_display_write_pixel_current_at(int index, int x, int y) {
+    M5.Displays(index).writePixel(x, y);
+}
+
+void m5u_display_write_fill_rect_at(int index, int x, int y, int w, int h, uint16_t color) {
+    M5.Displays(index).writeFillRect(x, y, w, h, color);
+}
+
+void m5u_display_write_fill_rect_preclipped_at(int index, int x, int y, int w, int h, uint16_t color) {
+    M5.Displays(index).writeFillRectPreclipped(x, y, w, h, color);
 }
 
 void m5u_display_push_block_at(int index, uint16_t color, uint32_t length) {
@@ -1916,6 +2008,14 @@ void m5u_display_pop_state_at(int index) {
 
 void m5u_display_set_color_at(int index, uint16_t color) {
     M5.Displays(index).setColor(color);
+}
+
+uint32_t m5u_display_get_base_color_at(int index) {
+    return M5.Displays(index).getBaseColor();
+}
+
+void m5u_display_set_base_color_at(int index, uint32_t color) {
+    M5.Displays(index).setBaseColor(color);
 }
 
 int m5u_display_get_cursor_x_at(int index) {

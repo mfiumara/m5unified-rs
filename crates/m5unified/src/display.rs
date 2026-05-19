@@ -152,8 +152,56 @@ impl Display {
         unsafe { m5unified_sys::m5u_display_set_addr_window(rect.x, rect.y, rect.w, rect.h) }
     }
 
+    pub fn set_window(&mut self, start: Point, end: Point) {
+        unsafe { m5unified_sys::m5u_display_set_window(start.x, start.y, end.x, end.y) }
+    }
+
+    pub fn begin_transaction(&mut self) {
+        unsafe { m5unified_sys::m5u_display_begin_transaction() }
+    }
+
+    pub fn end_transaction(&mut self) {
+        unsafe { m5unified_sys::m5u_display_end_transaction() }
+    }
+
+    pub fn start_count(&self) -> u32 {
+        unsafe { m5unified_sys::m5u_display_get_start_count() }
+    }
+
+    pub fn scan_line(&self) -> i32 {
+        unsafe { m5unified_sys::m5u_display_get_scan_line() as i32 }
+    }
+
+    pub fn set_raw_color(&mut self, color: u32) {
+        unsafe { m5unified_sys::m5u_display_set_raw_color(color) }
+    }
+
+    pub fn raw_color(&self) -> u32 {
+        unsafe { m5unified_sys::m5u_display_get_raw_color() }
+    }
+
     pub fn write_color(&mut self, color: u16, length: u32) {
         unsafe { m5unified_sys::m5u_display_write_color(color, length) }
+    }
+
+    pub fn draw_pixel_current(&mut self, x: i32, y: i32) {
+        unsafe { m5unified_sys::m5u_display_draw_pixel_current(x, y) }
+    }
+
+    pub fn write_pixel_current(&mut self, x: i32, y: i32) {
+        unsafe { m5unified_sys::m5u_display_write_pixel_current(x, y) }
+    }
+
+    pub fn write_fill_rect(&mut self, rect: Rect, color: u16) {
+        unsafe { m5unified_sys::m5u_display_write_fill_rect(rect.x, rect.y, rect.w, rect.h, color) }
+    }
+
+    pub fn write_fill_rect_preclipped(&mut self, rect: Rect, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_write_fill_rect_preclipped(
+                rect.x, rect.y, rect.w, rect.h, color,
+            )
+        }
     }
 
     pub fn push_block(&mut self, color: u16, length: u32) {
@@ -233,8 +281,12 @@ impl Display {
         unsafe { m5unified_sys::m5u_display_font_width() as i32 }
     }
 
-    pub fn base_color(&self) -> u16 {
+    pub fn base_color(&self) -> u32 {
         unsafe { m5unified_sys::m5u_display_get_base_color() }
+    }
+
+    pub fn set_base_color(&mut self, color: u32) {
+        unsafe { m5unified_sys::m5u_display_set_base_color(color) }
     }
 
     pub fn set_color(&mut self, color: u16) {
@@ -588,7 +640,7 @@ impl Display {
         unsafe { m5unified_sys::m5u_display_clear_clip_rect() }
     }
 
-    pub fn color888(&self, r: u8, g: u8, b: u8) -> u16 {
+    pub fn color888(&self, r: u8, g: u8, b: u8) -> u32 {
         unsafe { m5unified_sys::m5u_display_color888(r, g, b) }
     }
 
@@ -768,7 +820,7 @@ impl Color565 {
     }
 
     pub fn rgb888(r: u8, g: u8, b: u8) -> Self {
-        Self(unsafe { m5unified_sys::m5u_display_color888(r, g, b) })
+        Self(((u16::from(r) >> 3) << 11) | ((u16::from(g) >> 2) << 5) | (u16::from(b) >> 3))
     }
 }
 
@@ -1151,8 +1203,62 @@ impl DisplayRef {
         }
     }
 
+    pub fn set_window(&mut self, start: Point, end: Point) {
+        unsafe {
+            m5unified_sys::m5u_display_set_window_at(self.index, start.x, start.y, end.x, end.y);
+        }
+    }
+
+    pub fn begin_transaction(&mut self) {
+        unsafe { m5unified_sys::m5u_display_begin_transaction_at(self.index) }
+    }
+
+    pub fn end_transaction(&mut self) {
+        unsafe { m5unified_sys::m5u_display_end_transaction_at(self.index) }
+    }
+
+    pub fn start_count(&self) -> u32 {
+        unsafe { m5unified_sys::m5u_display_get_start_count_at(self.index) }
+    }
+
+    pub fn scan_line(&self) -> i32 {
+        unsafe { m5unified_sys::m5u_display_get_scan_line_at(self.index) as i32 }
+    }
+
+    pub fn set_raw_color(&mut self, color: u32) {
+        unsafe { m5unified_sys::m5u_display_set_raw_color_at(self.index, color) }
+    }
+
+    pub fn raw_color(&self) -> u32 {
+        unsafe { m5unified_sys::m5u_display_get_raw_color_at(self.index) }
+    }
+
     pub fn write_color(&mut self, color: u16, length: u32) {
         unsafe { m5unified_sys::m5u_display_write_color_at(self.index, color, length) }
+    }
+
+    pub fn draw_pixel_current(&mut self, x: i32, y: i32) {
+        unsafe { m5unified_sys::m5u_display_draw_pixel_current_at(self.index, x, y) }
+    }
+
+    pub fn write_pixel_current(&mut self, x: i32, y: i32) {
+        unsafe { m5unified_sys::m5u_display_write_pixel_current_at(self.index, x, y) }
+    }
+
+    pub fn write_fill_rect(&mut self, rect: Rect, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_write_fill_rect_at(
+                self.index, rect.x, rect.y, rect.w, rect.h, color,
+            );
+        }
+    }
+
+    pub fn write_fill_rect_preclipped(&mut self, rect: Rect, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_write_fill_rect_preclipped_at(
+                self.index, rect.x, rect.y, rect.w, rect.h, color,
+            );
+        }
     }
 
     pub fn push_block(&mut self, color: u16, length: u32) {
@@ -1177,6 +1283,14 @@ impl DisplayRef {
 
     pub fn set_color(&mut self, color: u16) {
         unsafe { m5unified_sys::m5u_display_set_color_at(self.index, color) }
+    }
+
+    pub fn base_color(&self) -> u32 {
+        unsafe { m5unified_sys::m5u_display_get_base_color_at(self.index) }
+    }
+
+    pub fn set_base_color(&mut self, color: u32) {
+        unsafe { m5unified_sys::m5u_display_set_base_color_at(self.index, color) }
     }
 
     pub fn cursor_x(&self) -> i32 {

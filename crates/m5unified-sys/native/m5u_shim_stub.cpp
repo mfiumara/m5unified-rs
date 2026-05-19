@@ -687,8 +687,50 @@ void m5u_display_set_addr_window(int x, int y, int w, int h) {
     (void)x; (void)y; (void)w; (void)h;
 }
 
+void m5u_display_set_window(int xs, int ys, int xe, int ye) {
+    (void)xs; (void)ys; (void)xe; (void)ye;
+}
+
+void m5u_display_begin_transaction(void) {
+}
+
+void m5u_display_end_transaction(void) {
+}
+
+uint32_t m5u_display_get_start_count(void) {
+    return 0;
+}
+
+int m5u_display_get_scan_line(void) {
+    return 0;
+}
+
+void m5u_display_set_raw_color(uint32_t color) {
+    (void)color;
+}
+
+uint32_t m5u_display_get_raw_color(void) {
+    return 0;
+}
+
 void m5u_display_write_color(uint16_t color, uint32_t length) {
     (void)color; (void)length;
+}
+
+void m5u_display_draw_pixel_current(int x, int y) {
+    (void)x; (void)y;
+}
+
+void m5u_display_write_pixel_current(int x, int y) {
+    (void)x; (void)y;
+}
+
+void m5u_display_write_fill_rect(int x, int y, int w, int h, uint16_t color) {
+    (void)x; (void)y; (void)w; (void)h; (void)color;
+}
+
+void m5u_display_write_fill_rect_preclipped(int x, int y, int w, int h, uint16_t color) {
+    (void)x; (void)y; (void)w; (void)h; (void)color;
 }
 
 void m5u_display_push_block(uint16_t color, uint32_t length) {
@@ -748,8 +790,12 @@ int m5u_display_font_height(void) {
     return 16;
 }
 
-uint16_t m5u_display_get_base_color(void) {
+uint32_t m5u_display_get_base_color(void) {
     return 0;
+}
+
+void m5u_display_set_base_color(uint32_t color) {
+    (void)color;
 }
 
 void m5u_display_set_color(uint16_t color) {
@@ -964,8 +1010,8 @@ void m5u_display_get_clip_rect(int* x, int* y, int* w, int* h) {
 void m5u_display_clear_clip_rect(void) {
 }
 
-uint16_t m5u_display_color888(uint8_t r, uint8_t g, uint8_t b) {
-    return (uint16_t)((r & 0xF8) << 8 | (g & 0xFC) << 3 | (b >> 3));
+uint32_t m5u_display_color888(uint8_t r, uint8_t g, uint8_t b) {
+    return ((uint32_t)r << 16) | ((uint32_t)g << 8) | b;
 }
 
 void m5u_display_set_pivot(float x, float y) {
@@ -1113,8 +1159,52 @@ void m5u_display_set_addr_window_at(int index, int x, int y, int w, int h) {
     (void)index; (void)x; (void)y; (void)w; (void)h;
 }
 
+void m5u_display_set_window_at(int index, int xs, int ys, int xe, int ye) {
+    (void)index; (void)xs; (void)ys; (void)xe; (void)ye;
+}
+
+void m5u_display_begin_transaction_at(int index) {
+    (void)index;
+}
+
+void m5u_display_end_transaction_at(int index) {
+    (void)index;
+}
+
+uint32_t m5u_display_get_start_count_at(int index) {
+    (void)index; return 0;
+}
+
+int m5u_display_get_scan_line_at(int index) {
+    (void)index; return 0;
+}
+
+void m5u_display_set_raw_color_at(int index, uint32_t color) {
+    (void)index; (void)color;
+}
+
+uint32_t m5u_display_get_raw_color_at(int index) {
+    (void)index; return 0;
+}
+
 void m5u_display_write_color_at(int index, uint16_t color, uint32_t length) {
     (void)index; (void)color; (void)length;
+}
+
+void m5u_display_draw_pixel_current_at(int index, int x, int y) {
+    (void)index; (void)x; (void)y;
+}
+
+void m5u_display_write_pixel_current_at(int index, int x, int y) {
+    (void)index; (void)x; (void)y;
+}
+
+void m5u_display_write_fill_rect_at(int index, int x, int y, int w, int h, uint16_t color) {
+    (void)index; (void)x; (void)y; (void)w; (void)h; (void)color;
+}
+
+void m5u_display_write_fill_rect_preclipped_at(int index, int x, int y, int w, int h, uint16_t color) {
+    (void)index; (void)x; (void)y; (void)w; (void)h; (void)color;
 }
 
 void m5u_display_push_block_at(int index, uint16_t color, uint32_t length) {
@@ -1134,6 +1224,14 @@ void m5u_display_pop_state_at(int index) {
 }
 
 void m5u_display_set_color_at(int index, uint16_t color) {
+    (void)index; (void)color;
+}
+
+uint32_t m5u_display_get_base_color_at(int index) {
+    (void)index; return 0;
+}
+
+void m5u_display_set_base_color_at(int index, uint32_t color) {
     (void)index; (void)color;
 }
 

@@ -625,7 +625,24 @@ extern "C" {
     pub fn m5u_display_set_color_depth(depth: c_int);
     pub fn m5u_display_get_color_depth() -> c_int;
     pub fn m5u_display_set_addr_window(x: c_int, y: c_int, w: c_int, h: c_int);
+    pub fn m5u_display_set_window(xs: c_int, ys: c_int, xe: c_int, ye: c_int);
+    pub fn m5u_display_begin_transaction();
+    pub fn m5u_display_end_transaction();
+    pub fn m5u_display_get_start_count() -> u32;
+    pub fn m5u_display_get_scan_line() -> c_int;
+    pub fn m5u_display_set_raw_color(color: u32);
+    pub fn m5u_display_get_raw_color() -> u32;
     pub fn m5u_display_write_color(color: u16, length: u32);
+    pub fn m5u_display_draw_pixel_current(x: c_int, y: c_int);
+    pub fn m5u_display_write_pixel_current(x: c_int, y: c_int);
+    pub fn m5u_display_write_fill_rect(x: c_int, y: c_int, w: c_int, h: c_int, color: u16);
+    pub fn m5u_display_write_fill_rect_preclipped(
+        x: c_int,
+        y: c_int,
+        w: c_int,
+        h: c_int,
+        color: u16,
+    );
     pub fn m5u_display_push_block(color: u16, length: u32);
     pub fn m5u_display_progress_bar(x: c_int, y: c_int, w: c_int, h: c_int, value: u8);
     pub fn m5u_display_push_state();
@@ -642,7 +659,8 @@ extern "C" {
     pub fn m5u_display_get_cursor_x() -> c_int;
     pub fn m5u_display_get_cursor_y() -> c_int;
     pub fn m5u_display_font_height() -> c_int;
-    pub fn m5u_display_get_base_color() -> u16;
+    pub fn m5u_display_get_base_color() -> u32;
+    pub fn m5u_display_set_base_color(color: u32);
     pub fn m5u_display_set_color(color: u16);
     pub fn m5u_display_set_text_wrap(wrap_x: bool, wrap_y: bool);
     pub fn m5u_display_set_text_datum(datum: c_int);
@@ -816,7 +834,7 @@ extern "C" {
     pub fn m5u_display_set_clip_rect(x: c_int, y: c_int, w: c_int, h: c_int);
     pub fn m5u_display_get_clip_rect(x: *mut c_int, y: *mut c_int, w: *mut c_int, h: *mut c_int);
     pub fn m5u_display_clear_clip_rect();
-    pub fn m5u_display_color888(r: u8, g: u8, b: u8) -> u16;
+    pub fn m5u_display_color888(r: u8, g: u8, b: u8) -> u32;
     pub fn m5u_display_set_pivot(x: c_float, y: c_float);
     pub fn m5u_display_get_pivot_x() -> c_float;
     pub fn m5u_display_get_pivot_y() -> c_float;
@@ -893,7 +911,32 @@ extern "C" {
     pub fn m5u_display_set_color_depth_at(index: c_int, depth: c_int);
     pub fn m5u_display_get_color_depth_at(index: c_int) -> c_int;
     pub fn m5u_display_set_addr_window_at(index: c_int, x: c_int, y: c_int, w: c_int, h: c_int);
+    pub fn m5u_display_set_window_at(index: c_int, xs: c_int, ys: c_int, xe: c_int, ye: c_int);
+    pub fn m5u_display_begin_transaction_at(index: c_int);
+    pub fn m5u_display_end_transaction_at(index: c_int);
+    pub fn m5u_display_get_start_count_at(index: c_int) -> u32;
+    pub fn m5u_display_get_scan_line_at(index: c_int) -> c_int;
+    pub fn m5u_display_set_raw_color_at(index: c_int, color: u32);
+    pub fn m5u_display_get_raw_color_at(index: c_int) -> u32;
     pub fn m5u_display_write_color_at(index: c_int, color: u16, length: u32);
+    pub fn m5u_display_draw_pixel_current_at(index: c_int, x: c_int, y: c_int);
+    pub fn m5u_display_write_pixel_current_at(index: c_int, x: c_int, y: c_int);
+    pub fn m5u_display_write_fill_rect_at(
+        index: c_int,
+        x: c_int,
+        y: c_int,
+        w: c_int,
+        h: c_int,
+        color: u16,
+    );
+    pub fn m5u_display_write_fill_rect_preclipped_at(
+        index: c_int,
+        x: c_int,
+        y: c_int,
+        w: c_int,
+        h: c_int,
+        color: u16,
+    );
     pub fn m5u_display_push_block_at(index: c_int, color: u16, length: u32);
     pub fn m5u_display_progress_bar_at(
         index: c_int,
@@ -906,6 +949,8 @@ extern "C" {
     pub fn m5u_display_push_state_at(index: c_int);
     pub fn m5u_display_pop_state_at(index: c_int);
     pub fn m5u_display_set_color_at(index: c_int, color: u16);
+    pub fn m5u_display_get_base_color_at(index: c_int) -> u32;
+    pub fn m5u_display_set_base_color_at(index: c_int, color: u32);
     pub fn m5u_display_get_cursor_x_at(index: c_int) -> c_int;
     pub fn m5u_display_get_cursor_y_at(index: c_int) -> c_int;
     pub fn m5u_display_start_write_at(index: c_int);
@@ -2187,7 +2232,38 @@ mod host_stubs {
         16
     }
     pub unsafe fn m5u_display_set_addr_window(_x: c_int, _y: c_int, _w: c_int, _h: c_int) {}
+    pub unsafe fn m5u_display_set_window(_xs: c_int, _ys: c_int, _xe: c_int, _ye: c_int) {}
+    pub unsafe fn m5u_display_begin_transaction() {}
+    pub unsafe fn m5u_display_end_transaction() {}
+    pub unsafe fn m5u_display_get_start_count() -> u32 {
+        0
+    }
+    pub unsafe fn m5u_display_get_scan_line() -> c_int {
+        0
+    }
+    pub unsafe fn m5u_display_set_raw_color(_color: u32) {}
+    pub unsafe fn m5u_display_get_raw_color() -> u32 {
+        0
+    }
     pub unsafe fn m5u_display_write_color(_color: u16, _length: u32) {}
+    pub unsafe fn m5u_display_draw_pixel_current(_x: c_int, _y: c_int) {}
+    pub unsafe fn m5u_display_write_pixel_current(_x: c_int, _y: c_int) {}
+    pub unsafe fn m5u_display_write_fill_rect(
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _h: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_write_fill_rect_preclipped(
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _h: c_int,
+        _color: u16,
+    ) {
+    }
     pub unsafe fn m5u_display_push_block(_color: u16, _length: u32) {}
     pub unsafe fn m5u_display_progress_bar(_x: c_int, _y: c_int, _w: c_int, _h: c_int, _value: u8) {
     }
@@ -2215,9 +2291,10 @@ mod host_stubs {
     pub unsafe fn m5u_display_font_height() -> c_int {
         16
     }
-    pub unsafe fn m5u_display_get_base_color() -> u16 {
+    pub unsafe fn m5u_display_get_base_color() -> u32 {
         0
     }
+    pub unsafe fn m5u_display_set_base_color(_color: u32) {}
     pub unsafe fn m5u_display_set_color(_color: u16) {}
     pub unsafe fn m5u_display_set_text_wrap(_wrap_x: bool, _wrap_y: bool) {}
     pub unsafe fn m5u_display_set_text_datum(_datum: c_int) {}
@@ -2509,8 +2586,8 @@ mod host_stubs {
         }
     }
     pub unsafe fn m5u_display_clear_clip_rect() {}
-    pub unsafe fn m5u_display_color888(r: u8, g: u8, b: u8) -> u16 {
-        ((u16::from(r & 0xF8)) << 8) | ((u16::from(g & 0xFC)) << 3) | u16::from(b >> 3)
+    pub unsafe fn m5u_display_color888(r: u8, g: u8, b: u8) -> u32 {
+        (u32::from(r) << 16) | (u32::from(g) << 8) | u32::from(b)
     }
     pub unsafe fn m5u_display_set_pivot(_x: c_float, _y: c_float) {}
     pub unsafe fn m5u_display_get_pivot_x() -> c_float {
@@ -2642,7 +2719,47 @@ mod host_stubs {
         _h: c_int,
     ) {
     }
+    pub unsafe fn m5u_display_set_window_at(
+        _index: c_int,
+        _xs: c_int,
+        _ys: c_int,
+        _xe: c_int,
+        _ye: c_int,
+    ) {
+    }
+    pub unsafe fn m5u_display_begin_transaction_at(_index: c_int) {}
+    pub unsafe fn m5u_display_end_transaction_at(_index: c_int) {}
+    pub unsafe fn m5u_display_get_start_count_at(_index: c_int) -> u32 {
+        0
+    }
+    pub unsafe fn m5u_display_get_scan_line_at(_index: c_int) -> c_int {
+        0
+    }
+    pub unsafe fn m5u_display_set_raw_color_at(_index: c_int, _color: u32) {}
+    pub unsafe fn m5u_display_get_raw_color_at(_index: c_int) -> u32 {
+        0
+    }
     pub unsafe fn m5u_display_write_color_at(_index: c_int, _color: u16, _length: u32) {}
+    pub unsafe fn m5u_display_draw_pixel_current_at(_index: c_int, _x: c_int, _y: c_int) {}
+    pub unsafe fn m5u_display_write_pixel_current_at(_index: c_int, _x: c_int, _y: c_int) {}
+    pub unsafe fn m5u_display_write_fill_rect_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _h: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_write_fill_rect_preclipped_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _h: c_int,
+        _color: u16,
+    ) {
+    }
     pub unsafe fn m5u_display_push_block_at(_index: c_int, _color: u16, _length: u32) {}
     pub unsafe fn m5u_display_progress_bar_at(
         _index: c_int,
@@ -2656,6 +2773,10 @@ mod host_stubs {
     pub unsafe fn m5u_display_push_state_at(_index: c_int) {}
     pub unsafe fn m5u_display_pop_state_at(_index: c_int) {}
     pub unsafe fn m5u_display_set_color_at(_index: c_int, _color: u16) {}
+    pub unsafe fn m5u_display_get_base_color_at(_index: c_int) -> u32 {
+        0
+    }
+    pub unsafe fn m5u_display_set_base_color_at(_index: c_int, _color: u32) {}
     pub unsafe fn m5u_display_get_cursor_x_at(_index: c_int) -> c_int {
         0
     }

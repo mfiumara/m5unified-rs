@@ -209,6 +209,8 @@ mod tests {
         assert_eq!(ColorDepth::RGB565_2BYTE.raw(), 16);
         assert_eq!(ColorDepth::RGB565_2BYTE.bits(), 16);
         assert!(!ColorDepth::RGB565_2BYTE.has_palette());
+        assert_eq!(Color565::rgb888(255, 0, 0), Color565(colors::RED));
+        assert_eq!(m5.display.color888(0x12, 0x34, 0x56), 0x123456);
         let image = [colors::RED, colors::GREEN, colors::BLUE, colors::WHITE];
         let encoded_image = [0xFF_u8];
         let image_options = ImageDrawOptions {
@@ -292,7 +294,22 @@ mod tests {
         m5.display.set_color_depth(ColorDepth::RGB565_2BYTE);
         assert_eq!(m5.display.color_depth(), ColorDepth::RGB565_2BYTE);
         m5.display.set_addr_window(scroll_rect);
+        m5.display
+            .set_window(Point { x: 0, y: 0 }, Point { x: 1, y: 1 });
+        m5.display.begin_transaction();
+        assert_eq!(m5.display.start_count(), 0);
+        m5.display.end_transaction();
+        assert_eq!(m5.display.scan_line(), 0);
+        m5.display.set_raw_color(0x123456);
+        assert_eq!(m5.display.raw_color(), 0);
+        m5.display.set_base_color(0x123456);
+        assert_eq!(m5.display.base_color(), 0);
         m5.display.write_color(colors::WHITE, 2);
+        m5.display.draw_pixel_current(0, 0);
+        m5.display.write_pixel_current(0, 0);
+        m5.display.write_fill_rect(image_rect, colors::WHITE);
+        m5.display
+            .write_fill_rect_preclipped(image_rect, colors::WHITE);
         m5.display.push_block(colors::BLACK, 2);
         m5.display.progress_bar(scroll_rect, 50);
         m5.display.push_state();
@@ -440,7 +457,20 @@ mod tests {
         display.set_color_depth(ColorDepth::RGB565_2BYTE);
         assert_eq!(display.color_depth(), ColorDepth::RGB565_2BYTE);
         display.set_addr_window(scroll_rect);
+        display.set_window(Point { x: 0, y: 0 }, Point { x: 1, y: 1 });
+        display.begin_transaction();
+        assert_eq!(display.start_count(), 0);
+        display.end_transaction();
+        assert_eq!(display.scan_line(), 0);
+        display.set_raw_color(0x123456);
+        assert_eq!(display.raw_color(), 0);
+        display.set_base_color(0x123456);
+        assert_eq!(display.base_color(), 0);
         display.write_color(colors::WHITE, 2);
+        display.draw_pixel_current(0, 0);
+        display.write_pixel_current(0, 0);
+        display.write_fill_rect(image_rect, colors::WHITE);
+        display.write_fill_rect_preclipped(image_rect, colors::WHITE);
         display.push_block(colors::BLACK, 2);
         display.progress_bar(scroll_rect, 50);
         display.push_state();
