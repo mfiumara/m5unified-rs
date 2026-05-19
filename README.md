@@ -74,7 +74,7 @@ The current wrapper covers the API used by the translated upstream examples:
 - IMU acceleration, gyro, temperature, sensor masks, axis order, calibration, raw data, and NVS offsets
 - touch points, touch detail state, flick/drag state helpers, and touch thresholds
 - RTC date/time, date-only/time-only, low-voltage and IRQ helpers, system-time sync, power PMIC type, battery/VBUS/external-port readings, sleep/power-off, output/charge controls, direct AXP192, AXP2101, AW32001, PY32 PMIC, IP5306, BQ27220 gauge, INA226, and INA3221 power-monitor helpers, LED control/color batches/type queries, logging dump/path/configuration/callbacks, `core::fmt::Write` log formatting, and SD SPI mount helpers
-- internal/external I2C bus setup, raw transfers, register helpers, device helpers, bit helpers, and address scanning
+- internal/external I2C bus setup, raw transfers, register helpers, device helpers, bit helpers, address scanning, and board IO expander helpers
 - named board identity, timing helpers, pin lookup, primary/log display selection, and touch-button sizing
 
 This is not a complete M5Unified port yet. Missing APIs should be added through

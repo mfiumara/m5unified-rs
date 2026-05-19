@@ -45,6 +45,18 @@ void m5u_set_touch_button_height(uint16_t pixel);
 void m5u_set_touch_button_height_by_ratio(uint8_t ratio);
 uint16_t m5u_get_touch_button_height(void);
 
+bool m5u_io_expander_available(size_t index);
+bool m5u_io_expander_set_direction(size_t index, uint8_t pin, bool output);
+bool m5u_io_expander_enable_pull(size_t index, uint8_t pin, bool enable);
+bool m5u_io_expander_set_pull_mode(size_t index, uint8_t pin, bool pull_up);
+bool m5u_io_expander_set_high_impedance(size_t index, uint8_t pin, bool enable);
+bool m5u_io_expander_get_write_value(size_t index, uint8_t pin);
+bool m5u_io_expander_digital_write(size_t index, uint8_t pin, bool level);
+bool m5u_io_expander_digital_read(size_t index, uint8_t pin);
+bool m5u_io_expander_reset_irq(size_t index);
+bool m5u_io_expander_disable_irq(size_t index);
+bool m5u_io_expander_enable_irq(size_t index);
+
 void m5u_i2c_set_port(int bus, int port_num, int pin_sda, int pin_scl);
 bool m5u_i2c_begin(int bus);
 bool m5u_i2c_begin_with_port(int bus, int port_num, int pin_sda, int pin_scl);

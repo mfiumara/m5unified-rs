@@ -310,6 +310,18 @@ extern "C" {
     pub fn m5u_set_touch_button_height_by_ratio(ratio: u8);
     pub fn m5u_get_touch_button_height() -> u16;
 
+    pub fn m5u_io_expander_available(index: usize) -> bool;
+    pub fn m5u_io_expander_set_direction(index: usize, pin: u8, output: bool) -> bool;
+    pub fn m5u_io_expander_enable_pull(index: usize, pin: u8, enable: bool) -> bool;
+    pub fn m5u_io_expander_set_pull_mode(index: usize, pin: u8, pull_up: bool) -> bool;
+    pub fn m5u_io_expander_set_high_impedance(index: usize, pin: u8, enable: bool) -> bool;
+    pub fn m5u_io_expander_get_write_value(index: usize, pin: u8) -> bool;
+    pub fn m5u_io_expander_digital_write(index: usize, pin: u8, level: bool) -> bool;
+    pub fn m5u_io_expander_digital_read(index: usize, pin: u8) -> bool;
+    pub fn m5u_io_expander_reset_irq(index: usize) -> bool;
+    pub fn m5u_io_expander_disable_irq(index: usize) -> bool;
+    pub fn m5u_io_expander_enable_irq(index: usize) -> bool;
+
     pub fn m5u_i2c_set_port(bus: c_int, port_num: c_int, pin_sda: c_int, pin_scl: c_int);
     pub fn m5u_i2c_begin(bus: c_int) -> bool;
     pub fn m5u_i2c_begin_with_port(
@@ -859,6 +871,44 @@ mod host_stubs {
     pub unsafe fn m5u_set_touch_button_height_by_ratio(_ratio: u8) {}
     pub unsafe fn m5u_get_touch_button_height() -> u16 {
         0
+    }
+
+    pub unsafe fn m5u_io_expander_available(_index: usize) -> bool {
+        false
+    }
+    pub unsafe fn m5u_io_expander_set_direction(_index: usize, _pin: u8, _output: bool) -> bool {
+        false
+    }
+    pub unsafe fn m5u_io_expander_enable_pull(_index: usize, _pin: u8, _enable: bool) -> bool {
+        false
+    }
+    pub unsafe fn m5u_io_expander_set_pull_mode(_index: usize, _pin: u8, _pull_up: bool) -> bool {
+        false
+    }
+    pub unsafe fn m5u_io_expander_set_high_impedance(
+        _index: usize,
+        _pin: u8,
+        _enable: bool,
+    ) -> bool {
+        false
+    }
+    pub unsafe fn m5u_io_expander_get_write_value(_index: usize, _pin: u8) -> bool {
+        false
+    }
+    pub unsafe fn m5u_io_expander_digital_write(_index: usize, _pin: u8, _level: bool) -> bool {
+        false
+    }
+    pub unsafe fn m5u_io_expander_digital_read(_index: usize, _pin: u8) -> bool {
+        false
+    }
+    pub unsafe fn m5u_io_expander_reset_irq(_index: usize) -> bool {
+        false
+    }
+    pub unsafe fn m5u_io_expander_disable_irq(_index: usize) -> bool {
+        false
+    }
+    pub unsafe fn m5u_io_expander_enable_irq(_index: usize) -> bool {
+        false
     }
 
     pub unsafe fn m5u_i2c_set_port(

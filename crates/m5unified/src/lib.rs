@@ -34,6 +34,7 @@ mod display;
 mod error;
 mod i2c;
 mod imu;
+mod io_expander;
 mod led;
 mod log;
 mod power;
@@ -55,6 +56,7 @@ pub use display::{
 pub use error::Error;
 pub use i2c::{I2cBus, I2cDevice};
 pub use imu::{Imu, ImuAxis, ImuData, ImuKind, ImuSensorMask, Vec3};
+pub use io_expander::IoExpander;
 pub use led::{Led, LedColor, LedType};
 pub use log::{Log, LogLevel, LogTarget, RawLogCallback};
 pub use power::{
@@ -335,6 +337,19 @@ mod tests {
         assert_eq!(m5.in_i2c.port(), None);
         assert_eq!(m5.in_i2c.sda_pin(), None);
         assert_eq!(m5.in_i2c.scl_pin(), None);
+        let io_expander = m5.io_expander(0);
+        assert_eq!(io_expander.index(), 0);
+        assert!(!io_expander.available());
+        assert!(!io_expander.set_direction(0, true));
+        assert!(!io_expander.enable_pull(0, true));
+        assert!(!io_expander.set_pull_mode(0, true));
+        assert!(!io_expander.set_high_impedance(0, false));
+        assert!(!io_expander.write_value(0));
+        assert!(!io_expander.digital_write(0, true));
+        assert!(!io_expander.digital_read(0));
+        assert!(!io_expander.reset_irq());
+        assert!(!io_expander.disable_irq());
+        assert!(!io_expander.enable_irq());
         m5.ex_i2c.set_port(0, 1, 2);
         assert!(!m5.ex_i2c.begin());
         assert!(!m5.ex_i2c.begin_with_port(0, 1, 2));

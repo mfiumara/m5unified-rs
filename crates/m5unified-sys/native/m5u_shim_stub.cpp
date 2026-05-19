@@ -76,6 +76,18 @@ uint16_t m5u_get_touch_button_height(void) {
     return 0;
 }
 
+bool m5u_io_expander_available(size_t index) { (void)index; return false; }
+bool m5u_io_expander_set_direction(size_t index, uint8_t pin, bool output) { (void)index; (void)pin; (void)output; return false; }
+bool m5u_io_expander_enable_pull(size_t index, uint8_t pin, bool enable) { (void)index; (void)pin; (void)enable; return false; }
+bool m5u_io_expander_set_pull_mode(size_t index, uint8_t pin, bool pull_up) { (void)index; (void)pin; (void)pull_up; return false; }
+bool m5u_io_expander_set_high_impedance(size_t index, uint8_t pin, bool enable) { (void)index; (void)pin; (void)enable; return false; }
+bool m5u_io_expander_get_write_value(size_t index, uint8_t pin) { (void)index; (void)pin; return false; }
+bool m5u_io_expander_digital_write(size_t index, uint8_t pin, bool level) { (void)index; (void)pin; (void)level; return false; }
+bool m5u_io_expander_digital_read(size_t index, uint8_t pin) { (void)index; (void)pin; return false; }
+bool m5u_io_expander_reset_irq(size_t index) { (void)index; return false; }
+bool m5u_io_expander_disable_irq(size_t index) { (void)index; return false; }
+bool m5u_io_expander_enable_irq(size_t index) { (void)index; return false; }
+
 void m5u_i2c_set_port(int bus, int port_num, int pin_sda, int pin_scl) {
     (void)bus; (void)port_num; (void)pin_sda; (void)pin_scl;
 }

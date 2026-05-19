@@ -180,6 +180,115 @@ uint16_t m5u_get_touch_button_height(void) {
     return M5.getTouchButtonHeight();
 }
 
+static bool m5u_io_expander_valid_index(size_t index) {
+    switch (M5.getBoard()) {
+#if defined(CONFIG_IDF_TARGET_ESP32P4)
+    case m5::board_t::board_M5Tab5:
+        return index < 2;
+#elif defined(CONFIG_IDF_TARGET_ESP32C6)
+    case m5::board_t::board_M5UnitC6L:
+        return index == 0;
+    case m5::board_t::board_ArduinoNessoN1:
+        return index < 2;
+#elif defined(CONFIG_IDF_TARGET_ESP32S3)
+    case m5::board_t::board_M5StampPLC:
+        return index == 0;
+#endif
+    default:
+        return false;
+    }
+}
+
+static m5::IOExpander_Base* m5u_io_expander(size_t index) {
+    return m5u_io_expander_valid_index(index) ? &M5.getIOExpander(index) : nullptr;
+}
+
+bool m5u_io_expander_available(size_t index) {
+    return m5u_io_expander_valid_index(index);
+}
+
+bool m5u_io_expander_set_direction(size_t index, uint8_t pin, bool output) {
+    auto io_expander = m5u_io_expander(index);
+    if (!io_expander || pin >= 8) {
+        return false;
+    }
+    io_expander->setDirection(pin, output);
+    return true;
+}
+
+bool m5u_io_expander_enable_pull(size_t index, uint8_t pin, bool enable) {
+    auto io_expander = m5u_io_expander(index);
+    if (!io_expander || pin >= 8) {
+        return false;
+    }
+    io_expander->enablePull(pin, enable);
+    return true;
+}
+
+bool m5u_io_expander_set_pull_mode(size_t index, uint8_t pin, bool pull_up) {
+    auto io_expander = m5u_io_expander(index);
+    if (!io_expander || pin >= 8) {
+        return false;
+    }
+    io_expander->setPullMode(pin, pull_up);
+    return true;
+}
+
+bool m5u_io_expander_set_high_impedance(size_t index, uint8_t pin, bool enable) {
+    auto io_expander = m5u_io_expander(index);
+    if (!io_expander || pin >= 8) {
+        return false;
+    }
+    io_expander->setHighImpedance(pin, enable);
+    return true;
+}
+
+bool m5u_io_expander_get_write_value(size_t index, uint8_t pin) {
+    auto io_expander = m5u_io_expander(index);
+    return io_expander && pin < 8 && io_expander->getWriteValue(pin);
+}
+
+bool m5u_io_expander_digital_write(size_t index, uint8_t pin, bool level) {
+    auto io_expander = m5u_io_expander(index);
+    if (!io_expander || pin >= 8) {
+        return false;
+    }
+    io_expander->digitalWrite(pin, level);
+    return true;
+}
+
+bool m5u_io_expander_digital_read(size_t index, uint8_t pin) {
+    auto io_expander = m5u_io_expander(index);
+    return io_expander && pin < 8 && io_expander->digitalRead(pin);
+}
+
+bool m5u_io_expander_reset_irq(size_t index) {
+    auto io_expander = m5u_io_expander(index);
+    if (!io_expander) {
+        return false;
+    }
+    io_expander->resetIrq();
+    return true;
+}
+
+bool m5u_io_expander_disable_irq(size_t index) {
+    auto io_expander = m5u_io_expander(index);
+    if (!io_expander) {
+        return false;
+    }
+    io_expander->disableIrq();
+    return true;
+}
+
+bool m5u_io_expander_enable_irq(size_t index) {
+    auto io_expander = m5u_io_expander(index);
+    if (!io_expander) {
+        return false;
+    }
+    io_expander->enableIrq();
+    return true;
+}
+
 static m5::I2C_Class* m5u_i2c_for_bus(int bus) {
     switch (bus) {
         case 0: return &M5.In_I2C;
