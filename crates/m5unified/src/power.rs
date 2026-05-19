@@ -184,6 +184,10 @@ impl Power {
         Aw32001
     }
 
+    pub fn bq27220(&self) -> Bq27220 {
+        Bq27220
+    }
+
     pub fn py32pmic(&self) -> Py32Pmic {
         Py32Pmic
     }
@@ -535,6 +539,36 @@ impl Aw32001 {
         Aw32001ChargeStatus::from_raw(unsafe {
             m5unified_sys::m5u_power_aw32001_get_charge_status()
         })
+    }
+}
+
+#[derive(Debug)]
+pub struct Bq27220;
+
+impl Bq27220 {
+    /// Initialize the direct BQ27220 battery gauge backend when this board has one.
+    pub fn begin(&self) -> bool {
+        unsafe { m5unified_sys::m5u_power_bq27220_begin() }
+    }
+
+    /// Return battery current in milliamps.
+    pub fn current_ma(&self) -> i16 {
+        unsafe { m5unified_sys::m5u_power_bq27220_get_current_ma() }
+    }
+
+    /// Return battery voltage in millivolts.
+    pub fn voltage_mv(&self) -> i16 {
+        unsafe { m5unified_sys::m5u_power_bq27220_get_voltage_mv() }
+    }
+
+    /// Return battery current in amps.
+    pub fn current_a(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_power_bq27220_get_current_a() }
+    }
+
+    /// Return battery voltage in volts.
+    pub fn voltage_v(&self) -> f32 {
+        unsafe { m5unified_sys::m5u_power_bq27220_get_voltage_v() }
     }
 }
 

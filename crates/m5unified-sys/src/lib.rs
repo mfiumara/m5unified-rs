@@ -660,6 +660,11 @@ extern "C" {
     pub fn m5u_power_aw32001_get_charge_current() -> u16;
     pub fn m5u_power_aw32001_get_charge_voltage() -> u16;
     pub fn m5u_power_aw32001_get_charge_status() -> c_int;
+    pub fn m5u_power_bq27220_begin() -> bool;
+    pub fn m5u_power_bq27220_get_current_ma() -> i16;
+    pub fn m5u_power_bq27220_get_voltage_mv() -> i16;
+    pub fn m5u_power_bq27220_get_current_a() -> c_float;
+    pub fn m5u_power_bq27220_get_voltage_v() -> c_float;
     pub fn m5u_power_py32pmic_begin() -> bool;
     pub fn m5u_power_py32pmic_set_ext_output(enable: bool) -> bool;
     pub fn m5u_power_py32pmic_set_battery_charge(enable: bool) -> bool;
@@ -1654,6 +1659,21 @@ mod host_stubs {
     }
     pub unsafe fn m5u_power_aw32001_get_charge_status() -> c_int {
         -1
+    }
+    pub unsafe fn m5u_power_bq27220_begin() -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_bq27220_get_current_ma() -> i16 {
+        0
+    }
+    pub unsafe fn m5u_power_bq27220_get_voltage_mv() -> i16 {
+        0
+    }
+    pub unsafe fn m5u_power_bq27220_get_current_a() -> c_float {
+        0.0
+    }
+    pub unsafe fn m5u_power_bq27220_get_voltage_v() -> c_float {
+        0.0
     }
     pub unsafe fn m5u_power_py32pmic_begin() -> bool {
         false

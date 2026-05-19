@@ -1046,6 +1046,11 @@ bool m5u_power_aw32001_is_charging(void) { return false; }
 uint16_t m5u_power_aw32001_get_charge_current(void) { return 0; }
 uint16_t m5u_power_aw32001_get_charge_voltage(void) { return 0; }
 int m5u_power_aw32001_get_charge_status(void) { return -1; }
+bool m5u_power_bq27220_begin(void) { return false; }
+int16_t m5u_power_bq27220_get_current_ma(void) { return 0; }
+int16_t m5u_power_bq27220_get_voltage_mv(void) { return 0; }
+float m5u_power_bq27220_get_current_a(void) { return 0.0f; }
+float m5u_power_bq27220_get_voltage_v(void) { return 0.0f; }
 bool m5u_power_py32pmic_begin(void) { return false; }
 bool m5u_power_py32pmic_set_ext_output(bool enable) { (void)enable; return false; }
 bool m5u_power_py32pmic_set_battery_charge(bool enable) { (void)enable; return false; }

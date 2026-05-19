@@ -26,8 +26,10 @@ static bool s_m5u_sd_owns_bus = false;
 
 #if defined(CONFIG_IDF_TARGET_ESP32C6)
 #define M5U_HAS_AW32001 1
+#define M5U_HAS_BQ27220 1
 #else
 #define M5U_HAS_AW32001 0
+#define M5U_HAS_BQ27220 0
 #endif
 
 #if defined(CONFIG_IDF_TARGET_ESP32S3)
@@ -1557,6 +1559,14 @@ static bool m5u_has_aw32001(void) {
 #endif
 }
 
+static bool m5u_has_bq27220(void) {
+#if M5U_HAS_BQ27220
+    return M5.Power.getType() == m5::Power_Class::pmic_t::pmic_aw32001;
+#else
+    return false;
+#endif
+}
+
 static bool m5u_has_py32pmic(void) {
 #if M5U_HAS_PY32PMIC
     return M5.Power.getType() == m5::Power_Class::pmic_t::pmic_py32pmic;
@@ -1629,6 +1639,46 @@ int m5u_power_aw32001_get_charge_status(void) {
     return m5u_has_aw32001() ? M5.Power.Aw32001.getChargeStatus() : -1;
 #else
     return -1;
+#endif
+}
+
+bool m5u_power_bq27220_begin(void) {
+#if M5U_HAS_BQ27220
+    return m5u_has_bq27220() && M5.Power.Bq27220.begin();
+#else
+    return false;
+#endif
+}
+
+int16_t m5u_power_bq27220_get_current_ma(void) {
+#if M5U_HAS_BQ27220
+    return m5u_has_bq27220() ? M5.Power.Bq27220.getCurrent_mA() : 0;
+#else
+    return 0;
+#endif
+}
+
+int16_t m5u_power_bq27220_get_voltage_mv(void) {
+#if M5U_HAS_BQ27220
+    return m5u_has_bq27220() ? M5.Power.Bq27220.getVoltage_mV() : 0;
+#else
+    return 0;
+#endif
+}
+
+float m5u_power_bq27220_get_current_a(void) {
+#if M5U_HAS_BQ27220
+    return m5u_has_bq27220() ? M5.Power.Bq27220.getCurrent_F() : 0.0f;
+#else
+    return 0.0f;
+#endif
+}
+
+float m5u_power_bq27220_get_voltage_v(void) {
+#if M5U_HAS_BQ27220
+    return m5u_has_bq27220() ? M5.Power.Bq27220.getVoltage_F() : 0.0f;
+#else
+    return 0.0f;
 #endif
 }
 

@@ -59,7 +59,8 @@ pub use led::{Led, LedColor, LedType};
 pub use log::{Log, LogLevel, LogTarget, RawLogCallback};
 pub use power::{
     Aw32001, Aw32001ChargeStatus, Axp2101, Axp2101ChargeStatus, Axp2101IrqStatus, Axp2101PekPress,
-    ChargeState, ExtPortBusConfig, ExtPortMask, Power, PowerType, Py32Pmic, Py32PmicPekPress,
+    Bq27220, ChargeState, ExtPortBusConfig, ExtPortMask, Power, PowerType, Py32Pmic,
+    Py32PmicPekPress,
 };
 pub use rtc::{Date, DateTime, Rtc, Time};
 pub use sd::{
@@ -655,6 +656,12 @@ mod tests {
             Aw32001ChargeStatus::from_raw(77),
             Aw32001ChargeStatus::Raw(77)
         );
+        let bq = m5.power.bq27220();
+        assert!(!bq.begin());
+        assert_eq!(bq.current_ma(), 0);
+        assert_eq!(bq.voltage_mv(), 0);
+        assert_eq!(bq.current_a(), 0.0);
+        assert_eq!(bq.voltage_v(), 0.0);
         let py32 = m5.power.py32pmic();
         assert!(!py32.begin());
         assert!(!py32.set_ext_output(true));
