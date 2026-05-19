@@ -191,6 +191,16 @@ mod tests {
         let p0 = Point { x: 4, y: 4 };
         let p1 = Point { x: 16, y: 4 };
         let p2 = Point { x: 10, y: 18 };
+        let p3 = Point { x: 20, y: 18 };
+        let line_start = Point { x: 0, y: 0 };
+        let line_end = Point { x: 20, y: 10 };
+        let image_rect = Rect {
+            x: 0,
+            y: 0,
+            w: 2,
+            h: 2,
+        };
+        let image = [colors::RED, colors::GREEN, colors::BLUE, colors::WHITE];
         m5.display.draw_triangle(p0, p1, p2, colors::YELLOW);
         m5.display.fill_triangle(p0, p1, p2, colors::CYAN);
         m5.display.draw_ellipse(30, 30, 8, 4, colors::WHITE);
@@ -199,6 +209,16 @@ mod tests {
             .draw_arc(Point { x: 40, y: 40 }, 8, 12, 0.0, 90.0, colors::GREEN);
         m5.display
             .fill_arc(Point { x: 45, y: 45 }, 6, 10, 90.0, 180.0, colors::BLUE);
+        m5.display.draw_quadratic_bezier(p0, p1, p2, colors::WHITE);
+        m5.display.draw_cubic_bezier(p0, p1, p2, p3, colors::WHITE);
+        m5.display
+            .draw_smooth_line(line_start, line_end, colors::CYAN);
+        m5.display
+            .draw_wide_line(line_start, line_end, 1.5, colors::CYAN);
+        m5.display
+            .draw_wedge_line(line_start, line_end, 0.5, 2.0, colors::CYAN);
+        m5.display
+            .draw_gradient_line(line_start, line_end, colors::RED, colors::BLUE);
         let scroll_rect = Rect {
             x: 0,
             y: 0,
@@ -208,12 +228,32 @@ mod tests {
         m5.display.set_scroll_rect(scroll_rect);
         m5.display.set_scroll_rect_color(scroll_rect, colors::BLACK);
         m5.display.scroll(1, -1);
+        assert_eq!(m5.display.cursor_x(), 0);
         assert_eq!(m5.display.text_width("host").unwrap(), 0);
         assert_eq!(m5.display.text_datum(), Some(TextDatum::TopLeft));
         m5.display.set_text_padding(12);
         assert_eq!(m5.display.text_padding(), 0);
         assert_eq!(m5.display.text_size_x(), 1.0);
         assert_eq!(m5.display.text_size_y(), 1.0);
+        assert_eq!(m5.display.push_image_rgb565(image_rect, &image), Ok(()));
+        assert_eq!(
+            m5.display
+                .push_image_rgb565_transparent(image_rect, &image, colors::BLACK),
+            Ok(())
+        );
+        assert_eq!(
+            m5.display.push_image_rgb565(image_rect, &image[..3]),
+            Err(Error::InvalidBufferLength)
+        );
+        assert_eq!(m5.display.read_pixel(0, 0), 0);
+        let mut pixels = [colors::WHITE; 4];
+        assert_eq!(m5.display.read_rect_rgb565(image_rect, &mut pixels), Ok(()));
+        assert_eq!(pixels, [0_u16; 4]);
+        m5.display.copy_rect(
+            Point { x: 4, y: 4 },
+            Size { w: 2, h: 2 },
+            Point { x: 0, y: 0 },
+        );
         let mut display = m5.displays(0).expect("host stub display should exist");
         display.draw_pixel(1, 1, colors::WHITE);
         display.write_pixel(2, 2, colors::RED);
@@ -229,15 +269,41 @@ mod tests {
         display.fill_ellipse(32, 32, 6, 3, colors::RED);
         display.draw_arc(Point { x: 40, y: 40 }, 8, 12, 0.0, 90.0, colors::GREEN);
         display.fill_arc(Point { x: 45, y: 45 }, 6, 10, 90.0, 180.0, colors::BLUE);
+        display.draw_quadratic_bezier(p0, p1, p2, colors::WHITE);
+        display.draw_cubic_bezier(p0, p1, p2, p3, colors::WHITE);
+        display.draw_smooth_line(line_start, line_end, colors::CYAN);
+        display.draw_wide_line(line_start, line_end, 1.5, colors::CYAN);
+        display.draw_wedge_line(line_start, line_end, 0.5, 2.0, colors::CYAN);
+        display.draw_gradient_line(line_start, line_end, colors::RED, colors::BLUE);
         display.set_scroll_rect(scroll_rect);
         display.set_scroll_rect_color(scroll_rect, colors::BLACK);
         display.scroll(1, -1);
+        assert_eq!(display.cursor_x(), 0);
+        assert_eq!(display.cursor_y(), 0);
         assert_eq!(display.text_width("host").unwrap(), 0);
         assert_eq!(display.text_datum(), Some(TextDatum::TopLeft));
         display.set_text_padding(12);
         assert_eq!(display.text_padding(), 0);
         assert_eq!(display.text_size_x(), 1.0);
         assert_eq!(display.text_size_y(), 1.0);
+        assert_eq!(display.push_image_rgb565(image_rect, &image), Ok(()));
+        assert_eq!(
+            display.push_image_rgb565_transparent(image_rect, &image, colors::BLACK),
+            Ok(())
+        );
+        assert_eq!(
+            display.push_image_rgb565(image_rect, &image[..3]),
+            Err(Error::InvalidBufferLength)
+        );
+        assert_eq!(display.read_pixel(0, 0), 0);
+        let mut pixels = [colors::WHITE; 4];
+        assert_eq!(display.read_rect_rgb565(image_rect, &mut pixels), Ok(()));
+        assert_eq!(pixels, [0_u16; 4]);
+        display.copy_rect(
+            Point { x: 4, y: 4 },
+            Size { w: 2, h: 2 },
+            Point { x: 0, y: 0 },
+        );
     }
 
     #[test]

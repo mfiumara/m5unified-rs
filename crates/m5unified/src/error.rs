@@ -9,6 +9,8 @@ pub enum Error {
     BeginFailed,
     /// The provided string contained an interior NUL byte.
     InvalidString,
+    /// A caller-provided buffer was too short for the requested rectangle.
+    InvalidBufferLength,
     /// Requested operation is not available on this board/build.
     Unavailable(&'static str),
 }
@@ -18,6 +20,9 @@ impl fmt::Display for Error {
         match self {
             Self::BeginFailed => f.write_str("M5Unified initialization failed"),
             Self::InvalidString => f.write_str("string contains an interior NUL byte"),
+            Self::InvalidBufferLength => {
+                f.write_str("buffer is too short for the requested rectangle")
+            }
             Self::Unavailable(feature) => write!(f, "M5Unified feature unavailable: {feature}"),
         }
     }

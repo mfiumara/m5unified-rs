@@ -593,6 +593,7 @@ extern "C" {
     pub fn m5u_display_display();
     pub fn m5u_display_display_busy() -> bool;
     pub fn m5u_display_wait_display();
+    pub fn m5u_display_get_cursor_x() -> c_int;
     pub fn m5u_display_get_cursor_y() -> c_int;
     pub fn m5u_display_font_height() -> c_int;
     pub fn m5u_display_get_base_color() -> u16;
@@ -660,6 +661,52 @@ extern "C" {
         angle1: c_float,
         color: u16,
     );
+    pub fn m5u_display_draw_bezier3(
+        x0: c_int,
+        y0: c_int,
+        x1: c_int,
+        y1: c_int,
+        x2: c_int,
+        y2: c_int,
+        color: u16,
+    );
+    pub fn m5u_display_draw_bezier4(
+        x0: c_int,
+        y0: c_int,
+        x1: c_int,
+        y1: c_int,
+        x2: c_int,
+        y2: c_int,
+        x3: c_int,
+        y3: c_int,
+        color: u16,
+    );
+    pub fn m5u_display_draw_smooth_line(x0: c_int, y0: c_int, x1: c_int, y1: c_int, color: u16);
+    pub fn m5u_display_draw_wide_line(
+        x0: c_int,
+        y0: c_int,
+        x1: c_int,
+        y1: c_int,
+        radius: c_float,
+        color: u16,
+    );
+    pub fn m5u_display_draw_wedge_line(
+        x0: c_int,
+        y0: c_int,
+        x1: c_int,
+        y1: c_int,
+        r0: c_float,
+        r1: c_float,
+        color: u16,
+    );
+    pub fn m5u_display_draw_gradient_line(
+        x0: c_int,
+        y0: c_int,
+        x1: c_int,
+        y1: c_int,
+        start_color: u16,
+        end_color: u16,
+    );
     pub fn m5u_display_set_scroll_rect(x: c_int, y: c_int, w: c_int, h: c_int);
     pub fn m5u_display_set_scroll_rect_color(x: c_int, y: c_int, w: c_int, h: c_int, color: u16);
     pub fn m5u_display_scroll(dx: c_int, dy: c_int);
@@ -672,6 +719,37 @@ extern "C" {
     pub fn m5u_display_set_clip_rect(x: c_int, y: c_int, w: c_int, h: c_int);
     pub fn m5u_display_clear_clip_rect();
     pub fn m5u_display_color888(r: u8, g: u8, b: u8) -> u16;
+    pub fn m5u_display_push_image_rgb565(
+        x: c_int,
+        y: c_int,
+        w: c_int,
+        h: c_int,
+        data: *const u16,
+    ) -> bool;
+    pub fn m5u_display_push_image_rgb565_transparent(
+        x: c_int,
+        y: c_int,
+        w: c_int,
+        h: c_int,
+        data: *const u16,
+        transparent: u16,
+    ) -> bool;
+    pub fn m5u_display_read_pixel(x: c_int, y: c_int) -> u16;
+    pub fn m5u_display_read_rect_rgb565(
+        x: c_int,
+        y: c_int,
+        w: c_int,
+        h: c_int,
+        data: *mut u16,
+    ) -> bool;
+    pub fn m5u_display_copy_rect(
+        dst_x: c_int,
+        dst_y: c_int,
+        w: c_int,
+        h: c_int,
+        src_x: c_int,
+        src_y: c_int,
+    );
     pub fn m5u_display_count() -> c_int;
     pub fn m5u_display_index_for_kind(kind: c_int) -> c_int;
     pub fn m5u_display_index_for_kinds(kinds: *const c_int, len: usize) -> c_int;
@@ -684,6 +762,8 @@ extern "C" {
     pub fn m5u_display_get_rotation_at(index: c_int) -> c_int;
     pub fn m5u_display_set_rotation_at(index: c_int, rotation: c_int);
     pub fn m5u_display_set_color_at(index: c_int, color: u16);
+    pub fn m5u_display_get_cursor_x_at(index: c_int) -> c_int;
+    pub fn m5u_display_get_cursor_y_at(index: c_int) -> c_int;
     pub fn m5u_display_start_write_at(index: c_int);
     pub fn m5u_display_end_write_at(index: c_int);
     pub fn m5u_display_print_at(index: c_int, text: *const c_char);
@@ -800,6 +880,64 @@ extern "C" {
         angle1: c_float,
         color: u16,
     );
+    pub fn m5u_display_draw_bezier3_at(
+        index: c_int,
+        x0: c_int,
+        y0: c_int,
+        x1: c_int,
+        y1: c_int,
+        x2: c_int,
+        y2: c_int,
+        color: u16,
+    );
+    pub fn m5u_display_draw_bezier4_at(
+        index: c_int,
+        x0: c_int,
+        y0: c_int,
+        x1: c_int,
+        y1: c_int,
+        x2: c_int,
+        y2: c_int,
+        x3: c_int,
+        y3: c_int,
+        color: u16,
+    );
+    pub fn m5u_display_draw_smooth_line_at(
+        index: c_int,
+        x0: c_int,
+        y0: c_int,
+        x1: c_int,
+        y1: c_int,
+        color: u16,
+    );
+    pub fn m5u_display_draw_wide_line_at(
+        index: c_int,
+        x0: c_int,
+        y0: c_int,
+        x1: c_int,
+        y1: c_int,
+        radius: c_float,
+        color: u16,
+    );
+    pub fn m5u_display_draw_wedge_line_at(
+        index: c_int,
+        x0: c_int,
+        y0: c_int,
+        x1: c_int,
+        y1: c_int,
+        r0: c_float,
+        r1: c_float,
+        color: u16,
+    );
+    pub fn m5u_display_draw_gradient_line_at(
+        index: c_int,
+        x0: c_int,
+        y0: c_int,
+        x1: c_int,
+        y1: c_int,
+        start_color: u16,
+        end_color: u16,
+    );
     pub fn m5u_display_set_scroll_rect_at(index: c_int, x: c_int, y: c_int, w: c_int, h: c_int);
     pub fn m5u_display_set_scroll_rect_color_at(
         index: c_int,
@@ -816,6 +954,41 @@ extern "C" {
     pub fn m5u_display_get_text_padding_at(index: c_int) -> u32;
     pub fn m5u_display_get_text_size_x_at(index: c_int) -> c_float;
     pub fn m5u_display_get_text_size_y_at(index: c_int) -> c_float;
+    pub fn m5u_display_push_image_rgb565_at(
+        index: c_int,
+        x: c_int,
+        y: c_int,
+        w: c_int,
+        h: c_int,
+        data: *const u16,
+    ) -> bool;
+    pub fn m5u_display_push_image_rgb565_transparent_at(
+        index: c_int,
+        x: c_int,
+        y: c_int,
+        w: c_int,
+        h: c_int,
+        data: *const u16,
+        transparent: u16,
+    ) -> bool;
+    pub fn m5u_display_read_pixel_at(index: c_int, x: c_int, y: c_int) -> u16;
+    pub fn m5u_display_read_rect_rgb565_at(
+        index: c_int,
+        x: c_int,
+        y: c_int,
+        w: c_int,
+        h: c_int,
+        data: *mut u16,
+    ) -> bool;
+    pub fn m5u_display_copy_rect_at(
+        index: c_int,
+        dst_x: c_int,
+        dst_y: c_int,
+        w: c_int,
+        h: c_int,
+        src_x: c_int,
+        src_y: c_int,
+    );
 
     pub fn m5u_button_is_pressed(button: c_int) -> bool;
     pub fn m5u_button_was_pressed(button: c_int) -> bool;
@@ -1141,6 +1314,13 @@ extern "C" {
 mod host_stubs {
     use super::*;
     use core::ptr;
+
+    fn rect_pixel_len(w: c_int, h: c_int) -> Option<usize> {
+        if w <= 0 || h <= 0 {
+            return None;
+        }
+        (w as usize).checked_mul(h as usize)
+    }
 
     pub unsafe fn m5u_begin() -> bool {
         true
@@ -1740,6 +1920,9 @@ mod host_stubs {
         false
     }
     pub unsafe fn m5u_display_wait_display() {}
+    pub unsafe fn m5u_display_get_cursor_x() -> c_int {
+        0
+    }
     pub unsafe fn m5u_display_get_cursor_y() -> c_int {
         0
     }
@@ -1835,6 +2018,64 @@ mod host_stubs {
         _color: u16,
     ) {
     }
+    pub unsafe fn m5u_display_draw_bezier3(
+        _x0: c_int,
+        _y0: c_int,
+        _x1: c_int,
+        _y1: c_int,
+        _x2: c_int,
+        _y2: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_draw_bezier4(
+        _x0: c_int,
+        _y0: c_int,
+        _x1: c_int,
+        _y1: c_int,
+        _x2: c_int,
+        _y2: c_int,
+        _x3: c_int,
+        _y3: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_draw_smooth_line(
+        _x0: c_int,
+        _y0: c_int,
+        _x1: c_int,
+        _y1: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_draw_wide_line(
+        _x0: c_int,
+        _y0: c_int,
+        _x1: c_int,
+        _y1: c_int,
+        _radius: c_float,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_draw_wedge_line(
+        _x0: c_int,
+        _y0: c_int,
+        _x1: c_int,
+        _y1: c_int,
+        _r0: c_float,
+        _r1: c_float,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_draw_gradient_line(
+        _x0: c_int,
+        _y0: c_int,
+        _x1: c_int,
+        _y1: c_int,
+        _start_color: u16,
+        _end_color: u16,
+    ) {
+    }
     pub unsafe fn m5u_display_set_scroll_rect(_x: c_int, _y: c_int, _w: c_int, _h: c_int) {}
     pub unsafe fn m5u_display_set_scroll_rect_color(
         _x: c_int,
@@ -1866,6 +2107,55 @@ mod host_stubs {
     pub unsafe fn m5u_display_color888(r: u8, g: u8, b: u8) -> u16 {
         ((u16::from(r & 0xF8)) << 8) | ((u16::from(g & 0xFC)) << 3) | u16::from(b >> 3)
     }
+    pub unsafe fn m5u_display_push_image_rgb565(
+        _x: c_int,
+        _y: c_int,
+        w: c_int,
+        h: c_int,
+        data: *const u16,
+    ) -> bool {
+        !data.is_null() && rect_pixel_len(w, h).is_some()
+    }
+    pub unsafe fn m5u_display_push_image_rgb565_transparent(
+        _x: c_int,
+        _y: c_int,
+        w: c_int,
+        h: c_int,
+        data: *const u16,
+        _transparent: u16,
+    ) -> bool {
+        !data.is_null() && rect_pixel_len(w, h).is_some()
+    }
+    pub unsafe fn m5u_display_read_pixel(_x: c_int, _y: c_int) -> u16 {
+        0
+    }
+    pub unsafe fn m5u_display_read_rect_rgb565(
+        _x: c_int,
+        _y: c_int,
+        w: c_int,
+        h: c_int,
+        data: *mut u16,
+    ) -> bool {
+        let Some(len) = rect_pixel_len(w, h) else {
+            return false;
+        };
+        if data.is_null() {
+            return false;
+        }
+        for i in 0..len {
+            ptr::write(data.add(i), 0);
+        }
+        true
+    }
+    pub unsafe fn m5u_display_copy_rect(
+        _dst_x: c_int,
+        _dst_y: c_int,
+        _w: c_int,
+        _h: c_int,
+        _src_x: c_int,
+        _src_y: c_int,
+    ) {
+    }
     pub unsafe fn m5u_display_count() -> c_int {
         1
     }
@@ -1890,6 +2180,12 @@ mod host_stubs {
     }
     pub unsafe fn m5u_display_set_rotation_at(_index: c_int, _rotation: c_int) {}
     pub unsafe fn m5u_display_set_color_at(_index: c_int, _color: u16) {}
+    pub unsafe fn m5u_display_get_cursor_x_at(_index: c_int) -> c_int {
+        0
+    }
+    pub unsafe fn m5u_display_get_cursor_y_at(_index: c_int) -> c_int {
+        0
+    }
     pub unsafe fn m5u_display_start_write_at(_index: c_int) {}
     pub unsafe fn m5u_display_end_write_at(_index: c_int) {}
     pub unsafe fn m5u_display_print_at(_index: c_int, _text: *const c_char) {}
@@ -2061,6 +2357,70 @@ mod host_stubs {
         _color: u16,
     ) {
     }
+    pub unsafe fn m5u_display_draw_bezier3_at(
+        _index: c_int,
+        _x0: c_int,
+        _y0: c_int,
+        _x1: c_int,
+        _y1: c_int,
+        _x2: c_int,
+        _y2: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_draw_bezier4_at(
+        _index: c_int,
+        _x0: c_int,
+        _y0: c_int,
+        _x1: c_int,
+        _y1: c_int,
+        _x2: c_int,
+        _y2: c_int,
+        _x3: c_int,
+        _y3: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_draw_smooth_line_at(
+        _index: c_int,
+        _x0: c_int,
+        _y0: c_int,
+        _x1: c_int,
+        _y1: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_draw_wide_line_at(
+        _index: c_int,
+        _x0: c_int,
+        _y0: c_int,
+        _x1: c_int,
+        _y1: c_int,
+        _radius: c_float,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_draw_wedge_line_at(
+        _index: c_int,
+        _x0: c_int,
+        _y0: c_int,
+        _x1: c_int,
+        _y1: c_int,
+        _r0: c_float,
+        _r1: c_float,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_draw_gradient_line_at(
+        _index: c_int,
+        _x0: c_int,
+        _y0: c_int,
+        _x1: c_int,
+        _y1: c_int,
+        _start_color: u16,
+        _end_color: u16,
+    ) {
+    }
     pub unsafe fn m5u_display_set_scroll_rect_at(
         _index: c_int,
         _x: c_int,
@@ -2094,6 +2454,59 @@ mod host_stubs {
     }
     pub unsafe fn m5u_display_get_text_size_y_at(_index: c_int) -> c_float {
         1.0
+    }
+    pub unsafe fn m5u_display_push_image_rgb565_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        w: c_int,
+        h: c_int,
+        data: *const u16,
+    ) -> bool {
+        !data.is_null() && rect_pixel_len(w, h).is_some()
+    }
+    pub unsafe fn m5u_display_push_image_rgb565_transparent_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        w: c_int,
+        h: c_int,
+        data: *const u16,
+        _transparent: u16,
+    ) -> bool {
+        !data.is_null() && rect_pixel_len(w, h).is_some()
+    }
+    pub unsafe fn m5u_display_read_pixel_at(_index: c_int, _x: c_int, _y: c_int) -> u16 {
+        0
+    }
+    pub unsafe fn m5u_display_read_rect_rgb565_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        w: c_int,
+        h: c_int,
+        data: *mut u16,
+    ) -> bool {
+        let Some(len) = rect_pixel_len(w, h) else {
+            return false;
+        };
+        if data.is_null() {
+            return false;
+        }
+        for i in 0..len {
+            ptr::write(data.add(i), 0);
+        }
+        true
+    }
+    pub unsafe fn m5u_display_copy_rect_at(
+        _index: c_int,
+        _dst_x: c_int,
+        _dst_y: c_int,
+        _w: c_int,
+        _h: c_int,
+        _src_x: c_int,
+        _src_y: c_int,
+    ) {
     }
 
     pub unsafe fn m5u_button_is_pressed(_button: c_int) -> bool {

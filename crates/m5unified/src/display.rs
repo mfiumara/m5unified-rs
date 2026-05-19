@@ -151,6 +151,10 @@ impl Display {
         unsafe { m5unified_sys::m5u_display_wait_display() }
     }
 
+    pub fn cursor_x(&self) -> i32 {
+        unsafe { m5unified_sys::m5u_display_get_cursor_x() as i32 }
+    }
+
     pub fn cursor_y(&self) -> i32 {
         unsafe { m5unified_sys::m5u_display_get_cursor_y() as i32 }
     }
@@ -269,6 +273,61 @@ impl Display {
         }
     }
 
+    pub fn draw_quadratic_bezier(&mut self, p0: Point, p1: Point, p2: Point, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_draw_bezier3(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, color);
+        }
+    }
+
+    pub fn draw_cubic_bezier(&mut self, p0: Point, p1: Point, p2: Point, p3: Point, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_draw_bezier4(
+                p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, color,
+            );
+        }
+    }
+
+    pub fn draw_smooth_line(&mut self, start: Point, end: Point, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_draw_smooth_line(start.x, start.y, end.x, end.y, color);
+        }
+    }
+
+    pub fn draw_wide_line(&mut self, start: Point, end: Point, radius: f32, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_draw_wide_line(
+                start.x, start.y, end.x, end.y, radius, color,
+            );
+        }
+    }
+
+    pub fn draw_wedge_line(&mut self, start: Point, end: Point, r0: f32, r1: f32, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_draw_wedge_line(
+                start.x, start.y, end.x, end.y, r0, r1, color,
+            );
+        }
+    }
+
+    pub fn draw_gradient_line(
+        &mut self,
+        start: Point,
+        end: Point,
+        start_color: u16,
+        end_color: u16,
+    ) {
+        unsafe {
+            m5unified_sys::m5u_display_draw_gradient_line(
+                start.x,
+                start.y,
+                end.x,
+                end.y,
+                start_color,
+                end_color,
+            );
+        }
+    }
+
     pub fn set_scroll_rect(&mut self, rect: Rect) {
         unsafe { m5unified_sys::m5u_display_set_scroll_rect(rect.x, rect.y, rect.w, rect.h) }
     }
@@ -310,6 +369,79 @@ impl Display {
     pub fn color888(&self, r: u8, g: u8, b: u8) -> u16 {
         unsafe { m5unified_sys::m5u_display_color888(r, g, b) }
     }
+
+    pub fn push_image_rgb565(&mut self, rect: Rect, pixels: &[u16]) -> Result<(), Error> {
+        let required = validate_pixel_buffer(rect, pixels.len())?;
+        if required == 0 {
+            return Ok(());
+        }
+
+        let ok = unsafe {
+            m5unified_sys::m5u_display_push_image_rgb565(
+                rect.x,
+                rect.y,
+                rect.w,
+                rect.h,
+                pixels.as_ptr(),
+            )
+        };
+        ok.then_some(())
+            .ok_or(Error::Unavailable("display push_image_rgb565"))
+    }
+
+    pub fn push_image_rgb565_transparent(
+        &mut self,
+        rect: Rect,
+        pixels: &[u16],
+        transparent: u16,
+    ) -> Result<(), Error> {
+        let required = validate_pixel_buffer(rect, pixels.len())?;
+        if required == 0 {
+            return Ok(());
+        }
+
+        let ok = unsafe {
+            m5unified_sys::m5u_display_push_image_rgb565_transparent(
+                rect.x,
+                rect.y,
+                rect.w,
+                rect.h,
+                pixels.as_ptr(),
+                transparent,
+            )
+        };
+        ok.then_some(())
+            .ok_or(Error::Unavailable("display push_image_rgb565_transparent"))
+    }
+
+    pub fn read_pixel(&mut self, x: i32, y: i32) -> u16 {
+        unsafe { m5unified_sys::m5u_display_read_pixel(x, y) }
+    }
+
+    pub fn read_rect_rgb565(&mut self, rect: Rect, pixels: &mut [u16]) -> Result<(), Error> {
+        let required = validate_pixel_buffer(rect, pixels.len())?;
+        if required == 0 {
+            return Ok(());
+        }
+
+        let ok = unsafe {
+            m5unified_sys::m5u_display_read_rect_rgb565(
+                rect.x,
+                rect.y,
+                rect.w,
+                rect.h,
+                pixels.as_mut_ptr(),
+            )
+        };
+        ok.then_some(())
+            .ok_or(Error::Unavailable("display read_rect_rgb565"))
+    }
+
+    pub fn copy_rect(&mut self, dst: Point, size: Size, src: Point) {
+        unsafe {
+            m5unified_sys::m5u_display_copy_rect(dst.x, dst.y, size.w, size.h, src.x, src.y);
+        }
+    }
 }
 
 impl core::fmt::Write for Display {
@@ -349,6 +481,24 @@ pub struct Rect {
     pub y: i32,
     pub w: i32,
     pub h: i32,
+}
+
+impl Rect {
+    fn pixel_count(self) -> Option<usize> {
+        if self.w <= 0 || self.h <= 0 {
+            return Some(0);
+        }
+
+        (self.w as usize).checked_mul(self.h as usize)
+    }
+}
+
+fn validate_pixel_buffer(rect: Rect, len: usize) -> Result<usize, Error> {
+    let required = rect.pixel_count().ok_or(Error::InvalidBufferLength)?;
+    if len < required {
+        return Err(Error::InvalidBufferLength);
+    }
+    Ok(required)
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -499,6 +649,14 @@ impl DisplayRef {
         unsafe { m5unified_sys::m5u_display_set_color_at(self.index, color) }
     }
 
+    pub fn cursor_x(&self) -> i32 {
+        unsafe { m5unified_sys::m5u_display_get_cursor_x_at(self.index) as i32 }
+    }
+
+    pub fn cursor_y(&self) -> i32 {
+        unsafe { m5unified_sys::m5u_display_get_cursor_y_at(self.index) as i32 }
+    }
+
     pub fn start_write(&mut self) {
         unsafe { m5unified_sys::m5u_display_start_write_at(self.index) }
     }
@@ -646,6 +804,66 @@ impl DisplayRef {
         }
     }
 
+    pub fn draw_quadratic_bezier(&mut self, p0: Point, p1: Point, p2: Point, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_draw_bezier3_at(
+                self.index, p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, color,
+            );
+        }
+    }
+
+    pub fn draw_cubic_bezier(&mut self, p0: Point, p1: Point, p2: Point, p3: Point, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_draw_bezier4_at(
+                self.index, p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, color,
+            );
+        }
+    }
+
+    pub fn draw_smooth_line(&mut self, start: Point, end: Point, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_draw_smooth_line_at(
+                self.index, start.x, start.y, end.x, end.y, color,
+            );
+        }
+    }
+
+    pub fn draw_wide_line(&mut self, start: Point, end: Point, radius: f32, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_draw_wide_line_at(
+                self.index, start.x, start.y, end.x, end.y, radius, color,
+            );
+        }
+    }
+
+    pub fn draw_wedge_line(&mut self, start: Point, end: Point, r0: f32, r1: f32, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_draw_wedge_line_at(
+                self.index, start.x, start.y, end.x, end.y, r0, r1, color,
+            );
+        }
+    }
+
+    pub fn draw_gradient_line(
+        &mut self,
+        start: Point,
+        end: Point,
+        start_color: u16,
+        end_color: u16,
+    ) {
+        unsafe {
+            m5unified_sys::m5u_display_draw_gradient_line_at(
+                self.index,
+                start.x,
+                start.y,
+                end.x,
+                end.y,
+                start_color,
+                end_color,
+            );
+        }
+    }
+
     pub fn set_scroll_rect(&mut self, rect: Rect) {
         unsafe {
             m5unified_sys::m5u_display_set_scroll_rect_at(
@@ -684,6 +902,84 @@ impl DisplayRef {
 
     pub fn text_size_y(&self) -> f32 {
         unsafe { m5unified_sys::m5u_display_get_text_size_y_at(self.index) }
+    }
+
+    pub fn push_image_rgb565(&mut self, rect: Rect, pixels: &[u16]) -> Result<(), Error> {
+        let required = validate_pixel_buffer(rect, pixels.len())?;
+        if required == 0 {
+            return Ok(());
+        }
+
+        let ok = unsafe {
+            m5unified_sys::m5u_display_push_image_rgb565_at(
+                self.index,
+                rect.x,
+                rect.y,
+                rect.w,
+                rect.h,
+                pixels.as_ptr(),
+            )
+        };
+        ok.then_some(())
+            .ok_or(Error::Unavailable("display push_image_rgb565"))
+    }
+
+    pub fn push_image_rgb565_transparent(
+        &mut self,
+        rect: Rect,
+        pixels: &[u16],
+        transparent: u16,
+    ) -> Result<(), Error> {
+        let required = validate_pixel_buffer(rect, pixels.len())?;
+        if required == 0 {
+            return Ok(());
+        }
+
+        let ok = unsafe {
+            m5unified_sys::m5u_display_push_image_rgb565_transparent_at(
+                self.index,
+                rect.x,
+                rect.y,
+                rect.w,
+                rect.h,
+                pixels.as_ptr(),
+                transparent,
+            )
+        };
+        ok.then_some(())
+            .ok_or(Error::Unavailable("display push_image_rgb565_transparent"))
+    }
+
+    pub fn read_pixel(&mut self, x: i32, y: i32) -> u16 {
+        unsafe { m5unified_sys::m5u_display_read_pixel_at(self.index, x, y) }
+    }
+
+    pub fn read_rect_rgb565(&mut self, rect: Rect, pixels: &mut [u16]) -> Result<(), Error> {
+        let required = validate_pixel_buffer(rect, pixels.len())?;
+        if required == 0 {
+            return Ok(());
+        }
+
+        let ok = unsafe {
+            m5unified_sys::m5u_display_read_rect_rgb565_at(
+                self.index,
+                rect.x,
+                rect.y,
+                rect.w,
+                rect.h,
+                pixels.as_mut_ptr(),
+            )
+        };
+        ok.then_some(())
+            .ok_or(Error::Unavailable("display read_rect_rgb565"))
+    }
+
+    pub fn copy_rect(&mut self, dst: Point, size: Size, src: Point) {
+        unsafe {
+            m5unified_sys::m5u_display_copy_rect_at(
+                self.index, dst.x, dst.y, size.w, size.h, src.x, src.y,
+            );
+        }
     }
 }
 

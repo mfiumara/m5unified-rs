@@ -676,6 +676,10 @@ bool m5u_display_display_busy(void) {
 void m5u_display_wait_display(void) {
 }
 
+int m5u_display_get_cursor_x(void) {
+    return 0;
+}
+
 int m5u_display_get_cursor_y(void) {
     return 0;
 }
@@ -760,6 +764,30 @@ void m5u_display_fill_arc(int x, int y, int r0, int r1, float angle0, float angl
     (void)x; (void)y; (void)r0; (void)r1; (void)angle0; (void)angle1; (void)color;
 }
 
+void m5u_display_draw_bezier3(int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color) {
+    (void)x0; (void)y0; (void)x1; (void)y1; (void)x2; (void)y2; (void)color;
+}
+
+void m5u_display_draw_bezier4(int x0, int y0, int x1, int y1, int x2, int y2, int x3, int y3, uint16_t color) {
+    (void)x0; (void)y0; (void)x1; (void)y1; (void)x2; (void)y2; (void)x3; (void)y3; (void)color;
+}
+
+void m5u_display_draw_smooth_line(int x0, int y0, int x1, int y1, uint16_t color) {
+    (void)x0; (void)y0; (void)x1; (void)y1; (void)color;
+}
+
+void m5u_display_draw_wide_line(int x0, int y0, int x1, int y1, float radius, uint16_t color) {
+    (void)x0; (void)y0; (void)x1; (void)y1; (void)radius; (void)color;
+}
+
+void m5u_display_draw_wedge_line(int x0, int y0, int x1, int y1, float r0, float r1, uint16_t color) {
+    (void)x0; (void)y0; (void)x1; (void)y1; (void)r0; (void)r1; (void)color;
+}
+
+void m5u_display_draw_gradient_line(int x0, int y0, int x1, int y1, uint16_t start_color, uint16_t end_color) {
+    (void)x0; (void)y0; (void)x1; (void)y1; (void)start_color; (void)end_color;
+}
+
 void m5u_display_set_scroll_rect(int x, int y, int w, int h) {
     (void)x; (void)y; (void)w; (void)h;
 }
@@ -805,6 +833,33 @@ void m5u_display_clear_clip_rect(void) {
 
 uint16_t m5u_display_color888(uint8_t r, uint8_t g, uint8_t b) {
     return (uint16_t)((r & 0xF8) << 8 | (g & 0xFC) << 3 | (b >> 3));
+}
+
+bool m5u_display_push_image_rgb565(int x, int y, int w, int h, const uint16_t* data) {
+    (void)x; (void)y; return data && w > 0 && h > 0;
+}
+
+bool m5u_display_push_image_rgb565_transparent(int x, int y, int w, int h, const uint16_t* data, uint16_t transparent) {
+    (void)x; (void)y; (void)transparent; return data && w > 0 && h > 0;
+}
+
+uint16_t m5u_display_read_pixel(int x, int y) {
+    (void)x; (void)y; return 0;
+}
+
+bool m5u_display_read_rect_rgb565(int x, int y, int w, int h, uint16_t* data) {
+    (void)x; (void)y;
+    if (!data || w <= 0 || h <= 0) {
+        return false;
+    }
+    for (int i = 0; i < w * h; ++i) {
+        data[i] = 0;
+    }
+    return true;
+}
+
+void m5u_display_copy_rect(int dst_x, int dst_y, int w, int h, int src_x, int src_y) {
+    (void)dst_x; (void)dst_y; (void)w; (void)h; (void)src_x; (void)src_y;
 }
 
 int m5u_display_count(void) {
@@ -853,6 +908,14 @@ void m5u_display_set_rotation_at(int index, int rotation) {
 
 void m5u_display_set_color_at(int index, uint16_t color) {
     (void)index; (void)color;
+}
+
+int m5u_display_get_cursor_x_at(int index) {
+    (void)index; return 0;
+}
+
+int m5u_display_get_cursor_y_at(int index) {
+    (void)index; return 0;
 }
 
 void m5u_display_start_write_at(int index) {
@@ -951,6 +1014,30 @@ void m5u_display_fill_arc_at(int index, int x, int y, int r0, int r1, float angl
     (void)index; (void)x; (void)y; (void)r0; (void)r1; (void)angle0; (void)angle1; (void)color;
 }
 
+void m5u_display_draw_bezier3_at(int index, int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color) {
+    (void)index; (void)x0; (void)y0; (void)x1; (void)y1; (void)x2; (void)y2; (void)color;
+}
+
+void m5u_display_draw_bezier4_at(int index, int x0, int y0, int x1, int y1, int x2, int y2, int x3, int y3, uint16_t color) {
+    (void)index; (void)x0; (void)y0; (void)x1; (void)y1; (void)x2; (void)y2; (void)x3; (void)y3; (void)color;
+}
+
+void m5u_display_draw_smooth_line_at(int index, int x0, int y0, int x1, int y1, uint16_t color) {
+    (void)index; (void)x0; (void)y0; (void)x1; (void)y1; (void)color;
+}
+
+void m5u_display_draw_wide_line_at(int index, int x0, int y0, int x1, int y1, float radius, uint16_t color) {
+    (void)index; (void)x0; (void)y0; (void)x1; (void)y1; (void)radius; (void)color;
+}
+
+void m5u_display_draw_wedge_line_at(int index, int x0, int y0, int x1, int y1, float r0, float r1, uint16_t color) {
+    (void)index; (void)x0; (void)y0; (void)x1; (void)y1; (void)r0; (void)r1; (void)color;
+}
+
+void m5u_display_draw_gradient_line_at(int index, int x0, int y0, int x1, int y1, uint16_t start_color, uint16_t end_color) {
+    (void)index; (void)x0; (void)y0; (void)x1; (void)y1; (void)start_color; (void)end_color;
+}
+
 void m5u_display_set_scroll_rect_at(int index, int x, int y, int w, int h) {
     (void)index; (void)x; (void)y; (void)w; (void)h;
 }
@@ -985,6 +1072,33 @@ float m5u_display_get_text_size_x_at(int index) {
 
 float m5u_display_get_text_size_y_at(int index) {
     (void)index; return 1.0f;
+}
+
+bool m5u_display_push_image_rgb565_at(int index, int x, int y, int w, int h, const uint16_t* data) {
+    (void)index; (void)x; (void)y; return data && w > 0 && h > 0;
+}
+
+bool m5u_display_push_image_rgb565_transparent_at(int index, int x, int y, int w, int h, const uint16_t* data, uint16_t transparent) {
+    (void)index; (void)x; (void)y; (void)transparent; return data && w > 0 && h > 0;
+}
+
+uint16_t m5u_display_read_pixel_at(int index, int x, int y) {
+    (void)index; (void)x; (void)y; return 0;
+}
+
+bool m5u_display_read_rect_rgb565_at(int index, int x, int y, int w, int h, uint16_t* data) {
+    (void)index; (void)x; (void)y;
+    if (!data || w <= 0 || h <= 0) {
+        return false;
+    }
+    for (int i = 0; i < w * h; ++i) {
+        data[i] = 0;
+    }
+    return true;
+}
+
+void m5u_display_copy_rect_at(int index, int dst_x, int dst_y, int w, int h, int src_x, int src_y) {
+    (void)index; (void)dst_x; (void)dst_y; (void)w; (void)h; (void)src_x; (void)src_y;
 }
 
 bool m5u_button_is_pressed(int button) { return m5u_button_state(button, 0); }
