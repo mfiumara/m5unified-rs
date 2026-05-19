@@ -574,6 +574,13 @@ void m5u_led_set_all_color_rgb(uint8_t r, uint8_t g, uint8_t b);
 void m5u_led_set_colors_rgb(const m5u_led_color_t* colors, size_t index, size_t length);
 int m5u_led_get_type(size_t index);
 bool m5u_led_is_enabled(void);
+bool m5u_led_power_hub_begin(void);
+size_t m5u_led_power_hub_count(void);
+void m5u_led_power_hub_set_brightness(uint8_t brightness);
+void m5u_led_power_hub_set_color_rgb(size_t index, uint8_t r, uint8_t g, uint8_t b);
+void m5u_led_power_hub_set_colors_rgb(const m5u_led_color_t* colors, size_t index, size_t length);
+void m5u_led_power_hub_display(void);
+int m5u_led_power_hub_get_type(size_t index);
 
 void m5u_log_print(const char* text);
 void m5u_log_println(const char* text);

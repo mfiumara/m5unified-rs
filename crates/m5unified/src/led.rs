@@ -54,6 +54,10 @@ impl Led {
     pub fn is_enabled(&self) -> bool {
         unsafe { m5unified_sys::m5u_led_is_enabled() }
     }
+
+    pub fn power_hub(&self) -> LedPowerHub {
+        LedPowerHub
+    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -100,5 +104,46 @@ impl LedColor {
 
     pub const fn new(r: u8, g: u8, b: u8) -> Self {
         Self { r, g, b }
+    }
+}
+
+#[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]
+pub struct LedPowerHub;
+
+impl LedPowerHub {
+    pub fn begin(&mut self) -> bool {
+        unsafe { m5unified_sys::m5u_led_power_hub_begin() }
+    }
+
+    pub fn count(&self) -> usize {
+        unsafe { m5unified_sys::m5u_led_power_hub_count() }
+    }
+
+    pub fn set_brightness(&mut self, brightness: u8) {
+        unsafe { m5unified_sys::m5u_led_power_hub_set_brightness(brightness) }
+    }
+
+    pub fn set_color(&mut self, index: usize, color: LedColor) {
+        unsafe { m5unified_sys::m5u_led_power_hub_set_color_rgb(index, color.r, color.g, color.b) }
+    }
+
+    pub fn set_colors(&mut self, index: usize, colors: &[LedColor]) {
+        let raw: Vec<m5unified_sys::m5u_led_color_t> = colors
+            .iter()
+            .map(|color| m5unified_sys::m5u_led_color_t {
+                r: color.r,
+                g: color.g,
+                b: color.b,
+            })
+            .collect();
+        unsafe { m5unified_sys::m5u_led_power_hub_set_colors_rgb(raw.as_ptr(), index, raw.len()) }
+    }
+
+    pub fn display(&mut self) {
+        unsafe { m5unified_sys::m5u_led_power_hub_display() }
+    }
+
+    pub fn led_type(&self, index: usize) -> LedType {
+        LedType::from_raw(unsafe { m5unified_sys::m5u_led_power_hub_get_type(index) })
     }
 }

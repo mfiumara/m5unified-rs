@@ -888,6 +888,17 @@ extern "C" {
     pub fn m5u_led_set_colors_rgb(colors: *const m5u_led_color_t, index: usize, length: usize);
     pub fn m5u_led_get_type(index: usize) -> c_int;
     pub fn m5u_led_is_enabled() -> bool;
+    pub fn m5u_led_power_hub_begin() -> bool;
+    pub fn m5u_led_power_hub_count() -> usize;
+    pub fn m5u_led_power_hub_set_brightness(brightness: u8);
+    pub fn m5u_led_power_hub_set_color_rgb(index: usize, r: u8, g: u8, b: u8);
+    pub fn m5u_led_power_hub_set_colors_rgb(
+        colors: *const m5u_led_color_t,
+        index: usize,
+        length: usize,
+    );
+    pub fn m5u_led_power_hub_display();
+    pub fn m5u_led_power_hub_get_type(index: usize) -> c_int;
 
     pub fn m5u_log_print(text: *const c_char);
     pub fn m5u_log_println(text: *const c_char);
@@ -2317,6 +2328,24 @@ mod host_stubs {
     }
     pub unsafe fn m5u_led_is_enabled() -> bool {
         false
+    }
+    pub unsafe fn m5u_led_power_hub_begin() -> bool {
+        false
+    }
+    pub unsafe fn m5u_led_power_hub_count() -> usize {
+        0
+    }
+    pub unsafe fn m5u_led_power_hub_set_brightness(_brightness: u8) {}
+    pub unsafe fn m5u_led_power_hub_set_color_rgb(_index: usize, _r: u8, _g: u8, _b: u8) {}
+    pub unsafe fn m5u_led_power_hub_set_colors_rgb(
+        _colors: *const m5u_led_color_t,
+        _index: usize,
+        _length: usize,
+    ) {
+    }
+    pub unsafe fn m5u_led_power_hub_display() {}
+    pub unsafe fn m5u_led_power_hub_get_type(_index: usize) -> c_int {
+        0
     }
 
     pub unsafe fn m5u_log_print(_text: *const c_char) {}

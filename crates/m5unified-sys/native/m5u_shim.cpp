@@ -7,6 +7,7 @@
 #include <utility/imu/BMM150_Class.hpp>
 #include <utility/imu/MPU6886_Class.hpp>
 #include <utility/imu/SH200Q_Class.hpp>
+#include <utility/led/LED_PowerHub_Class.hpp>
 #include <utility/rtc/PCF8563_Class.hpp>
 #include <utility/rtc/RTC_PowerHub_Class.hpp>
 #include <utility/rtc/RX8130_Class.hpp>
@@ -3167,6 +3168,79 @@ int m5u_led_get_type(size_t index) {
 
 bool m5u_led_is_enabled(void) {
     return M5.Led.isEnabled();
+}
+
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+static m5::LED_PowerHub_Class& m5u_led_power_hub(void) {
+    static m5::LED_PowerHub_Class led;
+    return led;
+}
+#endif
+
+bool m5u_led_power_hub_begin(void) {
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+    return m5u_led_power_hub().begin();
+#else
+    return false;
+#endif
+}
+
+size_t m5u_led_power_hub_count(void) {
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+    return m5u_led_power_hub().getCount();
+#else
+    return 0;
+#endif
+}
+
+void m5u_led_power_hub_set_brightness(uint8_t brightness) {
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+    m5u_led_power_hub().setBrightness(brightness);
+#else
+    (void)brightness;
+#endif
+}
+
+void m5u_led_power_hub_set_color_rgb(size_t index, uint8_t r, uint8_t g, uint8_t b) {
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+    if (index < m5u_led_power_hub().getCount()) {
+        RGBColor color{r, g, b};
+        m5u_led_power_hub().setColors(&color, index, 1);
+    }
+#else
+    (void)index; (void)r; (void)g; (void)b;
+#endif
+}
+
+void m5u_led_power_hub_set_colors_rgb(const m5u_led_color_t* colors, size_t index, size_t length) {
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+    if (!colors || !length) {
+        return;
+    }
+    std::vector<RGBColor> rgb;
+    rgb.reserve(length);
+    for (size_t i = 0; i < length; ++i) {
+        rgb.push_back(RGBColor{colors[i].r, colors[i].g, colors[i].b});
+    }
+    m5u_led_power_hub().setColors(rgb.data(), index, length);
+#else
+    (void)colors; (void)index; (void)length;
+#endif
+}
+
+void m5u_led_power_hub_display(void) {
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+    m5u_led_power_hub().display();
+#endif
+}
+
+int m5u_led_power_hub_get_type(size_t index) {
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+    return (int)m5u_led_power_hub().getLedType(index);
+#else
+    (void)index;
+    return 0;
+#endif
 }
 
 void m5u_log_print(const char* text) {

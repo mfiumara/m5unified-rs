@@ -61,7 +61,7 @@ pub use imu::{
     ImuSensorMask, RawVec3, Vec3,
 };
 pub use io_expander::{IoExpander, Pi4ioe5v6408};
-pub use led::{Led, LedColor, LedType};
+pub use led::{Led, LedColor, LedPowerHub, LedType};
 pub use log::{Log, LogLevel, LogTarget, RawLogCallback};
 pub use power::{
     Aw32001, Aw32001ChargeStatus, Axp192, Axp192PekPress, Axp2101, Axp2101ChargeStatus,
@@ -340,6 +340,14 @@ mod tests {
         m5.led.set_all_color(LedColor::RED);
         m5.led
             .set_colors(0, &[LedColor::RED, LedColor::GREEN, LedColor::BLUE]);
+        let mut power_hub = m5.led.power_hub();
+        assert!(!power_hub.begin());
+        assert_eq!(power_hub.count(), 0);
+        assert_eq!(power_hub.led_type(0), LedType::Unknown);
+        power_hub.set_brightness(32);
+        power_hub.set_color(0, LedColor::WHITE);
+        power_hub.set_colors(0, &[LedColor::RED, LedColor::GREEN]);
+        power_hub.display();
     }
 
     #[test]
