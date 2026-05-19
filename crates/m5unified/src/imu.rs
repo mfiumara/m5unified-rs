@@ -3,6 +3,8 @@
 //! This module wraps M5Unified's IMU class with typed vectors, sensor masks,
 //! sensor kind detection, and safe accessors for combined IMU data.
 
+use core::ffi::c_int;
+
 use crate::system::Board;
 
 #[derive(Debug, Copy, Clone, Default, PartialEq)]
@@ -81,6 +83,26 @@ impl Imu {
 
     pub fn init_for_board(&mut self, board: Board) -> bool {
         self.begin_for_board(board)
+    }
+
+    pub fn ak8963(&self) -> ImuDevice {
+        ImuDevice::new(ImuDeviceKind::Ak8963)
+    }
+
+    pub fn bmm150(&self) -> ImuDevice {
+        ImuDevice::new(ImuDeviceKind::Bmm150)
+    }
+
+    pub fn bmi270(&self) -> ImuDevice {
+        ImuDevice::new(ImuDeviceKind::Bmi270)
+    }
+
+    pub fn mpu6886(&self) -> ImuDevice {
+        ImuDevice::new(ImuDeviceKind::Mpu6886)
+    }
+
+    pub fn sh200q(&self) -> ImuDevice {
+        ImuDevice::new(ImuDeviceKind::Sh200q)
     }
 
     pub fn accel(&self) -> Option<Vec3> {
@@ -265,4 +287,183 @@ pub struct ImuData {
     pub gyro: Vec3,
     pub mag: Vec3,
     pub temperature_c: Option<f32>,
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum ImuDeviceKind {
+    Ak8963,
+    Bmm150,
+    Bmi270,
+    Mpu6886,
+    Sh200q,
+}
+
+impl ImuDeviceKind {
+    const fn raw(self) -> c_int {
+        match self {
+            Self::Ak8963 => 0,
+            Self::Bmm150 => 1,
+            Self::Bmi270 => 2,
+            Self::Mpu6886 => 3,
+            Self::Sh200q => 4,
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]
+pub struct RawVec3 {
+    pub x: i16,
+    pub y: i16,
+    pub z: i16,
+}
+
+impl RawVec3 {
+    pub const fn new(x: i16, y: i16, z: i16) -> Self {
+        Self { x, y, z }
+    }
+
+    pub fn scaled(self, resolution: f32) -> Vec3 {
+        Vec3 {
+            x: self.x as f32 * resolution,
+            y: self.y as f32 * resolution,
+            z: self.z as f32 * resolution,
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]
+pub struct ImuRawData {
+    pub sensor_mask: ImuSensorMask,
+    pub accel: RawVec3,
+    pub gyro: RawVec3,
+    pub mag: RawVec3,
+    pub temp_adc: i16,
+}
+
+impl ImuRawData {
+    fn from_raw(raw: m5unified_sys::m5u_imu_raw_data_t) -> Self {
+        Self {
+            sensor_mask: ImuSensorMask::from_raw(raw.sensor_mask),
+            accel: RawVec3::new(raw.accel_x, raw.accel_y, raw.accel_z),
+            gyro: RawVec3::new(raw.gyro_x, raw.gyro_y, raw.gyro_z),
+            mag: RawVec3::new(raw.mag_x, raw.mag_y, raw.mag_z),
+            temp_adc: raw.temp,
+        }
+    }
+
+    pub const fn has_accel(self) -> bool {
+        self.sensor_mask.contains(ImuSensorMask::ACCEL)
+    }
+
+    pub const fn has_gyro(self) -> bool {
+        self.sensor_mask.contains(ImuSensorMask::GYRO)
+    }
+
+    pub const fn has_mag(self) -> bool {
+        self.sensor_mask.contains(ImuSensorMask::MAG)
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct ImuConvertParams {
+    pub accel_res: f32,
+    pub gyro_res: f32,
+    pub mag_res: f32,
+    pub temp_res: f32,
+    pub temp_offset: f32,
+}
+
+impl ImuConvertParams {
+    fn from_raw(raw: m5unified_sys::m5u_imu_convert_param_t) -> Self {
+        Self {
+            accel_res: raw.accel_res,
+            gyro_res: raw.gyro_res,
+            mag_res: raw.mag_res,
+            temp_res: raw.temp_res,
+            temp_offset: raw.temp_offset,
+        }
+    }
+
+    pub fn temperature_c(self, adc: i16) -> f32 {
+        adc as f32 * self.temp_res + self.temp_offset
+    }
+}
+
+impl Default for ImuConvertParams {
+    fn default() -> Self {
+        Self::from_raw(m5unified_sys::m5u_imu_convert_param_t::default())
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct ImuDevice {
+    kind: ImuDeviceKind,
+}
+
+impl ImuDevice {
+    const fn new(kind: ImuDeviceKind) -> Self {
+        Self { kind }
+    }
+
+    pub const fn kind(&self) -> ImuDeviceKind {
+        self.kind
+    }
+
+    pub fn begin(&mut self) -> ImuSensorMask {
+        let raw = unsafe { m5unified_sys::m5u_imu_device_begin(self.kind.raw()) };
+        ImuSensorMask::from_raw(raw.max(0) as u8)
+    }
+
+    pub fn init(&mut self) -> ImuSensorMask {
+        self.begin()
+    }
+
+    pub fn raw_data(&self) -> Option<ImuRawData> {
+        let mut raw = m5unified_sys::m5u_imu_raw_data_t::default();
+        unsafe { m5unified_sys::m5u_imu_device_get_raw_data(self.kind.raw(), &mut raw) }
+            .then_some(ImuRawData::from_raw(raw))
+    }
+
+    pub fn convert_params(&self) -> Option<ImuConvertParams> {
+        let mut raw = m5unified_sys::m5u_imu_convert_param_t::default();
+        unsafe { m5unified_sys::m5u_imu_device_get_convert_param(self.kind.raw(), &mut raw) }
+            .then_some(ImuConvertParams::from_raw(raw))
+    }
+
+    pub fn data(&self) -> Option<ImuData> {
+        let raw = self.raw_data()?;
+        let params = self.convert_params().unwrap_or_default();
+        Some(ImuData {
+            usec: 0,
+            accel: raw.accel.scaled(params.accel_res),
+            gyro: raw.gyro.scaled(params.gyro_res),
+            mag: raw.mag.scaled(params.mag_res),
+            temperature_c: self.temperature_adc().map(|adc| params.temperature_c(adc)),
+        })
+    }
+
+    pub fn temperature_adc(&self) -> Option<i16> {
+        let mut adc = 0;
+        unsafe { m5unified_sys::m5u_imu_device_get_temp_adc(self.kind.raw(), &mut adc) }
+            .then_some(adc)
+    }
+
+    pub fn temperature_c(&self) -> Option<f32> {
+        let adc = self.temperature_adc()?;
+        self.convert_params()
+            .map(|params| params.temperature_c(adc))
+    }
+
+    pub fn sleep(&mut self) -> bool {
+        unsafe { m5unified_sys::m5u_imu_device_sleep(self.kind.raw()) }
+    }
+
+    pub fn set_int_pin_active_logic(&mut self, level: bool) -> bool {
+        unsafe { m5unified_sys::m5u_imu_device_set_int_pin_active_logic(self.kind.raw(), level) }
+    }
+
+    pub fn who_am_i(&self) -> Option<u8> {
+        let raw = unsafe { m5unified_sys::m5u_imu_device_who_am_i(self.kind.raw()) };
+        (raw >= 0).then_some(raw as u8)
+    }
 }

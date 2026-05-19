@@ -56,7 +56,10 @@ pub use display::{
 };
 pub use error::Error;
 pub use i2c::{I2cBus, I2cDevice};
-pub use imu::{Imu, ImuAxis, ImuData, ImuKind, ImuSensorMask, Vec3};
+pub use imu::{
+    Imu, ImuAxis, ImuConvertParams, ImuData, ImuDevice, ImuDeviceKind, ImuKind, ImuRawData,
+    ImuSensorMask, RawVec3, Vec3,
+};
 pub use io_expander::IoExpander;
 pub use led::{Led, LedColor, LedType};
 pub use log::{Log, LogLevel, LogTarget, RawLogCallback};
@@ -292,10 +295,39 @@ mod tests {
         assert_eq!(m5.imu.raw_data(0), 0);
         assert!(m5.imu.sleep());
 
+        let mut bmi270 = m5.imu.bmi270();
+        assert_eq!(bmi270.kind(), ImuDeviceKind::Bmi270);
+        assert!(bmi270.begin().is_empty());
+        assert!(bmi270.init().is_empty());
+        assert!(bmi270.raw_data().is_none());
+        assert!(bmi270.data().is_none());
+        assert!(bmi270.temperature_adc().is_none());
+        assert!(bmi270.temperature_c().is_none());
+        assert!(!bmi270.sleep());
+        assert!(!bmi270.set_int_pin_active_logic(true));
+        assert_eq!(bmi270.who_am_i(), None);
+        let params = bmi270
+            .convert_params()
+            .expect("host stub convert params should exist");
+        assert_eq!(params.temperature_c(25), 25.0);
+        assert_eq!(m5.imu.ak8963().kind(), ImuDeviceKind::Ak8963);
+        assert_eq!(m5.imu.bmm150().kind(), ImuDeviceKind::Bmm150);
+        assert_eq!(m5.imu.mpu6886().kind(), ImuDeviceKind::Mpu6886);
+        assert_eq!(m5.imu.sh200q().kind(), ImuDeviceKind::Sh200q);
+
         let mask = ImuSensorMask::from_raw(ImuSensorMask::ACCEL.raw() | ImuSensorMask::GYRO.raw());
         assert!(mask.contains(ImuSensorMask::ACCEL));
         assert!(mask.contains(ImuSensorMask::GYRO));
         assert!(!mask.contains(ImuSensorMask::MAG));
+        let raw_vec = RawVec3::new(2, -4, 8);
+        assert_eq!(
+            raw_vec.scaled(0.5),
+            Vec3 {
+                x: 1.0,
+                y: -2.0,
+                z: 4.0
+            }
+        );
         assert_eq!(ImuKind::Bmi270.raw(), 6);
     }
 

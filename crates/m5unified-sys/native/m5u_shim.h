@@ -270,6 +270,28 @@ typedef struct {
     float mag_z;
 } m5u_imu_data_t;
 
+typedef struct {
+    int16_t accel_x;
+    int16_t accel_y;
+    int16_t accel_z;
+    int16_t gyro_x;
+    int16_t gyro_y;
+    int16_t gyro_z;
+    int16_t mag_x;
+    int16_t mag_y;
+    int16_t mag_z;
+    int16_t temp;
+    uint8_t sensor_mask;
+} m5u_imu_raw_data_t;
+
+typedef struct {
+    float accel_res;
+    float gyro_res;
+    float mag_res;
+    float temp_res;
+    float temp_offset;
+} m5u_imu_convert_param_t;
+
 bool m5u_imu_begin(void);
 bool m5u_imu_begin_for_board(int board);
 bool m5u_imu_is_enabled(void);
@@ -296,6 +318,13 @@ void m5u_imu_clear_offset_data(void);
 void m5u_imu_set_offset_data(size_t index, int32_t value);
 int32_t m5u_imu_get_offset_data_i32(size_t index);
 int16_t m5u_imu_get_raw_data(size_t index);
+int m5u_imu_device_begin(int kind);
+bool m5u_imu_device_get_raw_data(int kind, m5u_imu_raw_data_t* out);
+bool m5u_imu_device_get_convert_param(int kind, m5u_imu_convert_param_t* out);
+bool m5u_imu_device_get_temp_adc(int kind, int16_t* adc);
+bool m5u_imu_device_sleep(int kind);
+bool m5u_imu_device_set_int_pin_active_logic(int kind, bool level);
+int m5u_imu_device_who_am_i(int kind);
 
 typedef struct {
     int x;

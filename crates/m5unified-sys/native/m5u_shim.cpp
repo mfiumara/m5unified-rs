@@ -1,6 +1,11 @@
 #include "m5u_shim.h"
 
 #include <M5Unified.h>
+#include <utility/imu/AK8963_Class.hpp>
+#include <utility/imu/BMI270_Class.hpp>
+#include <utility/imu/BMM150_Class.hpp>
+#include <utility/imu/MPU6886_Class.hpp>
+#include <utility/imu/SH200Q_Class.hpp>
 #include <utility/rtc/PCF8563_Class.hpp>
 #include <utility/rtc/RTC_PowerHub_Class.hpp>
 #include <utility/rtc/RX8130_Class.hpp>
@@ -1788,6 +1793,91 @@ int32_t m5u_imu_get_offset_data_i32(size_t index) {
 
 int16_t m5u_imu_get_raw_data(size_t index) {
     return M5.Imu.getRawData(index);
+}
+
+static m5::IMU_Base* m5u_imu_device_for_kind(int kind) {
+    static m5::AK8963_Class ak8963;
+    static m5::BMM150_Class bmm150;
+    static m5::BMI270_Class bmi270;
+    static m5::MPU6886_Class mpu6886;
+    static m5::SH200Q_Class sh200q;
+
+    switch (kind) {
+        case 0: return &ak8963;
+        case 1: return &bmm150;
+        case 2: return &bmi270;
+        case 3: return &mpu6886;
+        case 4: return &sh200q;
+        default: return nullptr;
+    }
+}
+
+int m5u_imu_device_begin(int kind) {
+    auto imu = m5u_imu_device_for_kind(kind);
+    return imu ? imu->begin() : 0;
+}
+
+bool m5u_imu_device_get_raw_data(int kind, m5u_imu_raw_data_t* out) {
+    auto imu = m5u_imu_device_for_kind(kind);
+    if (!imu || !out) {
+        return false;
+    }
+    m5::IMU_Base::imu_raw_data_t raw = {};
+    auto mask = imu->getImuRawData(&raw);
+    out->accel_x = raw.accel.x;
+    out->accel_y = raw.accel.y;
+    out->accel_z = raw.accel.z;
+    out->gyro_x = raw.gyro.x;
+    out->gyro_y = raw.gyro.y;
+    out->gyro_z = raw.gyro.z;
+    out->mag_x = raw.mag.x;
+    out->mag_y = raw.mag.y;
+    out->mag_z = raw.mag.z;
+    out->temp = raw.temp;
+    out->sensor_mask = static_cast<uint8_t>(mask);
+    return mask != m5::IMU_Base::imu_spec_none;
+}
+
+bool m5u_imu_device_get_convert_param(int kind, m5u_imu_convert_param_t* out) {
+    auto imu = m5u_imu_device_for_kind(kind);
+    if (!imu || !out) {
+        return false;
+    }
+    m5::IMU_Base::imu_convert_param_t param;
+    imu->getConvertParam(&param);
+    out->accel_res = param.accel_res;
+    out->gyro_res = param.gyro_res;
+    out->mag_res = param.mag_res;
+    out->temp_res = param.temp_res;
+    out->temp_offset = param.temp_offset;
+    return true;
+}
+
+bool m5u_imu_device_get_temp_adc(int kind, int16_t* adc) {
+    auto imu = m5u_imu_device_for_kind(kind);
+    return imu && adc ? imu->getTempAdc(adc) : false;
+}
+
+bool m5u_imu_device_sleep(int kind) {
+    auto imu = m5u_imu_device_for_kind(kind);
+    return imu ? imu->sleep() : false;
+}
+
+bool m5u_imu_device_set_int_pin_active_logic(int kind, bool level) {
+    auto imu = m5u_imu_device_for_kind(kind);
+    return imu ? imu->setINTPinActiveLogic(level) : false;
+}
+
+int m5u_imu_device_who_am_i(int kind) {
+    switch (kind) {
+        case 0: return static_cast<m5::AK8963_Class*>(m5u_imu_device_for_kind(kind))->WhoAmI();
+        case 1: return static_cast<m5::BMM150_Class*>(m5u_imu_device_for_kind(kind))->WhoAmI();
+        case 2: return static_cast<m5::BMI270_Class*>(m5u_imu_device_for_kind(kind))->WhoAmI();
+        case 3: return static_cast<m5::MPU6886_Class*>(m5u_imu_device_for_kind(kind))->whoAmI();
+        case 4: return static_cast<m5::SH200Q_Class*>(m5u_imu_device_for_kind(kind))->WhoAmI();
+        default:
+            return -1;
+    }
 }
 
 bool m5u_touch_get_detail(int index, m5u_touch_detail_t* out) {

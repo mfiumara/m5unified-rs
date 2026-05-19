@@ -289,6 +289,44 @@ pub struct m5u_imu_data_t {
     pub mag_z: f32,
 }
 
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]
+pub struct m5u_imu_raw_data_t {
+    pub accel_x: i16,
+    pub accel_y: i16,
+    pub accel_z: i16,
+    pub gyro_x: i16,
+    pub gyro_y: i16,
+    pub gyro_z: i16,
+    pub mag_x: i16,
+    pub mag_y: i16,
+    pub mag_z: i16,
+    pub temp: i16,
+    pub sensor_mask: u8,
+}
+
+#[repr(C)]
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct m5u_imu_convert_param_t {
+    pub accel_res: f32,
+    pub gyro_res: f32,
+    pub mag_res: f32,
+    pub temp_res: f32,
+    pub temp_offset: f32,
+}
+
+impl Default for m5u_imu_convert_param_t {
+    fn default() -> Self {
+        Self {
+            accel_res: 8.0 / 32768.0,
+            gyro_res: 2000.0 / 32768.0,
+            mag_res: 10.0 * 4912.0 / 32768.0,
+            temp_res: 1.0,
+            temp_offset: 0.0,
+        }
+    }
+}
+
 #[cfg(target_os = "espidf")]
 extern "C" {
     pub fn m5u_begin() -> bool;
@@ -697,6 +735,14 @@ extern "C" {
     pub fn m5u_imu_set_offset_data(index: usize, value: i32);
     pub fn m5u_imu_get_offset_data_i32(index: usize) -> i32;
     pub fn m5u_imu_get_raw_data(index: usize) -> i16;
+    pub fn m5u_imu_device_begin(kind: c_int) -> c_int;
+    pub fn m5u_imu_device_get_raw_data(kind: c_int, out: *mut m5u_imu_raw_data_t) -> bool;
+    pub fn m5u_imu_device_get_convert_param(kind: c_int, out: *mut m5u_imu_convert_param_t)
+        -> bool;
+    pub fn m5u_imu_device_get_temp_adc(kind: c_int, adc: *mut i16) -> bool;
+    pub fn m5u_imu_device_sleep(kind: c_int) -> bool;
+    pub fn m5u_imu_device_set_int_pin_active_logic(kind: c_int, level: bool) -> bool;
+    pub fn m5u_imu_device_who_am_i(kind: c_int) -> c_int;
 
     pub fn m5u_touch_get_detail(index: c_int, out: *mut m5u_touch_detail_t) -> bool;
     pub fn m5u_touch_is_enabled() -> bool;
@@ -1810,6 +1856,35 @@ mod host_stubs {
     }
     pub unsafe fn m5u_imu_get_raw_data(_index: usize) -> i16 {
         0
+    }
+    pub unsafe fn m5u_imu_device_begin(_kind: c_int) -> c_int {
+        0
+    }
+    pub unsafe fn m5u_imu_device_get_raw_data(_kind: c_int, _out: *mut m5u_imu_raw_data_t) -> bool {
+        false
+    }
+    pub unsafe fn m5u_imu_device_get_convert_param(
+        _kind: c_int,
+        out: *mut m5u_imu_convert_param_t,
+    ) -> bool {
+        if !out.is_null() {
+            *out = m5u_imu_convert_param_t::default();
+            true
+        } else {
+            false
+        }
+    }
+    pub unsafe fn m5u_imu_device_get_temp_adc(_kind: c_int, _adc: *mut i16) -> bool {
+        false
+    }
+    pub unsafe fn m5u_imu_device_sleep(_kind: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_imu_device_set_int_pin_active_logic(_kind: c_int, _level: bool) -> bool {
+        false
+    }
+    pub unsafe fn m5u_imu_device_who_am_i(_kind: c_int) -> c_int {
+        -1
     }
 
     pub unsafe fn m5u_touch_get_detail(_index: c_int, out: *mut m5u_touch_detail_t) -> bool {

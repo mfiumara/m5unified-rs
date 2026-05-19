@@ -1102,6 +1102,43 @@ int16_t m5u_imu_get_raw_data(size_t index) {
     (void)index; return 0;
 }
 
+int m5u_imu_device_begin(int kind) {
+    (void)kind; return 0;
+}
+
+bool m5u_imu_device_get_raw_data(int kind, m5u_imu_raw_data_t* out) {
+    (void)kind; (void)out; return false;
+}
+
+bool m5u_imu_device_get_convert_param(int kind, m5u_imu_convert_param_t* out) {
+    (void)kind;
+    if (!out) {
+        return false;
+    }
+    out->accel_res = 8.0f / 32768.0f;
+    out->gyro_res = 2000.0f / 32768.0f;
+    out->mag_res = 10.0f * 4912.0f / 32768.0f;
+    out->temp_res = 1.0f;
+    out->temp_offset = 0.0f;
+    return true;
+}
+
+bool m5u_imu_device_get_temp_adc(int kind, int16_t* adc) {
+    (void)kind; (void)adc; return false;
+}
+
+bool m5u_imu_device_sleep(int kind) {
+    (void)kind; return false;
+}
+
+bool m5u_imu_device_set_int_pin_active_logic(int kind, bool level) {
+    (void)kind; (void)level; return false;
+}
+
+int m5u_imu_device_who_am_i(int kind) {
+    (void)kind; return -1;
+}
+
 bool m5u_touch_get_detail(int index, m5u_touch_detail_t* out) {
     (void)index;
     if (out) {

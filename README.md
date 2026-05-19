@@ -71,7 +71,7 @@ The current wrapper covers the API used by the translated upstream examples:
 - button press, release, hold, click, click-count, timing, threshold, and state helpers
 - microphone recording, recording state, sample-rate, configuration helpers, and simple RMS calculation
 - speaker configuration, running/playing state, tone, PCM, WAV, channel, repeat, and volume controls
-- IMU acceleration, gyro, temperature, sensor masks, axis order, calibration, raw data, and NVS offsets
+- IMU acceleration, gyro, temperature, sensor masks, axis order, calibration, raw data, NVS offsets, and direct AK8963/BMM150/BMI270/MPU6886/SH200Q sensor helpers
 - touch points, touch detail state, flick/drag state helpers, and touch thresholds
 - RTC init, date/time, date-only/time-only, low-voltage and IRQ helpers, direct PCF8563/RX8130/PowerHub RTC access, system-time sync, power PMIC type, battery/VBUS/external-port readings, sleep/power-off, output/charge controls, direct AXP192, AXP2101, AW32001, PY32 PMIC, IP5306, BQ27220 gauge, INA226, and INA3221 power-monitor helpers, LED control/color batches/type queries, logging dump/path/configuration/callbacks, `core::fmt::Write` log formatting, and SD SPI mount helpers
 - internal/external I2C bus setup, raw transfers, register helpers, device helpers, bit helpers, address scanning, and board IO expander helpers
