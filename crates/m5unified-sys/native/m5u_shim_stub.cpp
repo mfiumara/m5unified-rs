@@ -1057,6 +1057,13 @@ float m5u_power_ina226_get_bus_voltage_v(void) { return 0.0f; }
 float m5u_power_ina226_get_shunt_voltage_v(void) { return 0.0f; }
 float m5u_power_ina226_get_shunt_current_a(void) { return 0.0f; }
 float m5u_power_ina226_get_power_w(void) { return 0.0f; }
+bool m5u_power_ina3221_begin(size_t index) { (void)index; return false; }
+float m5u_power_ina3221_get_bus_voltage_v(size_t index, uint8_t channel) { (void)index; (void)channel; return 0.0f; }
+float m5u_power_ina3221_get_shunt_voltage_v(size_t index, uint8_t channel) { (void)index; (void)channel; return 0.0f; }
+float m5u_power_ina3221_get_current_a(size_t index, uint8_t channel) { (void)index; (void)channel; return 0.0f; }
+int32_t m5u_power_ina3221_get_bus_voltage_mv(size_t index, uint8_t channel) { (void)index; (void)channel; return 0; }
+int32_t m5u_power_ina3221_get_shunt_voltage_mv(size_t index, uint8_t channel) { (void)index; (void)channel; return 0; }
+bool m5u_power_ina3221_set_shunt_res(size_t index, uint8_t channel, uint32_t res) { (void)index; (void)channel; (void)res; return false; }
 bool m5u_power_ip5306_begin(void) { return false; }
 int m5u_power_ip5306_get_battery_level(void) { return -1; }
 bool m5u_power_ip5306_set_battery_charge(bool enable) { (void)enable; return false; }

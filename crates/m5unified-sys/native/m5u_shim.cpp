@@ -40,8 +40,10 @@ static bool s_m5u_sd_owns_bus = false;
 
 #if !defined(CONFIG_IDF_TARGET) || defined(CONFIG_IDF_TARGET_ESP32)
 #define M5U_HAS_IP5306 1
+#define M5U_HAS_INA3221 1
 #else
 #define M5U_HAS_IP5306 0
+#define M5U_HAS_INA3221 0
 #endif
 
 #if defined(CONFIG_IDF_TARGET_ESP32S3)
@@ -1760,6 +1762,89 @@ float m5u_power_ina226_get_power_w(void) {
     return M5.Power.Ina226.getPower();
 #else
     return 0.0f;
+#endif
+}
+
+static bool m5u_power_ina3221_valid_index(size_t index) {
+#if M5U_HAS_INA3221
+    return index < 2;
+#else
+    (void)index;
+    return false;
+#endif
+}
+
+bool m5u_power_ina3221_begin(size_t index) {
+#if M5U_HAS_INA3221
+    return m5u_power_ina3221_valid_index(index) && M5.Power.Ina3221[index].begin();
+#else
+    (void)index;
+    return false;
+#endif
+}
+
+float m5u_power_ina3221_get_bus_voltage_v(size_t index, uint8_t channel) {
+#if M5U_HAS_INA3221
+    return m5u_power_ina3221_valid_index(index) ? M5.Power.Ina3221[index].getBusVoltage(channel) : 0.0f;
+#else
+    (void)index;
+    (void)channel;
+    return 0.0f;
+#endif
+}
+
+float m5u_power_ina3221_get_shunt_voltage_v(size_t index, uint8_t channel) {
+#if M5U_HAS_INA3221
+    return m5u_power_ina3221_valid_index(index) ? M5.Power.Ina3221[index].getShuntVoltage(channel) : 0.0f;
+#else
+    (void)index;
+    (void)channel;
+    return 0.0f;
+#endif
+}
+
+float m5u_power_ina3221_get_current_a(size_t index, uint8_t channel) {
+#if M5U_HAS_INA3221
+    return m5u_power_ina3221_valid_index(index) ? M5.Power.Ina3221[index].getCurrent(channel) : 0.0f;
+#else
+    (void)index;
+    (void)channel;
+    return 0.0f;
+#endif
+}
+
+int32_t m5u_power_ina3221_get_bus_voltage_mv(size_t index, uint8_t channel) {
+#if M5U_HAS_INA3221
+    return m5u_power_ina3221_valid_index(index) ? M5.Power.Ina3221[index].getBusMilliVoltage(channel) : 0;
+#else
+    (void)index;
+    (void)channel;
+    return 0;
+#endif
+}
+
+int32_t m5u_power_ina3221_get_shunt_voltage_mv(size_t index, uint8_t channel) {
+#if M5U_HAS_INA3221
+    return m5u_power_ina3221_valid_index(index) ? M5.Power.Ina3221[index].getShuntMilliVoltage(channel) : 0;
+#else
+    (void)index;
+    (void)channel;
+    return 0;
+#endif
+}
+
+bool m5u_power_ina3221_set_shunt_res(size_t index, uint8_t channel, uint32_t res) {
+#if M5U_HAS_INA3221
+    if (!m5u_power_ina3221_valid_index(index)) {
+        return false;
+    }
+    M5.Power.Ina3221[index].setShuntRes(channel, res);
+    return channel < 3;
+#else
+    (void)index;
+    (void)channel;
+    (void)res;
+    return false;
 #endif
 }
 

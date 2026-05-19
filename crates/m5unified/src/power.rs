@@ -192,6 +192,10 @@ impl Power {
         Ina226
     }
 
+    pub fn ina3221(&self, index: usize) -> Ina3221 {
+        Ina3221 { index }
+    }
+
     pub fn ip5306(&self) -> Ip5306 {
         Ip5306
     }
@@ -779,6 +783,91 @@ impl Ina226 {
     /// Return measured power in watts.
     pub fn power_w(&self) -> f32 {
         unsafe { m5unified_sys::m5u_power_ina226_get_power_w() }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct Ina3221 {
+    index: usize,
+}
+
+impl Ina3221 {
+    pub const CHANNEL_COUNT: usize = 3;
+
+    /// Return the zero-based upstream monitor index.
+    pub const fn index(&self) -> usize {
+        self.index
+    }
+
+    /// Initialize the selected direct INA3221 power monitor.
+    pub fn begin(&self) -> bool {
+        unsafe { m5unified_sys::m5u_power_ina3221_begin(self.index) }
+    }
+
+    /// Set the shunt resistance for the selected channel in milliohms.
+    pub fn set_shunt_res_milliohm(&self, channel: usize, res: u32) -> bool {
+        unsafe {
+            m5unified_sys::m5u_power_ina3221_set_shunt_res(
+                self.index,
+                Self::channel_raw(channel),
+                res,
+            )
+        }
+    }
+
+    /// Return bus voltage for the selected channel in volts.
+    pub fn bus_voltage_v(&self, channel: usize) -> f32 {
+        unsafe {
+            m5unified_sys::m5u_power_ina3221_get_bus_voltage_v(
+                self.index,
+                Self::channel_raw(channel),
+            )
+        }
+    }
+
+    /// Return shunt voltage for the selected channel in volts.
+    pub fn shunt_voltage_v(&self, channel: usize) -> f32 {
+        unsafe {
+            m5unified_sys::m5u_power_ina3221_get_shunt_voltage_v(
+                self.index,
+                Self::channel_raw(channel),
+            )
+        }
+    }
+
+    /// Return current for the selected channel in amps.
+    pub fn current_a(&self, channel: usize) -> f32 {
+        unsafe {
+            m5unified_sys::m5u_power_ina3221_get_current_a(self.index, Self::channel_raw(channel))
+        }
+    }
+
+    /// Return bus voltage for the selected channel in millivolts.
+    pub fn bus_voltage_mv(&self, channel: usize) -> i32 {
+        unsafe {
+            m5unified_sys::m5u_power_ina3221_get_bus_voltage_mv(
+                self.index,
+                Self::channel_raw(channel),
+            )
+        }
+    }
+
+    /// Return shunt voltage for the selected channel in millivolts.
+    pub fn shunt_voltage_mv(&self, channel: usize) -> i32 {
+        unsafe {
+            m5unified_sys::m5u_power_ina3221_get_shunt_voltage_mv(
+                self.index,
+                Self::channel_raw(channel),
+            )
+        }
+    }
+
+    fn channel_raw(channel: usize) -> u8 {
+        if channel > u8::MAX as usize {
+            u8::MAX
+        } else {
+            channel as u8
+        }
     }
 }
 

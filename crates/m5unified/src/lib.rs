@@ -60,7 +60,7 @@ pub use log::{Log, LogLevel, LogTarget, RawLogCallback};
 pub use power::{
     Aw32001, Aw32001ChargeStatus, Axp2101, Axp2101ChargeStatus, Axp2101IrqStatus, Axp2101PekPress,
     Bq27220, ChargeState, ExtPortBusConfig, ExtPortMask, Ina226, Ina226Config,
-    Ina226ConversionTime, Ina226Mode, Ina226Sampling, Ip5306, Power, PowerType, Py32Pmic,
+    Ina226ConversionTime, Ina226Mode, Ina226Sampling, Ina3221, Ip5306, Power, PowerType, Py32Pmic,
     Py32PmicPekPress,
 };
 pub use rtc::{Date, DateTime, Rtc, Time};
@@ -682,6 +682,16 @@ mod tests {
         assert_eq!(ina.shunt_voltage_v(), 0.0);
         assert_eq!(ina.shunt_current_a(), 0.0);
         assert_eq!(ina.power_w(), 0.0);
+        let ina3221 = m5.power.ina3221(0);
+        assert_eq!(ina3221.index(), 0);
+        assert_eq!(Ina3221::CHANNEL_COUNT, 3);
+        assert!(!ina3221.begin());
+        assert!(!ina3221.set_shunt_res_milliohm(0, 10));
+        assert_eq!(ina3221.bus_voltage_v(0), 0.0);
+        assert_eq!(ina3221.shunt_voltage_v(0), 0.0);
+        assert_eq!(ina3221.current_a(0), 0.0);
+        assert_eq!(ina3221.bus_voltage_mv(0), 0);
+        assert_eq!(ina3221.shunt_voltage_mv(0), 0);
         let ip5306 = m5.power.ip5306();
         assert!(!ip5306.begin());
         assert_eq!(ip5306.battery_level(), None);

@@ -695,6 +695,13 @@ extern "C" {
     pub fn m5u_power_ina226_get_shunt_voltage_v() -> c_float;
     pub fn m5u_power_ina226_get_shunt_current_a() -> c_float;
     pub fn m5u_power_ina226_get_power_w() -> c_float;
+    pub fn m5u_power_ina3221_begin(index: usize) -> bool;
+    pub fn m5u_power_ina3221_get_bus_voltage_v(index: usize, channel: u8) -> c_float;
+    pub fn m5u_power_ina3221_get_shunt_voltage_v(index: usize, channel: u8) -> c_float;
+    pub fn m5u_power_ina3221_get_current_a(index: usize, channel: u8) -> c_float;
+    pub fn m5u_power_ina3221_get_bus_voltage_mv(index: usize, channel: u8) -> i32;
+    pub fn m5u_power_ina3221_get_shunt_voltage_mv(index: usize, channel: u8) -> i32;
+    pub fn m5u_power_ina3221_set_shunt_res(index: usize, channel: u8, res: u32) -> bool;
     pub fn m5u_power_ip5306_begin() -> bool;
     pub fn m5u_power_ip5306_get_battery_level() -> c_int;
     pub fn m5u_power_ip5306_set_battery_charge(enable: bool) -> bool;
@@ -1729,6 +1736,27 @@ mod host_stubs {
     }
     pub unsafe fn m5u_power_ina226_get_power_w() -> c_float {
         0.0
+    }
+    pub unsafe fn m5u_power_ina3221_begin(_index: usize) -> bool {
+        false
+    }
+    pub unsafe fn m5u_power_ina3221_get_bus_voltage_v(_index: usize, _channel: u8) -> c_float {
+        0.0
+    }
+    pub unsafe fn m5u_power_ina3221_get_shunt_voltage_v(_index: usize, _channel: u8) -> c_float {
+        0.0
+    }
+    pub unsafe fn m5u_power_ina3221_get_current_a(_index: usize, _channel: u8) -> c_float {
+        0.0
+    }
+    pub unsafe fn m5u_power_ina3221_get_bus_voltage_mv(_index: usize, _channel: u8) -> i32 {
+        0
+    }
+    pub unsafe fn m5u_power_ina3221_get_shunt_voltage_mv(_index: usize, _channel: u8) -> i32 {
+        0
+    }
+    pub unsafe fn m5u_power_ina3221_set_shunt_res(_index: usize, _channel: u8, _res: u32) -> bool {
+        false
     }
     pub unsafe fn m5u_power_ip5306_begin() -> bool {
         false
