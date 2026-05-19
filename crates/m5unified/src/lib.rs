@@ -29,6 +29,7 @@
 
 mod audio;
 mod buttons;
+mod canvas;
 mod config;
 mod display;
 mod error;
@@ -40,6 +41,7 @@ mod log;
 mod power;
 mod rtc;
 mod sd;
+mod servo;
 mod system;
 mod timer;
 mod touch;
@@ -73,6 +75,8 @@ pub use power::{
     PowerType, Py32Pmic, Py32PmicPekPress,
 };
 pub use rtc::{Date, DateTime, Rtc, RtcDevice, RtcDeviceKind, Time};
+pub use canvas::Canvas;
+pub use servo::{StackChanServos, SERVO_PITCH, SERVO_YAW};
 pub use sd::{
     sd_begin, sd_begin_with_config, sd_end, sd_is_mounted, SdCard, SdSpiConfig, SD_MOUNT_PATH,
 };

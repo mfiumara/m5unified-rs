@@ -4431,4 +4431,183 @@ bool m5u_log_set_suffix(int target, const char* suffix) {
     return true;
 }
 
+// ─── Off-screen canvas (LGFX_Sprite) ────────────────────────────────────────
+
+static LGFX_Sprite* s_canvas = nullptr;
+
+bool m5u_canvas_create(int width, int height) {
+    delete s_canvas;
+    s_canvas = new LGFX_Sprite(&M5.Display);
+    s_canvas->setColorDepth(16);
+    void* buf = s_canvas->createSprite(width, height);
+    if (!buf) { delete s_canvas; s_canvas = nullptr; return false; }
+    return true;
+}
+
+void m5u_canvas_push(int x, int y) {
+    if (s_canvas) s_canvas->pushSprite(x, y);
+}
+
+void m5u_canvas_delete(void) {
+    if (s_canvas) { s_canvas->deleteSprite(); delete s_canvas; s_canvas = nullptr; }
+}
+
+void m5u_canvas_fill_screen(uint16_t color) {
+    if (s_canvas) s_canvas->fillScreen(color);
+}
+void m5u_canvas_fill_smooth_circle(int x, int y, int r, uint16_t color) {
+    if (s_canvas) s_canvas->fillSmoothCircle(x, y, r, color);
+}
+void m5u_canvas_draw_circle(int x, int y, int r, uint16_t color) {
+    if (s_canvas) s_canvas->drawCircle(x, y, r, color);
+}
+void m5u_canvas_fill_circle(int x, int y, int r, uint16_t color) {
+    if (s_canvas) s_canvas->fillCircle(x, y, r, color);
+}
+void m5u_canvas_fill_rect(int x, int y, int w, int h, uint16_t color) {
+    if (s_canvas) s_canvas->fillRect(x, y, w, h, color);
+}
+void m5u_canvas_fill_smooth_round_rect(int x, int y, int w, int h, int r, uint16_t color) {
+    if (s_canvas) s_canvas->fillSmoothRoundRect(x, y, w, h, r, color);
+}
+void m5u_canvas_fill_arc(int x, int y, int r0, int r1, float a0, float a1, uint16_t color) {
+    if (s_canvas) s_canvas->fillArc(x, y, r0, r1, a0, a1, color);
+}
+void m5u_canvas_fill_ellipse(int x, int y, int rx, int ry, uint16_t color) {
+    if (s_canvas) s_canvas->fillEllipse(x, y, rx, ry, color);
+}
+void m5u_canvas_draw_ellipse(int x, int y, int rx, int ry, uint16_t color) {
+    if (s_canvas) s_canvas->drawEllipse(x, y, rx, ry, color);
+}
+
+// ─── FEETECH SCSCL bus servo (StackChan head) ───────────────────────────────
+
+#include "driver/uart.h"
+
+#define M5U_SERVO_DEFAULT_TX   6
+#define M5U_SERVO_DEFAULT_RX   7
+#define M5U_SERVO_DEFAULT_BAUD 1000000
+#define M5U_SERVO_UART_NUM     UART_NUM_1
+#define M5U_SERVO_BUF_SIZE     512
+
+// SCSCL instruction codes
+#define SCSCL_WRITE   0x03
+#define SCSCL_READ    0x02
+
+// SCSCL SRAM register addresses
+#define SCSCL_TORQUE_ENABLE  0x28   // 1 byte
+#define SCSCL_GOAL_POS_L     0x2A   // 2 bytes: goal position
+#define SCSCL_GOAL_TIME_L    0x2C   // 2 bytes: travel time
+#define SCSCL_GOAL_SPEED_L   0x2E   // 2 bytes: max speed
+#define SCSCL_PRESENT_POS_L  0x38   // 2 bytes: current position
+
+static bool s_servo_initialized = false;
+
+static uint8_t scscl_checksum(const uint8_t* p, int len) {
+    uint8_t cs = 0;
+    for (int i = 0; i < len; i++) cs += p[i];
+    return static_cast<uint8_t>(~cs);
+}
+
+bool m5u_servo_init(int tx_pin, int rx_pin, int baud_rate) {
+    if (s_servo_initialized) return true;
+    if (tx_pin < 0)   tx_pin   = M5U_SERVO_DEFAULT_TX;
+    if (rx_pin < 0)   rx_pin   = M5U_SERVO_DEFAULT_RX;
+    if (baud_rate <= 0) baud_rate = M5U_SERVO_DEFAULT_BAUD;
+
+    uart_config_t cfg = {};
+    cfg.baud_rate  = baud_rate;
+    cfg.data_bits  = UART_DATA_8_BITS;
+    cfg.parity     = UART_PARITY_DISABLE;
+    cfg.stop_bits  = UART_STOP_BITS_1;
+    cfg.flow_ctrl  = UART_HW_FLOWCTRL_DISABLE;
+    cfg.source_clk = UART_SCLK_DEFAULT;
+
+    if (uart_driver_install(M5U_SERVO_UART_NUM, M5U_SERVO_BUF_SIZE * 2, 0, 0, nullptr, 0) != ESP_OK)
+        return false;
+    if (uart_param_config(M5U_SERVO_UART_NUM, &cfg) != ESP_OK) {
+        uart_driver_delete(M5U_SERVO_UART_NUM);
+        return false;
+    }
+    if (uart_set_pin(M5U_SERVO_UART_NUM, tx_pin, rx_pin,
+                     UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE) != ESP_OK) {
+        uart_driver_delete(M5U_SERVO_UART_NUM);
+        return false;
+    }
+    s_servo_initialized = true;
+    return true;
+}
+
+bool m5u_servo_write_raw_pos(uint8_t id, uint16_t raw_pos, uint16_t time_ms, uint16_t speed) {
+    if (!s_servo_initialized) return false;
+    // Packet: FF FF ID LEN INSTR ADDR PL PH TL TH SL SH CS  (13 bytes)
+    // LEN = INSTR(1) + ADDR(1) + DATA(6) + CS(1) = 9
+    uint8_t pkt[13];
+    pkt[0]  = 0xFF;
+    pkt[1]  = 0xFF;
+    pkt[2]  = id;
+    pkt[3]  = 9;
+    pkt[4]  = SCSCL_WRITE;
+    pkt[5]  = SCSCL_GOAL_POS_L;
+    pkt[6]  = raw_pos  & 0xFF;
+    pkt[7]  = (raw_pos  >> 8) & 0xFF;
+    pkt[8]  = time_ms & 0xFF;
+    pkt[9]  = (time_ms >> 8) & 0xFF;
+    pkt[10] = speed   & 0xFF;
+    pkt[11] = (speed   >> 8) & 0xFF;
+    pkt[12] = scscl_checksum(&pkt[2], 10); // covers ID..SPD_H
+    uart_write_bytes(M5U_SERVO_UART_NUM, reinterpret_cast<const char*>(pkt), sizeof(pkt));
+    return true;
+}
+
+int m5u_servo_read_raw_pos(uint8_t id) {
+    if (!s_servo_initialized) return -1;
+    uart_flush_input(M5U_SERVO_UART_NUM);
+
+    // Request: FF FF ID 04 02 ADDR NUM CS  (8 bytes)
+    // LEN = INSTR(1) + ADDR(1) + NUM(1) + CS(1) = 4
+    uint8_t req[8];
+    req[0] = 0xFF;
+    req[1] = 0xFF;
+    req[2] = id;
+    req[3] = 4;
+    req[4] = SCSCL_READ;
+    req[5] = SCSCL_PRESENT_POS_L;
+    req[6] = 2;
+    req[7] = scscl_checksum(&req[2], 5);
+    uart_write_bytes(M5U_SERVO_UART_NUM, reinterpret_cast<const char*>(req), sizeof(req));
+
+    // Response: FF FF ID 04 ERR PL PH CS  (8 bytes)
+    uint8_t resp[8] = {};
+    int got = uart_read_bytes(M5U_SERVO_UART_NUM, resp, sizeof(resp),
+                              pdMS_TO_TICKS(10));
+    if (got < 8) return -1;
+    if (resp[0] != 0xFF || resp[1] != 0xFF || resp[2] != id) return -1;
+    if (resp[4] != 0) return -1; // error byte
+    return static_cast<int>(resp[5]) | (static_cast<int>(resp[6]) << 8);
+}
+
+bool m5u_servo_enable_torque(uint8_t id, bool enable) {
+    if (!s_servo_initialized) return false;
+    // Packet: FF FF ID 04 03 28 ENABLE CS  (8 bytes)
+    // LEN = INSTR(1) + ADDR(1) + DATA(1) + CS(1) = 4
+    uint8_t pkt[8];
+    pkt[0] = 0xFF;
+    pkt[1] = 0xFF;
+    pkt[2] = id;
+    pkt[3] = 4;
+    pkt[4] = SCSCL_WRITE;
+    pkt[5] = SCSCL_TORQUE_ENABLE;
+    pkt[6] = enable ? 1 : 0;
+    pkt[7] = scscl_checksum(&pkt[2], 5);
+    uart_write_bytes(M5U_SERVO_UART_NUM, reinterpret_cast<const char*>(pkt), sizeof(pkt));
+    return true;
+}
+
+void m5u_servo_deinit(void) {
+    if (!s_servo_initialized) return;
+    uart_driver_delete(M5U_SERVO_UART_NUM);
+    s_servo_initialized = false;
+}
+
 } // extern "C"

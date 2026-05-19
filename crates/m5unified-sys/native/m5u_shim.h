@@ -843,6 +843,46 @@ bool m5u_sd_begin_spi(const m5u_sd_spi_config_t* config);
 bool m5u_sd_is_mounted(void);
 void m5u_sd_end(void);
 
+// Off-screen canvas (LGFX_Sprite) — draw everything here, then push to display
+// in one DMA transfer to eliminate per-primitive flicker.
+
+bool m5u_canvas_create(int width, int height);
+void m5u_canvas_push(int x, int y);
+void m5u_canvas_delete(void);
+void m5u_canvas_fill_screen(uint16_t color);
+void m5u_canvas_fill_smooth_circle(int x, int y, int r, uint16_t color);
+void m5u_canvas_draw_circle(int x, int y, int r, uint16_t color);
+void m5u_canvas_fill_circle(int x, int y, int r, uint16_t color);
+void m5u_canvas_fill_rect(int x, int y, int w, int h, uint16_t color);
+void m5u_canvas_fill_smooth_round_rect(int x, int y, int w, int h, int r, uint16_t color);
+void m5u_canvas_fill_arc(int x, int y, int r0, int r1, float a0, float a1, uint16_t color);
+void m5u_canvas_fill_ellipse(int x, int y, int rx, int ry, uint16_t color);
+void m5u_canvas_draw_ellipse(int x, int y, int rx, int ry, uint16_t color);
+
+// FEETECH SCSCL bus servo control (StackChan head servos)
+// Uses ESP-IDF UART driver. On non-firmware (host stub) builds these are no-ops.
+// Servo IDs: 1 = yaw (left/right), 2 = pitch (up/down)
+// Default pins for M5Stack Core S3: TX=6, RX=7, baud=1000000
+
+// Initialize the FEETECH servo UART bus.
+// Pass -1 for tx_pin/rx_pin/baud_rate to use StackChan Core S3 defaults (TX=6, RX=7, 1Mbps).
+bool m5u_servo_init(int tx_pin, int rx_pin, int baud_rate);
+
+// Write goal position to a SCSCL servo.
+// raw_pos: raw position units (0–1023)
+// time_ms: travel duration in milliseconds (0 = fastest)
+// speed:   max speed limit (0–1023, 0 = no limit)
+bool m5u_servo_write_raw_pos(uint8_t id, uint16_t raw_pos, uint16_t time_ms, uint16_t speed);
+
+// Read current raw position from a SCSCL servo (returns -1 on timeout / error).
+int m5u_servo_read_raw_pos(uint8_t id);
+
+// Enable or disable torque for a servo.
+bool m5u_servo_enable_torque(uint8_t id, bool enable);
+
+// Deinitialize and release the servo UART bus.
+void m5u_servo_deinit(void);
+
 #ifdef __cplusplus
 }
 #endif

@@ -1637,6 +1637,27 @@ extern "C" {
     pub fn m5u_sd_begin_spi(config: *const m5u_sd_spi_config_t) -> bool;
     pub fn m5u_sd_is_mounted() -> bool;
     pub fn m5u_sd_end();
+    pub fn m5u_canvas_create(width: c_int, height: c_int) -> bool;
+    pub fn m5u_canvas_push(x: c_int, y: c_int);
+    pub fn m5u_canvas_delete();
+    pub fn m5u_canvas_fill_screen(color: u16);
+    pub fn m5u_canvas_fill_smooth_circle(x: c_int, y: c_int, r: c_int, color: u16);
+    pub fn m5u_canvas_draw_circle(x: c_int, y: c_int, r: c_int, color: u16);
+    pub fn m5u_canvas_fill_circle(x: c_int, y: c_int, r: c_int, color: u16);
+    pub fn m5u_canvas_fill_rect(x: c_int, y: c_int, w: c_int, h: c_int, color: u16);
+    pub fn m5u_canvas_fill_smooth_round_rect(
+        x: c_int, y: c_int, w: c_int, h: c_int, r: c_int, color: u16,
+    );
+    pub fn m5u_canvas_fill_arc(
+        x: c_int, y: c_int, r0: c_int, r1: c_int, a0: c_float, a1: c_float, color: u16,
+    );
+    pub fn m5u_canvas_fill_ellipse(x: c_int, y: c_int, rx: c_int, ry: c_int, color: u16);
+    pub fn m5u_canvas_draw_ellipse(x: c_int, y: c_int, rx: c_int, ry: c_int, color: u16);
+    pub fn m5u_servo_init(tx_pin: c_int, rx_pin: c_int, baud_rate: c_int) -> bool;
+    pub fn m5u_servo_write_raw_pos(id: u8, raw_pos: u16, time_ms: u16, speed: u16) -> bool;
+    pub fn m5u_servo_read_raw_pos(id: u8) -> c_int;
+    pub fn m5u_servo_enable_torque(id: u8, enable: bool) -> bool;
+    pub fn m5u_servo_deinit();
 }
 
 #[cfg(not(target_os = "espidf"))]
@@ -4187,6 +4208,41 @@ mod host_stubs {
         false
     }
     pub unsafe fn m5u_sd_end() {}
+    pub unsafe fn m5u_canvas_create(_w: c_int, _h: c_int) -> bool { false }
+    pub unsafe fn m5u_canvas_push(_x: c_int, _y: c_int) {}
+    pub unsafe fn m5u_canvas_delete() {}
+    pub unsafe fn m5u_canvas_fill_screen(_c: u16) {}
+    pub unsafe fn m5u_canvas_fill_smooth_circle(_x: c_int, _y: c_int, _r: c_int, _c: u16) {}
+    pub unsafe fn m5u_canvas_draw_circle(_x: c_int, _y: c_int, _r: c_int, _c: u16) {}
+    pub unsafe fn m5u_canvas_fill_circle(_x: c_int, _y: c_int, _r: c_int, _c: u16) {}
+    pub unsafe fn m5u_canvas_fill_rect(_x: c_int, _y: c_int, _w: c_int, _h: c_int, _c: u16) {}
+    pub unsafe fn m5u_canvas_fill_smooth_round_rect(
+        _x: c_int, _y: c_int, _w: c_int, _h: c_int, _r: c_int, _c: u16,
+    ) {}
+    pub unsafe fn m5u_canvas_fill_arc(
+        _x: c_int, _y: c_int, _r0: c_int, _r1: c_int,
+        _a0: c_float, _a1: c_float, _c: u16,
+    ) {}
+    pub unsafe fn m5u_canvas_fill_ellipse(_x: c_int, _y: c_int, _rx: c_int, _ry: c_int, _c: u16) {}
+    pub unsafe fn m5u_canvas_draw_ellipse(_x: c_int, _y: c_int, _rx: c_int, _ry: c_int, _c: u16) {}
+    pub unsafe fn m5u_servo_init(_tx_pin: c_int, _rx_pin: c_int, _baud_rate: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_servo_write_raw_pos(
+        _id: u8,
+        _raw_pos: u16,
+        _time_ms: u16,
+        _speed: u16,
+    ) -> bool {
+        false
+    }
+    pub unsafe fn m5u_servo_read_raw_pos(_id: u8) -> c_int {
+        -1
+    }
+    pub unsafe fn m5u_servo_enable_torque(_id: u8, _enable: bool) -> bool {
+        false
+    }
+    pub unsafe fn m5u_servo_deinit() {}
 }
 
 #[cfg(not(target_os = "espidf"))]

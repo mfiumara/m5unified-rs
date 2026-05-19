@@ -2229,4 +2229,23 @@ bool m5u_log_set_suffix(int target, const char* suffix) {
     return target >= 0 && target <= 2 && suffix != nullptr;
 }
 
+bool m5u_canvas_create(int /*w*/, int /*h*/) { return false; }
+void m5u_canvas_push(int /*x*/, int /*y*/) {}
+void m5u_canvas_delete(void) {}
+void m5u_canvas_fill_screen(uint16_t /*c*/) {}
+void m5u_canvas_fill_smooth_circle(int /*x*/, int /*y*/, int /*r*/, uint16_t /*c*/) {}
+void m5u_canvas_draw_circle(int /*x*/, int /*y*/, int /*r*/, uint16_t /*c*/) {}
+void m5u_canvas_fill_circle(int /*x*/, int /*y*/, int /*r*/, uint16_t /*c*/) {}
+void m5u_canvas_fill_rect(int /*x*/, int /*y*/, int /*w*/, int /*h*/, uint16_t /*c*/) {}
+void m5u_canvas_fill_smooth_round_rect(int /*x*/, int /*y*/, int /*w*/, int /*h*/, int /*r*/, uint16_t /*c*/) {}
+void m5u_canvas_fill_arc(int /*x*/, int /*y*/, int /*r0*/, int /*r1*/, float /*a0*/, float /*a1*/, uint16_t /*c*/) {}
+void m5u_canvas_fill_ellipse(int /*x*/, int /*y*/, int /*rx*/, int /*ry*/, uint16_t /*c*/) {}
+void m5u_canvas_draw_ellipse(int /*x*/, int /*y*/, int /*rx*/, int /*ry*/, uint16_t /*c*/) {}
+
+bool m5u_servo_init(int /*tx_pin*/, int /*rx_pin*/, int /*baud_rate*/) { return false; }
+bool m5u_servo_write_raw_pos(uint8_t /*id*/, uint16_t /*raw_pos*/, uint16_t /*time_ms*/, uint16_t /*speed*/) { return false; }
+int  m5u_servo_read_raw_pos(uint8_t /*id*/) { return -1; }
+bool m5u_servo_enable_torque(uint8_t /*id*/, bool /*enable*/) { return false; }
+void m5u_servo_deinit(void) {}
+
 } // extern "C"
