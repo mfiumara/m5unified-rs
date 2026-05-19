@@ -1658,6 +1658,8 @@ extern "C" {
     pub fn m5u_servo_read_raw_pos(id: u8) -> c_int;
     pub fn m5u_servo_enable_torque(id: u8, enable: bool) -> bool;
     pub fn m5u_servo_deinit();
+    pub fn m5u_nvs_read_i32(ns: *const c_char, key: *const c_char, out_val: *mut i32) -> bool;
+    pub fn m5u_nvs_write_i32(ns: *const c_char, key: *const c_char, val: i32) -> bool;
 }
 
 #[cfg(not(target_os = "espidf"))]
@@ -4243,6 +4245,20 @@ mod host_stubs {
         false
     }
     pub unsafe fn m5u_servo_deinit() {}
+    pub unsafe fn m5u_nvs_read_i32(
+        _ns: *const c_char,
+        _key: *const c_char,
+        _out_val: *mut i32,
+    ) -> bool {
+        false
+    }
+    pub unsafe fn m5u_nvs_write_i32(
+        _ns: *const c_char,
+        _key: *const c_char,
+        _val: i32,
+    ) -> bool {
+        false
+    }
 }
 
 #[cfg(not(target_os = "espidf"))]

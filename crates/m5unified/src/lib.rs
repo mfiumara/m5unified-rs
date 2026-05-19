@@ -76,7 +76,9 @@ pub use power::{
 };
 pub use rtc::{Date, DateTime, Rtc, RtcDevice, RtcDeviceKind, Time};
 pub use canvas::Canvas;
-pub use servo::{StackChanServos, SERVO_PITCH, SERVO_YAW};
+pub use servo::{
+    StackChanServos, SERVO_PITCH, SERVO_YAW, PITCH_ZERO_DEFAULT, YAW_ZERO_DEFAULT,
+};
 pub use sd::{
     sd_begin, sd_begin_with_config, sd_end, sd_is_mounted, SdCard, SdSpiConfig, SD_MOUNT_PATH,
 };

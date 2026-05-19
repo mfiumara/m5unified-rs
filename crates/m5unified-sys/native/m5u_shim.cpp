@@ -4610,4 +4610,26 @@ void m5u_servo_deinit(void) {
     s_servo_initialized = false;
 }
 
+// ─── NVS helpers ────────────────────────────────────────────────────────────
+
+#include "nvs_flash.h"
+#include "nvs.h"
+
+bool m5u_nvs_read_i32(const char* ns, const char* key, int32_t* out_val) {
+    nvs_handle_t handle;
+    if (nvs_open(ns, NVS_READONLY, &handle) != ESP_OK) return false;
+    esp_err_t err = nvs_get_i32(handle, key, out_val);
+    nvs_close(handle);
+    return err == ESP_OK;
+}
+
+bool m5u_nvs_write_i32(const char* ns, const char* key, int32_t val) {
+    nvs_handle_t handle;
+    if (nvs_open(ns, NVS_READWRITE, &handle) != ESP_OK) return false;
+    esp_err_t err = nvs_set_i32(handle, key, val);
+    if (err == ESP_OK) err = nvs_commit(handle);
+    nvs_close(handle);
+    return err == ESP_OK;
+}
+
 } // extern "C"

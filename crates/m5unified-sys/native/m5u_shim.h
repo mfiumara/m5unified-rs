@@ -883,6 +883,11 @@ bool m5u_servo_enable_torque(uint8_t id, bool enable);
 // Deinitialize and release the servo UART bus.
 void m5u_servo_deinit(void);
 
+// NVS (non-volatile storage) helpers — thin wrappers around esp_nvs to persist
+// calibration data across reboots.  On host stub builds these are no-ops.
+bool m5u_nvs_read_i32(const char* ns, const char* key, int32_t* out_val);
+bool m5u_nvs_write_i32(const char* ns, const char* key, int32_t val);
+
 #ifdef __cplusplus
 }
 #endif

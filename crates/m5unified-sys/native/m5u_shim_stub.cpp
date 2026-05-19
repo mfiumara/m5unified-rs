@@ -2248,4 +2248,7 @@ int  m5u_servo_read_raw_pos(uint8_t /*id*/) { return -1; }
 bool m5u_servo_enable_torque(uint8_t /*id*/, bool /*enable*/) { return false; }
 void m5u_servo_deinit(void) {}
 
+bool m5u_nvs_read_i32(const char* /*ns*/, const char* /*key*/, int32_t* /*out_val*/) { return false; }
+bool m5u_nvs_write_i32(const char* /*ns*/, const char* /*key*/, int32_t /*val*/) { return false; }
+
 } // extern "C"
