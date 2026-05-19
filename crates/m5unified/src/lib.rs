@@ -66,7 +66,7 @@ pub use power::{
     Ina226Config, Ina226ConversionTime, Ina226Mode, Ina226Sampling, Ina3221, Ip5306, Power,
     PowerType, Py32Pmic, Py32PmicPekPress,
 };
-pub use rtc::{Date, DateTime, Rtc, Time};
+pub use rtc::{Date, DateTime, Rtc, RtcDevice, RtcDeviceKind, Time};
 pub use sd::{
     sd_begin, sd_begin_with_config, sd_end, sd_is_mounted, SdCard, SdSpiConfig, SD_MOUNT_PATH,
 };
@@ -545,6 +545,26 @@ mod tests {
         assert!(!m5.rtc.irq_status());
         m5.rtc.clear_irq();
         m5.rtc.disable_irq();
+
+        let mut pcf8563 = m5.rtc.pcf8563();
+        assert_eq!(pcf8563.kind(), RtcDeviceKind::Pcf8563);
+        assert!(!pcf8563.begin());
+        assert!(!pcf8563.init());
+        assert!(pcf8563.get_datetime().is_none());
+        assert!(pcf8563.get_date().is_none());
+        assert!(pcf8563.get_time().is_none());
+        assert!(!pcf8563.set_datetime(datetime));
+        assert!(!pcf8563.set_date(date));
+        assert!(!pcf8563.set_time(time));
+        assert!(!pcf8563.volt_low());
+        assert_eq!(pcf8563.set_timer_irq_ms(250), 0);
+        assert_eq!(pcf8563.set_alarm_irq(datetime), -1);
+        assert_eq!(pcf8563.set_alarm_irq_time(time), -1);
+        assert!(!pcf8563.irq_status());
+        pcf8563.clear_irq();
+        pcf8563.disable_irq();
+        assert_eq!(m5.rtc.rx8130().kind(), RtcDeviceKind::Rx8130);
+        assert_eq!(m5.rtc.power_hub().kind(), RtcDeviceKind::PowerHub);
 
         let mut display = m5.display(0).expect("host stub display should exist");
         assert_eq!(display.width(), 320);

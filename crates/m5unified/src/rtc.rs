@@ -1,7 +1,10 @@
 //! RTC date/time and alarm helpers.
 //!
 //! This module provides typed date, time, and date-time structs plus wrappers
-//! for RTC status, setters, system-time sync, timer IRQs, and alarm IRQs.
+//! for RTC status, setters, system-time sync, timer IRQs, alarm IRQs, and
+//! implementation-specific RTC backends.
+
+use core::ffi::c_int;
 
 use crate::Board;
 
@@ -146,6 +149,18 @@ impl Rtc {
         self.begin_for_board(board)
     }
 
+    pub fn pcf8563(&self) -> RtcDevice {
+        RtcDevice::new(RtcDeviceKind::Pcf8563)
+    }
+
+    pub fn rx8130(&self) -> RtcDevice {
+        RtcDevice::new(RtcDeviceKind::Rx8130)
+    }
+
+    pub fn power_hub(&self) -> RtcDevice {
+        RtcDevice::new(RtcDeviceKind::PowerHub)
+    }
+
     pub fn get_datetime(&self) -> Option<DateTime> {
         let mut raw = m5unified_sys::m5u_rtc_datetime_t::default();
         unsafe { m5unified_sys::m5u_rtc_get_datetime_detail(&mut raw) }
@@ -217,5 +232,110 @@ impl Rtc {
 
     pub fn disable_irq(&mut self) {
         unsafe { m5unified_sys::m5u_rtc_disable_irq() }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum RtcDeviceKind {
+    Pcf8563,
+    Rx8130,
+    PowerHub,
+}
+
+impl RtcDeviceKind {
+    const fn raw(self) -> c_int {
+        match self {
+            Self::Pcf8563 => 0,
+            Self::Rx8130 => 1,
+            Self::PowerHub => 2,
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct RtcDevice {
+    kind: RtcDeviceKind,
+}
+
+impl RtcDevice {
+    const fn new(kind: RtcDeviceKind) -> Self {
+        Self { kind }
+    }
+
+    pub const fn kind(&self) -> RtcDeviceKind {
+        self.kind
+    }
+
+    pub fn begin(&mut self) -> bool {
+        unsafe { m5unified_sys::m5u_rtc_device_begin(self.kind.raw()) }
+    }
+
+    pub fn init(&mut self) -> bool {
+        self.begin()
+    }
+
+    pub fn get_datetime(&self) -> Option<DateTime> {
+        let mut raw = m5unified_sys::m5u_rtc_datetime_t::default();
+        unsafe { m5unified_sys::m5u_rtc_device_get_datetime_detail(self.kind.raw(), &mut raw) }
+            .then_some(DateTime::from_raw(raw))
+    }
+
+    pub fn get_date(&self) -> Option<Date> {
+        let mut raw = m5unified_sys::m5u_rtc_datetime_t::default();
+        unsafe { m5unified_sys::m5u_rtc_device_get_date_detail(self.kind.raw(), &mut raw) }
+            .then_some(Date::from_raw(raw))
+    }
+
+    pub fn get_time(&self) -> Option<Time> {
+        let mut raw = m5unified_sys::m5u_rtc_datetime_t::default();
+        unsafe { m5unified_sys::m5u_rtc_device_get_time_detail(self.kind.raw(), &mut raw) }
+            .then_some(Time::from_raw(raw))
+    }
+
+    pub fn set_datetime(&mut self, datetime: DateTime) -> bool {
+        let raw = datetime.to_raw();
+        unsafe { m5unified_sys::m5u_rtc_device_set_datetime_detail(self.kind.raw(), &raw) }
+    }
+
+    pub fn set_date(&mut self, date: Date) -> bool {
+        let raw = date.to_raw();
+        unsafe { m5unified_sys::m5u_rtc_device_set_date_detail(self.kind.raw(), &raw) }
+    }
+
+    pub fn set_time(&mut self, time: Time) -> bool {
+        let raw = time.to_raw();
+        unsafe { m5unified_sys::m5u_rtc_device_set_time_detail(self.kind.raw(), &raw) }
+    }
+
+    pub fn volt_low(&self) -> bool {
+        unsafe { m5unified_sys::m5u_rtc_device_get_volt_low(self.kind.raw()) }
+    }
+
+    pub fn set_timer_irq_ms(&mut self, timer_msec: u32) -> u32 {
+        unsafe { m5unified_sys::m5u_rtc_device_set_timer_irq(self.kind.raw(), timer_msec) }
+    }
+
+    pub fn set_alarm_irq(&mut self, datetime: DateTime) -> i32 {
+        let raw = datetime.to_raw();
+        unsafe {
+            m5unified_sys::m5u_rtc_device_set_alarm_irq_datetime(self.kind.raw(), &raw) as i32
+        }
+    }
+
+    pub fn set_alarm_irq_time(&mut self, time: Time) -> i32 {
+        let raw = time.to_raw();
+        unsafe { m5unified_sys::m5u_rtc_device_set_alarm_irq_time(self.kind.raw(), &raw) as i32 }
+    }
+
+    pub fn irq_status(&self) -> bool {
+        unsafe { m5unified_sys::m5u_rtc_device_get_irq_status(self.kind.raw()) }
+    }
+
+    pub fn clear_irq(&mut self) {
+        unsafe { m5unified_sys::m5u_rtc_device_clear_irq(self.kind.raw()) }
+    }
+
+    pub fn disable_irq(&mut self) {
+        unsafe { m5unified_sys::m5u_rtc_device_disable_irq(self.kind.raw()) }
     }
 }

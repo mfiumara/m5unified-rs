@@ -435,6 +435,27 @@ extern "C" {
     pub fn m5u_rtc_set_datetime_detail(datetime: *const m5u_rtc_datetime_t) -> bool;
     pub fn m5u_rtc_set_date_detail(date: *const m5u_rtc_datetime_t) -> bool;
     pub fn m5u_rtc_set_time_detail(time: *const m5u_rtc_datetime_t) -> bool;
+    pub fn m5u_rtc_device_begin(kind: c_int) -> bool;
+    pub fn m5u_rtc_device_get_datetime_detail(kind: c_int, out: *mut m5u_rtc_datetime_t) -> bool;
+    pub fn m5u_rtc_device_get_date_detail(kind: c_int, out: *mut m5u_rtc_datetime_t) -> bool;
+    pub fn m5u_rtc_device_get_time_detail(kind: c_int, out: *mut m5u_rtc_datetime_t) -> bool;
+    pub fn m5u_rtc_device_set_datetime_detail(
+        kind: c_int,
+        datetime: *const m5u_rtc_datetime_t,
+    ) -> bool;
+    pub fn m5u_rtc_device_set_date_detail(kind: c_int, date: *const m5u_rtc_datetime_t) -> bool;
+    pub fn m5u_rtc_device_set_time_detail(kind: c_int, time: *const m5u_rtc_datetime_t) -> bool;
+    pub fn m5u_rtc_device_get_volt_low(kind: c_int) -> bool;
+    pub fn m5u_rtc_device_set_timer_irq(kind: c_int, timer_msec: u32) -> u32;
+    pub fn m5u_rtc_device_set_alarm_irq_datetime(
+        kind: c_int,
+        datetime: *const m5u_rtc_datetime_t,
+    ) -> c_int;
+    pub fn m5u_rtc_device_set_alarm_irq_time(kind: c_int, time: *const m5u_rtc_datetime_t)
+        -> c_int;
+    pub fn m5u_rtc_device_get_irq_status(kind: c_int) -> bool;
+    pub fn m5u_rtc_device_clear_irq(kind: c_int);
+    pub fn m5u_rtc_device_disable_irq(kind: c_int);
 
     pub fn m5u_battery_level() -> c_int;
     pub fn m5u_battery_voltage_mv() -> c_int;
@@ -1267,6 +1288,68 @@ mod host_stubs {
     pub unsafe fn m5u_rtc_set_time_detail(time: *const m5u_rtc_datetime_t) -> bool {
         !time.is_null()
     }
+    pub unsafe fn m5u_rtc_device_begin(_kind: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_rtc_device_get_datetime_detail(
+        _kind: c_int,
+        _out: *mut m5u_rtc_datetime_t,
+    ) -> bool {
+        false
+    }
+    pub unsafe fn m5u_rtc_device_get_date_detail(
+        _kind: c_int,
+        _out: *mut m5u_rtc_datetime_t,
+    ) -> bool {
+        false
+    }
+    pub unsafe fn m5u_rtc_device_get_time_detail(
+        _kind: c_int,
+        _out: *mut m5u_rtc_datetime_t,
+    ) -> bool {
+        false
+    }
+    pub unsafe fn m5u_rtc_device_set_datetime_detail(
+        _kind: c_int,
+        _datetime: *const m5u_rtc_datetime_t,
+    ) -> bool {
+        false
+    }
+    pub unsafe fn m5u_rtc_device_set_date_detail(
+        _kind: c_int,
+        _date: *const m5u_rtc_datetime_t,
+    ) -> bool {
+        false
+    }
+    pub unsafe fn m5u_rtc_device_set_time_detail(
+        _kind: c_int,
+        _time: *const m5u_rtc_datetime_t,
+    ) -> bool {
+        false
+    }
+    pub unsafe fn m5u_rtc_device_get_volt_low(_kind: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_rtc_device_set_timer_irq(_kind: c_int, _timer_msec: u32) -> u32 {
+        0
+    }
+    pub unsafe fn m5u_rtc_device_set_alarm_irq_datetime(
+        _kind: c_int,
+        _datetime: *const m5u_rtc_datetime_t,
+    ) -> c_int {
+        -1
+    }
+    pub unsafe fn m5u_rtc_device_set_alarm_irq_time(
+        _kind: c_int,
+        _time: *const m5u_rtc_datetime_t,
+    ) -> c_int {
+        -1
+    }
+    pub unsafe fn m5u_rtc_device_get_irq_status(_kind: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_rtc_device_clear_irq(_kind: c_int) {}
+    pub unsafe fn m5u_rtc_device_disable_irq(_kind: c_int) {}
 
     pub unsafe fn m5u_battery_level() -> c_int {
         100

@@ -434,6 +434,62 @@ void m5u_rtc_clear_irq(void) {
 void m5u_rtc_disable_irq(void) {
 }
 
+bool m5u_rtc_device_begin(int kind) {
+    (void)kind; return false;
+}
+
+bool m5u_rtc_device_get_datetime_detail(int kind, m5u_rtc_datetime_t* out) {
+    (void)kind; (void)out; return false;
+}
+
+bool m5u_rtc_device_get_date_detail(int kind, m5u_rtc_datetime_t* out) {
+    (void)kind; (void)out; return false;
+}
+
+bool m5u_rtc_device_get_time_detail(int kind, m5u_rtc_datetime_t* out) {
+    (void)kind; (void)out; return false;
+}
+
+bool m5u_rtc_device_set_datetime_detail(int kind, const m5u_rtc_datetime_t* datetime) {
+    (void)kind; (void)datetime; return false;
+}
+
+bool m5u_rtc_device_set_date_detail(int kind, const m5u_rtc_datetime_t* date) {
+    (void)kind; (void)date; return false;
+}
+
+bool m5u_rtc_device_set_time_detail(int kind, const m5u_rtc_datetime_t* time) {
+    (void)kind; (void)time; return false;
+}
+
+bool m5u_rtc_device_get_volt_low(int kind) {
+    (void)kind; return false;
+}
+
+uint32_t m5u_rtc_device_set_timer_irq(int kind, uint32_t timer_msec) {
+    (void)kind; (void)timer_msec; return 0;
+}
+
+int m5u_rtc_device_set_alarm_irq_datetime(int kind, const m5u_rtc_datetime_t* datetime) {
+    (void)kind; (void)datetime; return -1;
+}
+
+int m5u_rtc_device_set_alarm_irq_time(int kind, const m5u_rtc_datetime_t* time) {
+    (void)kind; (void)time; return -1;
+}
+
+bool m5u_rtc_device_get_irq_status(int kind) {
+    (void)kind; return false;
+}
+
+void m5u_rtc_device_clear_irq(int kind) {
+    (void)kind;
+}
+
+void m5u_rtc_device_disable_irq(int kind) {
+    (void)kind;
+}
+
 int m5u_battery_level(void) {
     return -1;
 }

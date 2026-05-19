@@ -1,6 +1,9 @@
 #include "m5u_shim.h"
 
 #include <M5Unified.h>
+#include <utility/rtc/PCF8563_Class.hpp>
+#include <utility/rtc/RTC_PowerHub_Class.hpp>
+#include <utility/rtc/RX8130_Class.hpp>
 #include <driver/gpio.h>
 #include <driver/sdspi_host.h>
 #include <driver/spi_common.h>
@@ -810,6 +813,138 @@ void m5u_rtc_clear_irq(void) {
 
 void m5u_rtc_disable_irq(void) {
     M5.Rtc.disableIRQ();
+}
+
+static m5::RTC_Base* m5u_rtc_device_for_kind(int kind) {
+    static m5::PCF8563_Class pcf8563;
+    static m5::RX8130_Class rx8130;
+    static m5::RTC_PowerHub_Class power_hub;
+
+    switch (kind) {
+        case 0: return &pcf8563;
+        case 1: return &rx8130;
+        case 2: return &power_hub;
+        default: return nullptr;
+    }
+}
+
+bool m5u_rtc_device_begin(int kind) {
+    auto rtc = m5u_rtc_device_for_kind(kind);
+    return rtc ? rtc->begin() : false;
+}
+
+bool m5u_rtc_device_get_datetime_detail(int kind, m5u_rtc_datetime_t* out) {
+    auto rtc = m5u_rtc_device_for_kind(kind);
+    if (!rtc || !out) {
+        return false;
+    }
+    m5::rtc_date_t date;
+    m5::rtc_time_t time;
+    if (!rtc->getDateTime(&date, &time)) {
+        return false;
+    }
+    m5u_rtc_to_raw(m5::rtc_datetime_t(date, time), out);
+    return true;
+}
+
+bool m5u_rtc_device_get_date_detail(int kind, m5u_rtc_datetime_t* out) {
+    auto rtc = m5u_rtc_device_for_kind(kind);
+    if (!rtc || !out) {
+        return false;
+    }
+    m5::rtc_date_t date;
+    if (!rtc->getDateTime(&date, nullptr)) {
+        return false;
+    }
+    m5u_rtc_date_to_raw(date, out);
+    return true;
+}
+
+bool m5u_rtc_device_get_time_detail(int kind, m5u_rtc_datetime_t* out) {
+    auto rtc = m5u_rtc_device_for_kind(kind);
+    if (!rtc || !out) {
+        return false;
+    }
+    m5::rtc_time_t time;
+    if (!rtc->getDateTime(nullptr, &time)) {
+        return false;
+    }
+    m5u_rtc_time_to_raw(time, out);
+    return true;
+}
+
+bool m5u_rtc_device_set_datetime_detail(int kind, const m5u_rtc_datetime_t* datetime) {
+    auto rtc = m5u_rtc_device_for_kind(kind);
+    if (!rtc || !datetime) {
+        return false;
+    }
+    auto raw = m5u_rtc_from_raw(datetime);
+    return rtc->setDateTime(&raw.date, &raw.time);
+}
+
+bool m5u_rtc_device_set_date_detail(int kind, const m5u_rtc_datetime_t* date) {
+    auto rtc = m5u_rtc_device_for_kind(kind);
+    if (!rtc || !date) {
+        return false;
+    }
+    auto raw = m5u_rtc_date_from_raw(date);
+    return rtc->setDateTime(&raw, nullptr);
+}
+
+bool m5u_rtc_device_set_time_detail(int kind, const m5u_rtc_datetime_t* time) {
+    auto rtc = m5u_rtc_device_for_kind(kind);
+    if (!rtc || !time) {
+        return false;
+    }
+    auto raw = m5u_rtc_time_from_raw(time);
+    return rtc->setDateTime(nullptr, &raw);
+}
+
+bool m5u_rtc_device_get_volt_low(int kind) {
+    auto rtc = m5u_rtc_device_for_kind(kind);
+    return rtc ? rtc->getVoltLow() : false;
+}
+
+uint32_t m5u_rtc_device_set_timer_irq(int kind, uint32_t timer_msec) {
+    auto rtc = m5u_rtc_device_for_kind(kind);
+    return rtc ? rtc->setTimerIRQ(timer_msec) : 0;
+}
+
+int m5u_rtc_device_set_alarm_irq_datetime(int kind, const m5u_rtc_datetime_t* datetime) {
+    auto rtc = m5u_rtc_device_for_kind(kind);
+    if (!rtc || !datetime) {
+        return -1;
+    }
+    auto raw = m5u_rtc_from_raw(datetime);
+    return rtc->setAlarmIRQ(&raw.date, &raw.time);
+}
+
+int m5u_rtc_device_set_alarm_irq_time(int kind, const m5u_rtc_datetime_t* time) {
+    auto rtc = m5u_rtc_device_for_kind(kind);
+    if (!rtc || !time) {
+        return -1;
+    }
+    auto raw = m5u_rtc_time_from_raw(time);
+    return rtc->setAlarmIRQ(nullptr, &raw);
+}
+
+bool m5u_rtc_device_get_irq_status(int kind) {
+    auto rtc = m5u_rtc_device_for_kind(kind);
+    return rtc ? rtc->getIRQstatus() : false;
+}
+
+void m5u_rtc_device_clear_irq(int kind) {
+    auto rtc = m5u_rtc_device_for_kind(kind);
+    if (rtc) {
+        rtc->clearIRQ();
+    }
+}
+
+void m5u_rtc_device_disable_irq(int kind) {
+    auto rtc = m5u_rtc_device_for_kind(kind);
+    if (rtc) {
+        rtc->disableIRQ();
+    }
 }
 
 int m5u_battery_level(void) {
