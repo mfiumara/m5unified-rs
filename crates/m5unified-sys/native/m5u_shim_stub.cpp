@@ -1038,6 +1038,35 @@ bool m5u_rtc_is_enabled(void) {
     return false;
 }
 
+bool m5u_power_axp2101_begin(void) { return false; }
+int m5u_power_axp2101_get_battery_level(void) { return -1; }
+bool m5u_power_axp2101_set_battery_charge(bool enable) { (void)enable; return false; }
+bool m5u_power_axp2101_set_pre_charge_current(uint16_t max_ma) { (void)max_ma; return false; }
+bool m5u_power_axp2101_set_charge_current(uint16_t max_ma) { (void)max_ma; return false; }
+bool m5u_power_axp2101_set_charge_voltage(uint16_t max_mv) { (void)max_mv; return false; }
+int m5u_power_axp2101_get_charge_status(void) { return -2; }
+bool m5u_power_axp2101_is_charging(void) { return false; }
+bool m5u_power_axp2101_set_ldo(int kind, int channel, int voltage_mv) { (void)kind; (void)channel; (void)voltage_mv; return false; }
+bool m5u_power_axp2101_get_ldo_enabled(int kind, int channel) { (void)kind; (void)channel; return false; }
+bool m5u_power_axp2101_power_off(void) { return false; }
+bool m5u_power_axp2101_set_adc_state(bool enable) { (void)enable; return false; }
+bool m5u_power_axp2101_set_adc_rate(uint8_t rate) { (void)rate; return false; }
+bool m5u_power_axp2101_set_backup(bool enable) { (void)enable; return false; }
+bool m5u_power_axp2101_is_acin(void) { return false; }
+bool m5u_power_axp2101_is_vbus(void) { return false; }
+bool m5u_power_axp2101_get_bat_state(void) { return false; }
+float m5u_power_axp2101_get_battery_voltage_v(void) { return 0.0f; }
+float m5u_power_axp2101_get_battery_discharge_current_ma(void) { return 0.0f; }
+float m5u_power_axp2101_get_battery_charge_current_ma(void) { return 0.0f; }
+float m5u_power_axp2101_get_battery_power_mw(void) { return 0.0f; }
+float m5u_power_axp2101_get_acin_voltage_v(void) { return 0.0f; }
+float m5u_power_axp2101_get_acin_current_ma(void) { return 0.0f; }
+float m5u_power_axp2101_get_vbus_voltage_v(void) { return 0.0f; }
+float m5u_power_axp2101_get_vbus_current_ma(void) { return 0.0f; }
+float m5u_power_axp2101_get_ts_voltage_v(void) { return 0.0f; }
+float m5u_power_axp2101_get_aps_voltage_v(void) { return 0.0f; }
+float m5u_power_axp2101_get_internal_temperature_c(void) { return 0.0f; }
+uint8_t m5u_power_axp2101_get_pek_press(void) { return 0; }
 bool m5u_power_axp2101_disable_irq(uint64_t mask) { (void)mask; return false; }
 bool m5u_power_axp2101_enable_irq(uint64_t mask) { (void)mask; return false; }
 bool m5u_power_axp2101_clear_irq_statuses(void) { return false; }

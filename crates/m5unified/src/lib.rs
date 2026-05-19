@@ -58,7 +58,8 @@ pub use imu::{Imu, ImuAxis, ImuData, ImuKind, ImuSensorMask, Vec3};
 pub use led::{Led, LedColor, LedType};
 pub use log::{Log, LogLevel, LogTarget, RawLogCallback};
 pub use power::{
-    Axp2101, Axp2101IrqStatus, ChargeState, ExtPortBusConfig, ExtPortMask, Power, PowerType,
+    Axp2101, Axp2101ChargeStatus, Axp2101IrqStatus, Axp2101PekPress, ChargeState, ExtPortBusConfig,
+    ExtPortMask, Power, PowerType,
 };
 pub use rtc::{Date, DateTime, Rtc, Time};
 pub use sd::{
@@ -641,6 +642,54 @@ mod tests {
         m5.power.light_sleep_us(0, false);
         m5.power.power_off();
         let axp = m5.power.axp2101();
+        assert!(!axp.begin());
+        assert_eq!(axp.battery_level(), None);
+        assert!(!axp.set_battery_charge(true));
+        assert!(!axp.set_pre_charge_current_ma(100));
+        assert!(!axp.set_charge_current_ma(500));
+        assert!(!axp.set_charge_voltage_mv(4_200));
+        assert_eq!(axp.charge_status(), Axp2101ChargeStatus::Unavailable);
+        assert_eq!(Axp2101ChargeStatus::Charging.raw(), 1);
+        assert_eq!(
+            Axp2101ChargeStatus::from_raw(99),
+            Axp2101ChargeStatus::Raw(99)
+        );
+        assert!(!axp.is_charging());
+        assert!(!axp.set_aldo1_mv(Some(3_300)));
+        assert!(!axp.set_aldo2_mv(Some(3_300)));
+        assert!(!axp.set_aldo3_mv(Some(3_300)));
+        assert!(!axp.set_aldo4_mv(None));
+        assert!(!axp.set_bldo1_mv(Some(1_800)));
+        assert!(!axp.set_bldo2_mv(None));
+        assert!(!axp.set_dldo1_mv(Some(3_300)));
+        assert!(!axp.set_dldo2_mv(None));
+        assert!(!axp.aldo1_enabled());
+        assert!(!axp.aldo2_enabled());
+        assert!(!axp.aldo3_enabled());
+        assert!(!axp.aldo4_enabled());
+        assert!(!axp.bldo1_enabled());
+        assert!(!axp.bldo2_enabled());
+        assert!(!axp.set_adc_state(true));
+        assert!(!axp.set_adc_rate(0));
+        assert!(!axp.set_backup(true));
+        assert!(!axp.is_acin());
+        assert!(!axp.is_vbus());
+        assert!(!axp.battery_present());
+        assert_eq!(axp.battery_voltage_v(), 0.0);
+        assert_eq!(axp.battery_discharge_current_ma(), 0.0);
+        assert_eq!(axp.battery_charge_current_ma(), 0.0);
+        assert_eq!(axp.battery_power_mw(), 0.0);
+        assert_eq!(axp.acin_voltage_v(), 0.0);
+        assert_eq!(axp.acin_current_ma(), 0.0);
+        assert_eq!(axp.vbus_voltage_v(), 0.0);
+        assert_eq!(axp.vbus_current_ma(), 0.0);
+        assert_eq!(axp.ts_voltage_v(), 0.0);
+        assert_eq!(axp.aps_voltage_v(), 0.0);
+        assert_eq!(axp.internal_temperature_c(), 0.0);
+        assert_eq!(axp.pek_press(), Axp2101PekPress::None);
+        assert_eq!(Axp2101PekPress::Both.raw(), 3);
+        assert_eq!(Axp2101PekPress::from_raw(4), Axp2101PekPress::Raw(4));
+        assert!(!axp.power_off());
         let mask = Axp2101::IRQ_BAT_CHG_UNDER_TEMP | Axp2101::IRQ_VBUS_INSERT;
         assert!(!axp.disable_irq(Axp2101::IRQ_ALL));
         assert!(!axp.enable_irq(mask));

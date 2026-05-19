@@ -12,6 +12,16 @@ fn main() -> ExampleResult {
         .println(&format!("charging={}", m5.power.is_charging()))?;
 
     let axp = m5.power.axp2101();
+    m5.display
+        .println(&format!("axp charge={:?}", axp.charge_status()))?;
+    m5.display
+        .println(&format!("axp batt={:?}%", axp.battery_level()))?;
+    m5.display
+        .println(&format!("axp batt={:.3}V", axp.battery_voltage_v()))?;
+    m5.display.println(&format!("axp vbus={}", axp.is_vbus()))?;
+    m5.display
+        .println(&format!("axp pek={:?}", axp.pek_press()))?;
+
     let irq_mask = Axp2101::IRQ_BAT_CHG_UNDER_TEMP
         | Axp2101::IRQ_BAT_CHG_OVER_TEMP
         | Axp2101::IRQ_VBUS_INSERT
