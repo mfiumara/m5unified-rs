@@ -1380,7 +1380,27 @@ void m5u_display_set_text_datum(int datum) {
 }
 
 int m5u_display_draw_string(const char* text, int x, int y) {
-    return M5.Display.drawString(text, x, y);
+    return text ? (int)M5.Display.drawString(text, x, y) : 0;
+}
+
+int m5u_display_draw_center_string(const char* text, int x, int y) {
+    return text ? (int)M5.Display.drawCenterString(text, x, y) : 0;
+}
+
+int m5u_display_draw_right_string(const char* text, int x, int y) {
+    return text ? (int)M5.Display.drawRightString(text, x, y) : 0;
+}
+
+int m5u_display_draw_number(int value, int x, int y) {
+    return (int)M5.Display.drawNumber((long)value, x, y);
+}
+
+int m5u_display_draw_float(float value, uint8_t decimals, int x, int y) {
+    return (int)M5.Display.drawFloat(value, decimals, x, y);
+}
+
+int m5u_display_draw_char(uint16_t codepoint, int x, int y) {
+    return (int)M5.Display.drawChar(codepoint, x, y);
 }
 
 void m5u_display_draw_pixel(int x, int y, uint16_t color) {
@@ -1538,8 +1558,16 @@ int m5u_display_text_width(const char* text) {
     return text ? M5.Display.textWidth(text) : 0;
 }
 
+int m5u_display_text_length(const char* text, int width) {
+    return text ? M5.Display.textLength(text, width) : 0;
+}
+
 int m5u_display_get_text_datum(void) {
     return (int)M5.Display.getTextDatum();
+}
+
+int m5u_display_font_width(void) {
+    return M5.Display.fontWidth();
 }
 
 void m5u_display_set_text_padding(uint32_t padding) {
@@ -1695,6 +1723,12 @@ bool m5u_display_draw_image_file(int format, const char* path, const m5u_image_o
     }
 }
 
+void m5u_display_qrcode(const char* text, int x, int y, int width, uint8_t version, bool margin) {
+    if (text) {
+        M5.Display.qrcode(text, x, y, width, version, margin);
+    }
+}
+
 int m5u_display_count(void) {
     return M5.getDisplayCount();
 }
@@ -1777,7 +1811,27 @@ void m5u_display_println_at(int index, const char* text) {
 }
 
 int m5u_display_draw_string_at(int index, const char* text, int x, int y) {
-    return M5.Displays(index).drawString(text, x, y);
+    return text ? (int)M5.Displays(index).drawString(text, x, y) : 0;
+}
+
+int m5u_display_draw_center_string_at(int index, const char* text, int x, int y) {
+    return text ? (int)M5.Displays(index).drawCenterString(text, x, y) : 0;
+}
+
+int m5u_display_draw_right_string_at(int index, const char* text, int x, int y) {
+    return text ? (int)M5.Displays(index).drawRightString(text, x, y) : 0;
+}
+
+int m5u_display_draw_number_at(int index, int value, int x, int y) {
+    return (int)M5.Displays(index).drawNumber((long)value, x, y);
+}
+
+int m5u_display_draw_float_at(int index, float value, uint8_t decimals, int x, int y) {
+    return (int)M5.Displays(index).drawFloat(value, decimals, x, y);
+}
+
+int m5u_display_draw_char_at(int index, uint16_t codepoint, int x, int y) {
+    return (int)M5.Displays(index).drawChar(codepoint, x, y);
 }
 
 void m5u_display_draw_line_at(int index, int x0, int y0, int x1, int y1, uint16_t color) {
@@ -1943,8 +1997,16 @@ int m5u_display_text_width_at(int index, const char* text) {
     return text ? M5.Displays(index).textWidth(text) : 0;
 }
 
+int m5u_display_text_length_at(int index, const char* text, int width) {
+    return text ? M5.Displays(index).textLength(text, width) : 0;
+}
+
 int m5u_display_get_text_datum_at(int index) {
     return (int)M5.Displays(index).getTextDatum();
+}
+
+int m5u_display_font_width_at(int index) {
+    return M5.Displays(index).fontWidth();
 }
 
 void m5u_display_set_text_padding_at(int index, uint32_t padding) {
@@ -2065,6 +2127,12 @@ bool m5u_display_draw_image_file_at(int index, int format, const char* path, con
         return M5.Displays(index).drawQoiFile(path, opts.x, opts.y, opts.max_width, opts.max_height, opts.off_x, opts.off_y, opts.scale_x, opts.scale_y, datum);
     default:
         return false;
+    }
+}
+
+void m5u_display_qrcode_at(int index, const char* text, int x, int y, int width, uint8_t version, bool margin) {
+    if (text) {
+        M5.Displays(index).qrcode(text, x, y, width, version, margin);
     }
 }
 

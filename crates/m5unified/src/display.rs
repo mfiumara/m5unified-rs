@@ -163,6 +163,10 @@ impl Display {
         unsafe { m5unified_sys::m5u_display_font_height() as i32 }
     }
 
+    pub fn font_width(&self) -> i32 {
+        unsafe { m5unified_sys::m5u_display_font_width() as i32 }
+    }
+
     pub fn base_color(&self) -> u16 {
         unsafe { m5unified_sys::m5u_display_get_base_color() }
     }
@@ -188,9 +192,51 @@ impl Display {
         Ok(unsafe { m5unified_sys::m5u_display_draw_string(text.as_ptr(), x, y) as i32 })
     }
 
+    pub fn draw_center_string(&mut self, text: &str, x: i32, y: i32) -> Result<i32, Error> {
+        let text = CString::new(text).map_err(|_| Error::InvalidString)?;
+        Ok(unsafe { m5unified_sys::m5u_display_draw_center_string(text.as_ptr(), x, y) as i32 })
+    }
+
+    pub fn draw_right_string(&mut self, text: &str, x: i32, y: i32) -> Result<i32, Error> {
+        let text = CString::new(text).map_err(|_| Error::InvalidString)?;
+        Ok(unsafe { m5unified_sys::m5u_display_draw_right_string(text.as_ptr(), x, y) as i32 })
+    }
+
+    pub fn draw_number(&mut self, value: i32, x: i32, y: i32) -> i32 {
+        unsafe { m5unified_sys::m5u_display_draw_number(value, x, y) as i32 }
+    }
+
+    pub fn draw_float(&mut self, value: f32, decimals: u8, x: i32, y: i32) -> i32 {
+        unsafe { m5unified_sys::m5u_display_draw_float(value, decimals, x, y) as i32 }
+    }
+
+    pub fn draw_char(&mut self, codepoint: u16, x: i32, y: i32) -> i32 {
+        unsafe { m5unified_sys::m5u_display_draw_char(codepoint, x, y) as i32 }
+    }
+
     pub fn text_width(&self, text: &str) -> Result<i32, Error> {
         let text = CString::new(text).map_err(|_| Error::InvalidString)?;
         Ok(unsafe { m5unified_sys::m5u_display_text_width(text.as_ptr()) as i32 })
+    }
+
+    pub fn text_length(&self, text: &str, width: i32) -> Result<i32, Error> {
+        let text = CString::new(text).map_err(|_| Error::InvalidString)?;
+        Ok(unsafe { m5unified_sys::m5u_display_text_length(text.as_ptr(), width) as i32 })
+    }
+
+    pub fn qr_code(&mut self, text: &str, options: QrCodeOptions) -> Result<(), Error> {
+        let text = CString::new(text).map_err(|_| Error::InvalidString)?;
+        unsafe {
+            m5unified_sys::m5u_display_qrcode(
+                text.as_ptr(),
+                options.position.x,
+                options.position.y,
+                options.width,
+                options.version,
+                options.margin,
+            );
+        }
+        Ok(())
     }
 
     pub fn draw_pixel(&mut self, x: i32, y: i32, color: u16) {
@@ -795,6 +841,25 @@ impl ImageDrawOptions {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct QrCodeOptions {
+    pub position: Point,
+    pub width: i32,
+    pub version: u8,
+    pub margin: bool,
+}
+
+impl Default for QrCodeOptions {
+    fn default() -> Self {
+        Self {
+            position: Point { x: -1, y: -1 },
+            width: -1,
+            version: 1,
+            margin: false,
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum EpdMode {
     Quality,
     Text,
@@ -936,6 +1001,10 @@ impl DisplayRef {
         unsafe { m5unified_sys::m5u_display_get_cursor_y_at(self.index) as i32 }
     }
 
+    pub fn font_width(&self) -> i32 {
+        unsafe { m5unified_sys::m5u_display_font_width_at(self.index) as i32 }
+    }
+
     pub fn start_write(&mut self) {
         unsafe { m5unified_sys::m5u_display_start_write_at(self.index) }
     }
@@ -970,9 +1039,60 @@ impl DisplayRef {
         })
     }
 
+    pub fn draw_center_string(&mut self, text: &str, x: i32, y: i32) -> Result<i32, Error> {
+        let text = CString::new(text).map_err(|_| Error::InvalidString)?;
+        Ok(unsafe {
+            m5unified_sys::m5u_display_draw_center_string_at(self.index, text.as_ptr(), x, y) as i32
+        })
+    }
+
+    pub fn draw_right_string(&mut self, text: &str, x: i32, y: i32) -> Result<i32, Error> {
+        let text = CString::new(text).map_err(|_| Error::InvalidString)?;
+        Ok(unsafe {
+            m5unified_sys::m5u_display_draw_right_string_at(self.index, text.as_ptr(), x, y) as i32
+        })
+    }
+
+    pub fn draw_number(&mut self, value: i32, x: i32, y: i32) -> i32 {
+        unsafe { m5unified_sys::m5u_display_draw_number_at(self.index, value, x, y) as i32 }
+    }
+
+    pub fn draw_float(&mut self, value: f32, decimals: u8, x: i32, y: i32) -> i32 {
+        unsafe {
+            m5unified_sys::m5u_display_draw_float_at(self.index, value, decimals, x, y) as i32
+        }
+    }
+
+    pub fn draw_char(&mut self, codepoint: u16, x: i32, y: i32) -> i32 {
+        unsafe { m5unified_sys::m5u_display_draw_char_at(self.index, codepoint, x, y) as i32 }
+    }
+
     pub fn text_width(&self, text: &str) -> Result<i32, Error> {
         let text = CString::new(text).map_err(|_| Error::InvalidString)?;
         Ok(unsafe { m5unified_sys::m5u_display_text_width_at(self.index, text.as_ptr()) as i32 })
+    }
+
+    pub fn text_length(&self, text: &str, width: i32) -> Result<i32, Error> {
+        let text = CString::new(text).map_err(|_| Error::InvalidString)?;
+        Ok(unsafe {
+            m5unified_sys::m5u_display_text_length_at(self.index, text.as_ptr(), width) as i32
+        })
+    }
+
+    pub fn qr_code(&mut self, text: &str, options: QrCodeOptions) -> Result<(), Error> {
+        let text = CString::new(text).map_err(|_| Error::InvalidString)?;
+        unsafe {
+            m5unified_sys::m5u_display_qrcode_at(
+                self.index,
+                text.as_ptr(),
+                options.position.x,
+                options.position.y,
+                options.width,
+                options.version,
+                options.margin,
+            );
+        }
+        Ok(())
     }
 
     pub fn draw_line(&mut self, x0: i32, y0: i32, x1: i32, y1: i32, color: u16) {

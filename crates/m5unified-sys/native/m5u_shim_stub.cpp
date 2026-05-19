@@ -708,6 +708,26 @@ int m5u_display_draw_string(const char* text, int x, int y) {
     (void)text; (void)x; (void)y; return 0;
 }
 
+int m5u_display_draw_center_string(const char* text, int x, int y) {
+    (void)text; (void)x; (void)y; return 0;
+}
+
+int m5u_display_draw_right_string(const char* text, int x, int y) {
+    (void)text; (void)x; (void)y; return 0;
+}
+
+int m5u_display_draw_number(int value, int x, int y) {
+    (void)value; (void)x; (void)y; return 0;
+}
+
+int m5u_display_draw_float(float value, uint8_t decimals, int x, int y) {
+    (void)value; (void)decimals; (void)x; (void)y; return 0;
+}
+
+int m5u_display_draw_char(uint16_t codepoint, int x, int y) {
+    (void)codepoint; (void)x; (void)y; return 0;
+}
+
 void m5u_display_draw_pixel(int x, int y, uint16_t color) {
     (void)x; (void)y; (void)color;
 }
@@ -842,8 +862,16 @@ int m5u_display_text_width(const char* text) {
     (void)text; return 0;
 }
 
+int m5u_display_text_length(const char* text, int width) {
+    (void)text; (void)width; return 0;
+}
+
 int m5u_display_get_text_datum(void) {
     return 0;
+}
+
+int m5u_display_font_width(void) {
+    return 6;
 }
 
 void m5u_display_set_text_padding(uint32_t padding) {
@@ -929,6 +957,10 @@ bool m5u_display_draw_image_file(int format, const char* path, const m5u_image_o
     return format >= 0 && format <= 3 && path && *path;
 }
 
+void m5u_display_qrcode(const char* text, int x, int y, int width, uint8_t version, bool margin) {
+    (void)text; (void)x; (void)y; (void)width; (void)version; (void)margin;
+}
+
 int m5u_display_count(void) {
     return 1;
 }
@@ -1003,6 +1035,26 @@ void m5u_display_println_at(int index, const char* text) {
 
 int m5u_display_draw_string_at(int index, const char* text, int x, int y) {
     (void)index; (void)text; (void)x; (void)y; return 0;
+}
+
+int m5u_display_draw_center_string_at(int index, const char* text, int x, int y) {
+    (void)index; (void)text; (void)x; (void)y; return 0;
+}
+
+int m5u_display_draw_right_string_at(int index, const char* text, int x, int y) {
+    (void)index; (void)text; (void)x; (void)y; return 0;
+}
+
+int m5u_display_draw_number_at(int index, int value, int x, int y) {
+    (void)index; (void)value; (void)x; (void)y; return 0;
+}
+
+int m5u_display_draw_float_at(int index, float value, uint8_t decimals, int x, int y) {
+    (void)index; (void)value; (void)decimals; (void)x; (void)y; return 0;
+}
+
+int m5u_display_draw_char_at(int index, uint16_t codepoint, int x, int y) {
+    (void)index; (void)codepoint; (void)x; (void)y; return 0;
 }
 
 void m5u_display_draw_line_at(int index, int x0, int y0, int x1, int y1, uint16_t color) {
@@ -1161,8 +1213,16 @@ int m5u_display_text_width_at(int index, const char* text) {
     (void)index; (void)text; return 0;
 }
 
+int m5u_display_text_length_at(int index, const char* text, int width) {
+    (void)index; (void)text; (void)width; return 0;
+}
+
 int m5u_display_get_text_datum_at(int index) {
     (void)index; return 0;
+}
+
+int m5u_display_font_width_at(int index) {
+    (void)index; return 6;
 }
 
 void m5u_display_set_text_padding_at(int index, uint32_t padding) {
@@ -1244,6 +1304,10 @@ bool m5u_display_draw_image_at(int index, int format, const uint8_t* data, size_
 bool m5u_display_draw_image_file_at(int index, int format, const char* path, const m5u_image_options_t* options) {
     (void)index; (void)options;
     return format >= 0 && format <= 3 && path && *path;
+}
+
+void m5u_display_qrcode_at(int index, const char* text, int x, int y, int width, uint8_t version, bool margin) {
+    (void)index; (void)text; (void)x; (void)y; (void)width; (void)version; (void)margin;
 }
 
 bool m5u_button_is_pressed(int button) { return m5u_button_state(button, 0); }

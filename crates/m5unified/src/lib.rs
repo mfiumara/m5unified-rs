@@ -52,7 +52,7 @@ pub use buttons::{Button, ButtonId, ButtonState, Buttons};
 pub use config::{ExternalDisplayConfig, ExternalSpeakerConfig, M5UnifiedConfig};
 pub use display::{
     colors, Color565, Display, DisplayFont, DisplayKind, DisplayRef, EpdMode, GradientFillStyle,
-    ImageDrawOptions, ImageFormat, Point, Rect, Size, TextDatum,
+    ImageDrawOptions, ImageFormat, Point, QrCodeOptions, Rect, Size, TextDatum,
 };
 pub use error::Error;
 pub use i2c::{I2cBus, I2cDevice};
@@ -276,7 +276,19 @@ mod tests {
         m5.display.clear_scroll_rect();
         m5.display.scroll(1, -1);
         assert_eq!(m5.display.cursor_x(), 0);
+        assert_eq!(m5.display.font_width(), 6);
+        assert_eq!(m5.display.draw_center_string("center", 20, 20), Ok(0));
+        assert_eq!(m5.display.draw_right_string("right", 20, 30), Ok(0));
+        assert_eq!(m5.display.draw_number(1234, 0, 0), 0);
+        assert_eq!(m5.display.draw_float(12.5, 1, 0, 0), 0);
+        assert_eq!(m5.display.draw_char(b'A' as u16, 0, 0), 0);
         assert_eq!(m5.display.text_width("host").unwrap(), 0);
+        assert_eq!(m5.display.text_length("host", 120).unwrap(), 0);
+        assert_eq!(
+            m5.display
+                .qr_code("https://m5stack.com", QrCodeOptions::default()),
+            Ok(())
+        );
         assert_eq!(m5.display.text_datum(), Some(TextDatum::TopLeft));
         m5.display.set_text_padding(12);
         assert_eq!(m5.display.text_padding(), 0);
@@ -394,7 +406,18 @@ mod tests {
         display.scroll(1, -1);
         assert_eq!(display.cursor_x(), 0);
         assert_eq!(display.cursor_y(), 0);
+        assert_eq!(display.font_width(), 6);
+        assert_eq!(display.draw_center_string("center", 20, 20), Ok(0));
+        assert_eq!(display.draw_right_string("right", 20, 30), Ok(0));
+        assert_eq!(display.draw_number(1234, 0, 0), 0);
+        assert_eq!(display.draw_float(12.5, 1, 0, 0), 0);
+        assert_eq!(display.draw_char(b'A' as u16, 0, 0), 0);
         assert_eq!(display.text_width("host").unwrap(), 0);
+        assert_eq!(display.text_length("host", 120).unwrap(), 0);
+        assert_eq!(
+            display.qr_code("https://m5stack.com", QrCodeOptions::default()),
+            Ok(())
+        );
         assert_eq!(display.text_datum(), Some(TextDatum::TopLeft));
         display.set_text_padding(12);
         assert_eq!(display.text_padding(), 0);
@@ -462,12 +485,44 @@ mod tests {
             Err(Error::InvalidString)
         );
         assert_eq!(
+            m5.display.draw_center_string("bad\0string", 0, 0),
+            Err(Error::InvalidString)
+        );
+        assert_eq!(
+            m5.display.draw_right_string("bad\0string", 0, 0),
+            Err(Error::InvalidString)
+        );
+        assert_eq!(
+            m5.display.text_length("bad\0string", 80),
+            Err(Error::InvalidString)
+        );
+        assert_eq!(
+            m5.display.qr_code("bad\0string", QrCodeOptions::default()),
+            Err(Error::InvalidString)
+        );
+        assert_eq!(
             m5.display
                 .draw_bmp_file("bad\0path", ImageDrawOptions::default()),
             Err(Error::InvalidString)
         );
         let mut display = m5.displays(0).expect("host stub display should exist");
         assert_eq!(display.text_width("bad\0string"), Err(Error::InvalidString));
+        assert_eq!(
+            display.draw_center_string("bad\0string", 0, 0),
+            Err(Error::InvalidString)
+        );
+        assert_eq!(
+            display.draw_right_string("bad\0string", 0, 0),
+            Err(Error::InvalidString)
+        );
+        assert_eq!(
+            display.text_length("bad\0string", 80),
+            Err(Error::InvalidString)
+        );
+        assert_eq!(
+            display.qr_code("bad\0string", QrCodeOptions::default()),
+            Err(Error::InvalidString)
+        );
         assert_eq!(
             display.draw_bmp_file("bad\0path", ImageDrawOptions::default()),
             Err(Error::InvalidString)

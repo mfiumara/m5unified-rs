@@ -631,6 +631,11 @@ extern "C" {
     pub fn m5u_display_set_text_wrap(wrap_x: bool, wrap_y: bool);
     pub fn m5u_display_set_text_datum(datum: c_int);
     pub fn m5u_display_draw_string(text: *const c_char, x: c_int, y: c_int) -> c_int;
+    pub fn m5u_display_draw_center_string(text: *const c_char, x: c_int, y: c_int) -> c_int;
+    pub fn m5u_display_draw_right_string(text: *const c_char, x: c_int, y: c_int) -> c_int;
+    pub fn m5u_display_draw_number(value: c_int, x: c_int, y: c_int) -> c_int;
+    pub fn m5u_display_draw_float(value: c_float, decimals: u8, x: c_int, y: c_int) -> c_int;
+    pub fn m5u_display_draw_char(codepoint: u16, x: c_int, y: c_int) -> c_int;
     pub fn m5u_display_draw_pixel(x: c_int, y: c_int, color: u16);
     pub fn m5u_display_write_pixel(x: c_int, y: c_int, color: u16);
     pub fn m5u_display_draw_fast_hline(x: c_int, y: c_int, w: c_int, color: u16);
@@ -785,7 +790,9 @@ extern "C" {
     pub fn m5u_display_clear_scroll_rect();
     pub fn m5u_display_scroll(dx: c_int, dy: c_int);
     pub fn m5u_display_text_width(text: *const c_char) -> c_int;
+    pub fn m5u_display_text_length(text: *const c_char, width: c_int) -> c_int;
     pub fn m5u_display_get_text_datum() -> c_int;
+    pub fn m5u_display_font_width() -> c_int;
     pub fn m5u_display_set_text_padding(padding: u32);
     pub fn m5u_display_get_text_padding() -> u32;
     pub fn m5u_display_get_text_size_x() -> c_float;
@@ -839,6 +846,14 @@ extern "C" {
         path: *const c_char,
         options: *const m5u_image_options_t,
     ) -> bool;
+    pub fn m5u_display_qrcode(
+        text: *const c_char,
+        x: c_int,
+        y: c_int,
+        width: c_int,
+        version: u8,
+        margin: bool,
+    );
     pub fn m5u_display_count() -> c_int;
     pub fn m5u_display_index_for_kind(kind: c_int) -> c_int;
     pub fn m5u_display_index_for_kinds(kinds: *const c_int, len: usize) -> c_int;
@@ -863,6 +878,27 @@ extern "C" {
         x: c_int,
         y: c_int,
     ) -> c_int;
+    pub fn m5u_display_draw_center_string_at(
+        index: c_int,
+        text: *const c_char,
+        x: c_int,
+        y: c_int,
+    ) -> c_int;
+    pub fn m5u_display_draw_right_string_at(
+        index: c_int,
+        text: *const c_char,
+        x: c_int,
+        y: c_int,
+    ) -> c_int;
+    pub fn m5u_display_draw_number_at(index: c_int, value: c_int, x: c_int, y: c_int) -> c_int;
+    pub fn m5u_display_draw_float_at(
+        index: c_int,
+        value: c_float,
+        decimals: u8,
+        x: c_int,
+        y: c_int,
+    ) -> c_int;
+    pub fn m5u_display_draw_char_at(index: c_int, codepoint: u16, x: c_int, y: c_int) -> c_int;
     pub fn m5u_display_draw_line_at(
         index: c_int,
         x0: c_int,
@@ -1098,7 +1134,9 @@ extern "C" {
     pub fn m5u_display_clear_scroll_rect_at(index: c_int);
     pub fn m5u_display_scroll_at(index: c_int, dx: c_int, dy: c_int);
     pub fn m5u_display_text_width_at(index: c_int, text: *const c_char) -> c_int;
+    pub fn m5u_display_text_length_at(index: c_int, text: *const c_char, width: c_int) -> c_int;
     pub fn m5u_display_get_text_datum_at(index: c_int) -> c_int;
+    pub fn m5u_display_font_width_at(index: c_int) -> c_int;
     pub fn m5u_display_set_text_padding_at(index: c_int, padding: u32);
     pub fn m5u_display_get_text_padding_at(index: c_int) -> u32;
     pub fn m5u_display_get_text_size_x_at(index: c_int) -> c_float;
@@ -1163,6 +1201,15 @@ extern "C" {
         path: *const c_char,
         options: *const m5u_image_options_t,
     ) -> bool;
+    pub fn m5u_display_qrcode_at(
+        index: c_int,
+        text: *const c_char,
+        x: c_int,
+        y: c_int,
+        width: c_int,
+        version: u8,
+        margin: bool,
+    );
 
     pub fn m5u_button_is_pressed(button: c_int) -> bool;
     pub fn m5u_button_was_pressed(button: c_int) -> bool;
@@ -2112,6 +2159,34 @@ mod host_stubs {
     pub unsafe fn m5u_display_draw_string(_text: *const c_char, _x: c_int, _y: c_int) -> c_int {
         0
     }
+    pub unsafe fn m5u_display_draw_center_string(
+        _text: *const c_char,
+        _x: c_int,
+        _y: c_int,
+    ) -> c_int {
+        0
+    }
+    pub unsafe fn m5u_display_draw_right_string(
+        _text: *const c_char,
+        _x: c_int,
+        _y: c_int,
+    ) -> c_int {
+        0
+    }
+    pub unsafe fn m5u_display_draw_number(_value: c_int, _x: c_int, _y: c_int) -> c_int {
+        0
+    }
+    pub unsafe fn m5u_display_draw_float(
+        _value: c_float,
+        _decimals: u8,
+        _x: c_int,
+        _y: c_int,
+    ) -> c_int {
+        0
+    }
+    pub unsafe fn m5u_display_draw_char(_codepoint: u16, _x: c_int, _y: c_int) -> c_int {
+        0
+    }
     pub unsafe fn m5u_display_draw_pixel(_x: c_int, _y: c_int, _color: u16) {}
     pub unsafe fn m5u_display_write_pixel(_x: c_int, _y: c_int, _color: u16) {}
     pub unsafe fn m5u_display_draw_fast_hline(_x: c_int, _y: c_int, _w: c_int, _color: u16) {}
@@ -2329,8 +2404,14 @@ mod host_stubs {
     pub unsafe fn m5u_display_text_width(_text: *const c_char) -> c_int {
         0
     }
+    pub unsafe fn m5u_display_text_length(_text: *const c_char, _width: c_int) -> c_int {
+        0
+    }
     pub unsafe fn m5u_display_get_text_datum() -> c_int {
         0
+    }
+    pub unsafe fn m5u_display_font_width() -> c_int {
+        6
     }
     pub unsafe fn m5u_display_set_text_padding(_padding: u32) {}
     pub unsafe fn m5u_display_get_text_padding() -> u32 {
@@ -2437,6 +2518,15 @@ mod host_stubs {
     ) -> bool {
         (0..=3).contains(&format) && !path.is_null() && ptr::read(path) != 0
     }
+    pub unsafe fn m5u_display_qrcode(
+        _text: *const c_char,
+        _x: c_int,
+        _y: c_int,
+        _width: c_int,
+        _version: u8,
+        _margin: bool,
+    ) {
+    }
     pub unsafe fn m5u_display_count() -> c_int {
         1
     }
@@ -2474,6 +2564,47 @@ mod host_stubs {
     pub unsafe fn m5u_display_draw_string_at(
         _index: c_int,
         _text: *const c_char,
+        _x: c_int,
+        _y: c_int,
+    ) -> c_int {
+        0
+    }
+    pub unsafe fn m5u_display_draw_center_string_at(
+        _index: c_int,
+        _text: *const c_char,
+        _x: c_int,
+        _y: c_int,
+    ) -> c_int {
+        0
+    }
+    pub unsafe fn m5u_display_draw_right_string_at(
+        _index: c_int,
+        _text: *const c_char,
+        _x: c_int,
+        _y: c_int,
+    ) -> c_int {
+        0
+    }
+    pub unsafe fn m5u_display_draw_number_at(
+        _index: c_int,
+        _value: c_int,
+        _x: c_int,
+        _y: c_int,
+    ) -> c_int {
+        0
+    }
+    pub unsafe fn m5u_display_draw_float_at(
+        _index: c_int,
+        _value: c_float,
+        _decimals: u8,
+        _x: c_int,
+        _y: c_int,
+    ) -> c_int {
+        0
+    }
+    pub unsafe fn m5u_display_draw_char_at(
+        _index: c_int,
+        _codepoint: u16,
         _x: c_int,
         _y: c_int,
     ) -> c_int {
@@ -2808,8 +2939,18 @@ mod host_stubs {
     pub unsafe fn m5u_display_text_width_at(_index: c_int, _text: *const c_char) -> c_int {
         0
     }
+    pub unsafe fn m5u_display_text_length_at(
+        _index: c_int,
+        _text: *const c_char,
+        _width: c_int,
+    ) -> c_int {
+        0
+    }
     pub unsafe fn m5u_display_get_text_datum_at(_index: c_int) -> c_int {
         0
+    }
+    pub unsafe fn m5u_display_font_width_at(_index: c_int) -> c_int {
+        6
     }
     pub unsafe fn m5u_display_set_text_padding_at(_index: c_int, _padding: u32) {}
     pub unsafe fn m5u_display_get_text_padding_at(_index: c_int) -> u32 {
@@ -2926,6 +3067,16 @@ mod host_stubs {
         _options: *const m5u_image_options_t,
     ) -> bool {
         (0..=3).contains(&format) && !path.is_null() && ptr::read(path) != 0
+    }
+    pub unsafe fn m5u_display_qrcode_at(
+        _index: c_int,
+        _text: *const c_char,
+        _x: c_int,
+        _y: c_int,
+        _width: c_int,
+        _version: u8,
+        _margin: bool,
+    ) {
     }
 
     pub unsafe fn m5u_button_is_pressed(_button: c_int) -> bool {
