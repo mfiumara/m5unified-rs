@@ -41,6 +41,7 @@ mod power;
 mod rtc;
 mod sd;
 mod system;
+mod timer;
 mod touch;
 
 pub use audio::{
@@ -71,6 +72,7 @@ pub use sd::{
 };
 pub(crate) use system::raw_display_kinds;
 pub use system::{Board, PinName};
+pub use timer::M5Timer;
 pub use touch::{Touch, TouchDetail, TouchPoint, TouchState};
 
 /// Top-level handle for M5Unified-backed board features.
