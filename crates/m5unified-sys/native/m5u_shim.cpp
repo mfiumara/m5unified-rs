@@ -1378,12 +1378,44 @@ int m5u_display_draw_string(const char* text, int x, int y) {
     return M5.Display.drawString(text, x, y);
 }
 
+void m5u_display_draw_pixel(int x, int y, uint16_t color) {
+    M5.Display.drawPixel(x, y, color);
+}
+
 void m5u_display_write_pixel(int x, int y, uint16_t color) {
     M5.Display.writePixel(x, y, color);
 }
 
+void m5u_display_draw_fast_hline(int x, int y, int w, uint16_t color) {
+    M5.Display.drawFastHLine(x, y, w, color);
+}
+
+void m5u_display_write_fast_hline(int x, int y, int w, uint16_t color) {
+    M5.Display.writeFastHLine(x, y, w, color);
+}
+
+void m5u_display_draw_fast_vline(int x, int y, int h, uint16_t color) {
+    M5.Display.drawFastVLine(x, y, h, color);
+}
+
 void m5u_display_write_fast_vline(int x, int y, int h, uint16_t color) {
     M5.Display.writeFastVLine(x, y, h, color);
+}
+
+void m5u_display_draw_round_rect(int x, int y, int w, int h, int r, uint16_t color) {
+    M5.Display.drawRoundRect(x, y, w, h, r, color);
+}
+
+void m5u_display_fill_round_rect(int x, int y, int w, int h, int r, uint16_t color) {
+    M5.Display.fillRoundRect(x, y, w, h, r, color);
+}
+
+void m5u_display_draw_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color) {
+    M5.Display.drawTriangle(x0, y0, x1, y1, x2, y2, color);
+}
+
+void m5u_display_fill_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color) {
+    M5.Display.fillTriangle(x0, y0, x1, y1, x2, y2, color);
 }
 
 void m5u_display_set_clip_rect(int x, int y, int w, int h) {
@@ -1501,6 +1533,38 @@ void m5u_display_write_pixel_at(int index, int x, int y, uint16_t color) {
 
 void m5u_display_draw_pixel_at(int index, int x, int y, uint16_t color) {
     M5.Displays(index).drawPixel(x, y, color);
+}
+
+void m5u_display_draw_fast_hline_at(int index, int x, int y, int w, uint16_t color) {
+    M5.Displays(index).drawFastHLine(x, y, w, color);
+}
+
+void m5u_display_write_fast_hline_at(int index, int x, int y, int w, uint16_t color) {
+    M5.Displays(index).writeFastHLine(x, y, w, color);
+}
+
+void m5u_display_draw_fast_vline_at(int index, int x, int y, int h, uint16_t color) {
+    M5.Displays(index).drawFastVLine(x, y, h, color);
+}
+
+void m5u_display_write_fast_vline_at(int index, int x, int y, int h, uint16_t color) {
+    M5.Displays(index).writeFastVLine(x, y, h, color);
+}
+
+void m5u_display_draw_round_rect_at(int index, int x, int y, int w, int h, int r, uint16_t color) {
+    M5.Displays(index).drawRoundRect(x, y, w, h, r, color);
+}
+
+void m5u_display_fill_round_rect_at(int index, int x, int y, int w, int h, int r, uint16_t color) {
+    M5.Displays(index).fillRoundRect(x, y, w, h, r, color);
+}
+
+void m5u_display_draw_triangle_at(int index, int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color) {
+    M5.Displays(index).drawTriangle(x0, y0, x1, y1, x2, y2, color);
+}
+
+void m5u_display_fill_triangle_at(int index, int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color) {
+    M5.Displays(index).fillTriangle(x0, y0, x1, y1, x2, y2, color);
 }
 
 bool m5u_button_is_pressed(int button) { return m5u_button_state(button, 0); }

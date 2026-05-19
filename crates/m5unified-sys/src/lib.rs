@@ -2,6 +2,7 @@
 #![allow(non_snake_case)]
 #![allow(non_upper_case_globals)]
 #![allow(clippy::missing_safety_doc)]
+#![allow(clippy::too_many_arguments)]
 
 //! Raw bindings for a small C ABI shim over M5Unified.
 //!
@@ -599,8 +600,46 @@ extern "C" {
     pub fn m5u_display_set_text_wrap(wrap_x: bool, wrap_y: bool);
     pub fn m5u_display_set_text_datum(datum: c_int);
     pub fn m5u_display_draw_string(text: *const c_char, x: c_int, y: c_int) -> c_int;
+    pub fn m5u_display_draw_pixel(x: c_int, y: c_int, color: u16);
     pub fn m5u_display_write_pixel(x: c_int, y: c_int, color: u16);
+    pub fn m5u_display_draw_fast_hline(x: c_int, y: c_int, w: c_int, color: u16);
+    pub fn m5u_display_write_fast_hline(x: c_int, y: c_int, w: c_int, color: u16);
+    pub fn m5u_display_draw_fast_vline(x: c_int, y: c_int, h: c_int, color: u16);
     pub fn m5u_display_write_fast_vline(x: c_int, y: c_int, h: c_int, color: u16);
+    pub fn m5u_display_draw_round_rect(
+        x: c_int,
+        y: c_int,
+        w: c_int,
+        h: c_int,
+        r: c_int,
+        color: u16,
+    );
+    pub fn m5u_display_fill_round_rect(
+        x: c_int,
+        y: c_int,
+        w: c_int,
+        h: c_int,
+        r: c_int,
+        color: u16,
+    );
+    pub fn m5u_display_draw_triangle(
+        x0: c_int,
+        y0: c_int,
+        x1: c_int,
+        y1: c_int,
+        x2: c_int,
+        y2: c_int,
+        color: u16,
+    );
+    pub fn m5u_display_fill_triangle(
+        x0: c_int,
+        y0: c_int,
+        x1: c_int,
+        y1: c_int,
+        x2: c_int,
+        y2: c_int,
+        color: u16,
+    );
     pub fn m5u_display_set_clip_rect(x: c_int, y: c_int, w: c_int, h: c_int);
     pub fn m5u_display_clear_clip_rect();
     pub fn m5u_display_color888(r: u8, g: u8, b: u8) -> u16;
@@ -654,6 +693,48 @@ extern "C" {
     pub fn m5u_display_fill_circle_at(index: c_int, x: c_int, y: c_int, r: c_int, color: u16);
     pub fn m5u_display_write_pixel_at(index: c_int, x: c_int, y: c_int, color: u16);
     pub fn m5u_display_draw_pixel_at(index: c_int, x: c_int, y: c_int, color: u16);
+    pub fn m5u_display_draw_fast_hline_at(index: c_int, x: c_int, y: c_int, w: c_int, color: u16);
+    pub fn m5u_display_write_fast_hline_at(index: c_int, x: c_int, y: c_int, w: c_int, color: u16);
+    pub fn m5u_display_draw_fast_vline_at(index: c_int, x: c_int, y: c_int, h: c_int, color: u16);
+    pub fn m5u_display_write_fast_vline_at(index: c_int, x: c_int, y: c_int, h: c_int, color: u16);
+    pub fn m5u_display_draw_round_rect_at(
+        index: c_int,
+        x: c_int,
+        y: c_int,
+        w: c_int,
+        h: c_int,
+        r: c_int,
+        color: u16,
+    );
+    pub fn m5u_display_fill_round_rect_at(
+        index: c_int,
+        x: c_int,
+        y: c_int,
+        w: c_int,
+        h: c_int,
+        r: c_int,
+        color: u16,
+    );
+    pub fn m5u_display_draw_triangle_at(
+        index: c_int,
+        x0: c_int,
+        y0: c_int,
+        x1: c_int,
+        y1: c_int,
+        x2: c_int,
+        y2: c_int,
+        color: u16,
+    );
+    pub fn m5u_display_fill_triangle_at(
+        index: c_int,
+        x0: c_int,
+        y0: c_int,
+        x1: c_int,
+        y1: c_int,
+        x2: c_int,
+        y2: c_int,
+        color: u16,
+    );
 
     pub fn m5u_button_is_pressed(button: c_int) -> bool;
     pub fn m5u_button_was_pressed(button: c_int) -> bool;
@@ -1593,8 +1674,50 @@ mod host_stubs {
     pub unsafe fn m5u_display_draw_string(_text: *const c_char, _x: c_int, _y: c_int) -> c_int {
         0
     }
+    pub unsafe fn m5u_display_draw_pixel(_x: c_int, _y: c_int, _color: u16) {}
     pub unsafe fn m5u_display_write_pixel(_x: c_int, _y: c_int, _color: u16) {}
+    pub unsafe fn m5u_display_draw_fast_hline(_x: c_int, _y: c_int, _w: c_int, _color: u16) {}
+    pub unsafe fn m5u_display_write_fast_hline(_x: c_int, _y: c_int, _w: c_int, _color: u16) {}
+    pub unsafe fn m5u_display_draw_fast_vline(_x: c_int, _y: c_int, _h: c_int, _color: u16) {}
     pub unsafe fn m5u_display_write_fast_vline(_x: c_int, _y: c_int, _h: c_int, _color: u16) {}
+    pub unsafe fn m5u_display_draw_round_rect(
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _h: c_int,
+        _r: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_fill_round_rect(
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _h: c_int,
+        _r: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_draw_triangle(
+        _x0: c_int,
+        _y0: c_int,
+        _x1: c_int,
+        _y1: c_int,
+        _x2: c_int,
+        _y2: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_fill_triangle(
+        _x0: c_int,
+        _y0: c_int,
+        _x1: c_int,
+        _y1: c_int,
+        _x2: c_int,
+        _y2: c_int,
+        _color: u16,
+    ) {
+    }
     pub unsafe fn m5u_display_set_clip_rect(_x: c_int, _y: c_int, _w: c_int, _h: c_int) {}
     pub unsafe fn m5u_display_clear_clip_rect() {}
     pub unsafe fn m5u_display_color888(r: u8, g: u8, b: u8) -> u16 {
@@ -1681,6 +1804,80 @@ mod host_stubs {
     }
     pub unsafe fn m5u_display_write_pixel_at(_index: c_int, _x: c_int, _y: c_int, _color: u16) {}
     pub unsafe fn m5u_display_draw_pixel_at(_index: c_int, _x: c_int, _y: c_int, _color: u16) {}
+    pub unsafe fn m5u_display_draw_fast_hline_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_write_fast_hline_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_draw_fast_vline_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _h: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_write_fast_vline_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _h: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_draw_round_rect_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _h: c_int,
+        _r: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_fill_round_rect_at(
+        _index: c_int,
+        _x: c_int,
+        _y: c_int,
+        _w: c_int,
+        _h: c_int,
+        _r: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_draw_triangle_at(
+        _index: c_int,
+        _x0: c_int,
+        _y0: c_int,
+        _x1: c_int,
+        _y1: c_int,
+        _x2: c_int,
+        _y2: c_int,
+        _color: u16,
+    ) {
+    }
+    pub unsafe fn m5u_display_fill_triangle_at(
+        _index: c_int,
+        _x0: c_int,
+        _y0: c_int,
+        _x1: c_int,
+        _y1: c_int,
+        _x2: c_int,
+        _y2: c_int,
+        _color: u16,
+    ) {
+    }
 
     pub unsafe fn m5u_button_is_pressed(_button: c_int) -> bool {
         false

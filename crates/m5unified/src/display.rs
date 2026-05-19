@@ -180,12 +180,48 @@ impl Display {
         Ok(unsafe { m5unified_sys::m5u_display_draw_string(text.as_ptr(), x, y) as i32 })
     }
 
+    pub fn draw_pixel(&mut self, x: i32, y: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_draw_pixel(x, y, color) }
+    }
+
     pub fn write_pixel(&mut self, x: i32, y: i32, color: u16) {
         unsafe { m5unified_sys::m5u_display_write_pixel(x, y, color) }
     }
 
+    pub fn draw_fast_hline(&mut self, x: i32, y: i32, w: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_draw_fast_hline(x, y, w, color) }
+    }
+
+    pub fn write_fast_hline(&mut self, x: i32, y: i32, w: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_write_fast_hline(x, y, w, color) }
+    }
+
+    pub fn draw_fast_vline(&mut self, x: i32, y: i32, h: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_draw_fast_vline(x, y, h, color) }
+    }
+
     pub fn write_fast_vline(&mut self, x: i32, y: i32, h: i32, color: u16) {
         unsafe { m5unified_sys::m5u_display_write_fast_vline(x, y, h, color) }
+    }
+
+    pub fn draw_round_rect(&mut self, x: i32, y: i32, w: i32, h: i32, r: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_draw_round_rect(x, y, w, h, r, color) }
+    }
+
+    pub fn fill_round_rect(&mut self, x: i32, y: i32, w: i32, h: i32, r: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_fill_round_rect(x, y, w, h, r, color) }
+    }
+
+    pub fn draw_triangle(&mut self, p0: Point, p1: Point, p2: Point, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_draw_triangle(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, color);
+        }
+    }
+
+    pub fn fill_triangle(&mut self, p0: Point, p1: Point, p2: Point, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_fill_triangle(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, color);
+        }
     }
 
     pub fn set_clip_rect(&mut self, rect: Rect) {
@@ -430,6 +466,46 @@ impl DisplayRef {
 
     pub fn draw_pixel(&mut self, x: i32, y: i32, color: u16) {
         unsafe { m5unified_sys::m5u_display_draw_pixel_at(self.index, x, y, color) }
+    }
+
+    pub fn draw_fast_hline(&mut self, x: i32, y: i32, w: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_draw_fast_hline_at(self.index, x, y, w, color) }
+    }
+
+    pub fn write_fast_hline(&mut self, x: i32, y: i32, w: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_write_fast_hline_at(self.index, x, y, w, color) }
+    }
+
+    pub fn draw_fast_vline(&mut self, x: i32, y: i32, h: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_draw_fast_vline_at(self.index, x, y, h, color) }
+    }
+
+    pub fn write_fast_vline(&mut self, x: i32, y: i32, h: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_write_fast_vline_at(self.index, x, y, h, color) }
+    }
+
+    pub fn draw_round_rect(&mut self, x: i32, y: i32, w: i32, h: i32, r: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_draw_round_rect_at(self.index, x, y, w, h, r, color) }
+    }
+
+    pub fn fill_round_rect(&mut self, x: i32, y: i32, w: i32, h: i32, r: i32, color: u16) {
+        unsafe { m5unified_sys::m5u_display_fill_round_rect_at(self.index, x, y, w, h, r, color) }
+    }
+
+    pub fn draw_triangle(&mut self, p0: Point, p1: Point, p2: Point, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_draw_triangle_at(
+                self.index, p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, color,
+            );
+        }
+    }
+
+    pub fn fill_triangle(&mut self, p0: Point, p1: Point, p2: Point, color: u16) {
+        unsafe {
+            m5unified_sys::m5u_display_fill_triangle_at(
+                self.index, p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, color,
+            );
+        }
     }
 }
 

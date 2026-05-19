@@ -180,7 +180,30 @@ mod tests {
         assert_eq!(m5.lcd_mut().height(), m5.display.height());
         assert!(m5.button(0).is_some());
         assert!(m5.buttons(0).is_some());
-        assert!(m5.displays(0).is_some());
+        m5.display.draw_pixel(1, 1, colors::WHITE);
+        m5.display.write_pixel(2, 2, colors::RED);
+        m5.display.draw_fast_hline(0, 4, 12, colors::GREEN);
+        m5.display.write_fast_hline(0, 5, 12, colors::GREEN);
+        m5.display.draw_fast_vline(4, 0, 12, colors::BLUE);
+        m5.display.write_fast_vline(5, 0, 12, colors::BLUE);
+        m5.display.draw_round_rect(8, 8, 24, 16, 4, colors::WHITE);
+        m5.display.fill_round_rect(10, 10, 20, 12, 3, colors::RED);
+        let p0 = Point { x: 4, y: 4 };
+        let p1 = Point { x: 16, y: 4 };
+        let p2 = Point { x: 10, y: 18 };
+        m5.display.draw_triangle(p0, p1, p2, colors::YELLOW);
+        m5.display.fill_triangle(p0, p1, p2, colors::CYAN);
+        let mut display = m5.displays(0).expect("host stub display should exist");
+        display.draw_pixel(1, 1, colors::WHITE);
+        display.write_pixel(2, 2, colors::RED);
+        display.draw_fast_hline(0, 4, 12, colors::GREEN);
+        display.write_fast_hline(0, 5, 12, colors::GREEN);
+        display.draw_fast_vline(4, 0, 12, colors::BLUE);
+        display.write_fast_vline(5, 0, 12, colors::BLUE);
+        display.draw_round_rect(8, 8, 24, 16, 4, colors::WHITE);
+        display.fill_round_rect(10, 10, 20, 12, 3, colors::RED);
+        display.draw_triangle(p0, p1, p2, colors::YELLOW);
+        display.fill_triangle(p0, p1, p2, colors::CYAN);
     }
 
     #[test]
