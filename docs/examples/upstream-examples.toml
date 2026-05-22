@@ -79,7 +79,7 @@ rust_bin = "basic_how_to_use"
 status = "host_compiles"
 category = "basic"
 requires = ["display", "buttons", "speaker", "rtc", "imu", "power", "touch", "led"]
-notes = "Core integration sample; LED is not currently modeled as a separate API."
+notes = "Core integration sample uses fallible LED helpers for boards without RGB LEDs."
 
 [[example]]
 upstream = "Basic/Imu/Imu.ino"
@@ -154,3 +154,84 @@ category = "extra"
 requires = ["display"]
 extra = true
 notes = "Repository-local smoke/example target, not an upstream .ino example."
+
+[[example]]
+upstream = "M5Cardputer/examples/Basic/Keyboard/Keyboard.ino"
+rust_bin = "cardputer_keyboard"
+status = "host_compiles"
+category = "cardputer"
+requires = ["cardputer", "keyboard", "display"]
+extra = true
+notes = "Cardputer-specific keyboard smoke example backed by the optional M5Cardputer shim path; uses fallible keyboard state helpers."
+
+[[example]]
+upstream = "M5Cardputer/examples/Basic/SDCard/SDCard.ino"
+rust_bin = "cardputer_sd"
+status = "host_compiles"
+category = "cardputer"
+requires = ["cardputer", "sd", "display"]
+extra = true
+notes = "Cardputer microSD mount and card metadata smoke example."
+
+[[example]]
+upstream = "M5Cardputer/examples/Basic/SDCard file read/write boundary"
+rust_bin = "cardputer_sd_file"
+status = "host_compiles"
+category = "cardputer"
+requires = ["cardputer", "sd", "display"]
+extra = true
+notes = "Cardputer microSD file existence, read, write, append, and remove API smoke example."
+
+[[example]]
+upstream = "M5Cardputer/examples/Basic/IR_NEC/IR_NEC.ino"
+rust_bin = "cardputer_ir_nec"
+status = "host_compiles"
+category = "cardputer"
+requires = ["cardputer", "ir", "display"]
+extra = true
+notes = "Cardputer IR NEC transmit smoke example; firmware needs Arduino-IRremote supplied to the ESP-IDF/Arduino build."
+
+[[example]]
+upstream = "M5Cardputer board HY2.0-4P Grove I2C boundary"
+rust_bin = "cardputer_grove_i2c"
+status = "host_compiles"
+category = "cardputer"
+requires = ["cardputer", "grove", "i2c", "display"]
+extra = true
+notes = "Cardputer Grove I2C init/scan smoke example; sensor-specific drivers should live outside the core binding."
+
+[[example]]
+upstream = "M5Cardputer board HY2.0-4P Grove GPIO boundary"
+rust_bin = "cardputer_grove_gpio"
+status = "host_compiles"
+category = "cardputer"
+requires = ["cardputer", "grove", "gpio", "display"]
+extra = true
+notes = "Cardputer Grove G1/G2 GPIO smoke example; avoid using concurrently with Grove I2C devices on the same pins."
+
+[[example]]
+upstream = "M5Cardputer board HY2.0-4P Grove analog/PWM boundary"
+rust_bin = "cardputer_grove_analog"
+status = "host_compiles"
+category = "cardputer"
+requires = ["cardputer", "grove", "gpio", "analog", "display"]
+extra = true
+notes = "Cardputer Grove G1 ADC read and G2 PWM smoke example; avoid using concurrently with Grove I2C/UART devices on the same pins."
+
+[[example]]
+upstream = "M5Cardputer board raw SPI boundary"
+rust_bin = "cardputer_spi"
+status = "host_compiles"
+category = "cardputer"
+requires = ["cardputer", "spi", "display"]
+extra = true
+notes = "Cardputer raw SPI smoke example using the built-in microSD SPI pin map; do not use while the SD wrapper is mounted."
+
+[[example]]
+upstream = "M5Cardputer board HY2.0-4P Grove UART boundary"
+rust_bin = "cardputer_grove_uart"
+status = "host_compiles"
+category = "cardputer"
+requires = ["cardputer", "grove", "uart", "display"]
+extra = true
+notes = "Cardputer Grove UART smoke example using RX=G1/GPIO1 and TX=G2/GPIO2; avoid using concurrently with Grove I2C/GPIO mode."

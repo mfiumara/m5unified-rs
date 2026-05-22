@@ -1,0 +1,19 @@
+[package]
+name = "m5unified-cardputer-keyboard"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+anyhow = "1"
+esp-idf-svc = { version = "0.52.1", default-features = false, features = ["std", "binstart"] }
+m5unified = { path = "../../crates/m5unified" }
+
+[build-dependencies]
+embuild = "0.33"
+
+[package.metadata.esp-idf-sys]
+esp_idf_version = "v5.3.2"
+
+[[package.metadata.esp-idf-sys.extra_components]]
+component_dirs = ["components"]

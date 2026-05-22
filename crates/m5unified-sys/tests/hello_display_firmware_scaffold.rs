@@ -50,4 +50,54 @@ fn root_workspace_excludes_target_specific_firmware() {
         fs::read_to_string(repo_root().join("Cargo.toml")).expect("read root manifest");
     assert!(root_manifest.contains("exclude"));
     assert!(root_manifest.contains("firmware/hello-display"));
+    assert!(root_manifest.contains("firmware/cardputer-keyboard"));
+}
+
+#[test]
+fn cardputer_keyboard_firmware_scaffold_enables_cardputer_component() {
+    let root = repo_root();
+    let firmware = root.join("firmware/cardputer-keyboard");
+
+    assert!(firmware.join("Cargo.toml").exists());
+    assert!(firmware.join("src/main.rs").exists());
+    assert!(firmware.join(".cargo/config.toml").exists());
+    assert!(firmware
+        .join("components/m5unified-rs/CMakeLists.txt")
+        .exists());
+    assert!(firmware
+        .join("components/m5unified-rs/idf_component.yml")
+        .exists());
+
+    let cargo = fs::read_to_string(firmware.join("Cargo.toml")).expect("read cardputer manifest");
+    assert!(cargo.contains("m5unified-cardputer-keyboard"));
+    assert!(cargo.contains("component_dirs = [\"components\"]"));
+
+    let config =
+        fs::read_to_string(firmware.join(".cargo/config.toml")).expect("read cargo config");
+    assert!(config.contains("xtensa-esp32s3-espidf"));
+    assert!(config.contains("ldproxy"));
+
+    let cmake = fs::read_to_string(firmware.join("components/m5unified-rs/CMakeLists.txt"))
+        .expect("read cardputer component cmake");
+    assert!(cmake.contains("crates/m5unified-sys/native"));
+    assert!(cmake.contains("m5u_shim.cpp"));
+    assert!(cmake.contains("M5Cardputer"));
+    assert!(cmake.contains("IRremote"));
+    assert!(cmake.contains("M5UNIFIED_RS_USE_REAL_M5UNIFIED=1"));
+    assert!(cmake.contains("M5UNIFIED_RS_USE_REAL_M5CARDPUTER=1"));
+    assert!(cmake.contains("M5UNIFIED_RS_USE_ARDUINO_GPIO=1"));
+    assert!(cmake.contains("M5UNIFIED_RS_USE_ARDUINO_SD=1"));
+    assert!(cmake.contains("M5UNIFIED_RS_USE_ARDUINO_SERIAL=1"));
+    assert!(cmake.contains("M5UNIFIED_RS_USE_ARDUINO_WIRE=1"));
+    assert!(cmake.contains("M5UNIFIED_RS_USE_ARDUINO_IRREMOTE=1"));
+
+    let main_rs = fs::read_to_string(firmware.join("src/main.rs")).expect("read cardputer main");
+    assert!(main_rs.contains("Cardputer::begin"));
+    assert!(main_rs.contains("keyboard.state()"));
+    assert!(main_rs.contains("sd.try_begin()"));
+    assert!(main_rs.contains("sd.write_file"));
+    assert!(main_rs.contains("ir.try_begin()"));
+    assert!(main_rs.contains("grove.i2c_try_begin()"));
+    assert!(main_rs.contains("send_nec"));
+    assert!(main_rs.contains("set_capslocked"));
 }

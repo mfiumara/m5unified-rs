@@ -27,6 +27,15 @@ They compile against the local `m5unified` Rust API. On non-ESP-IDF host targets
 - `examples/Advanced/Speak_with_AquesTalk` → `advanced_speak_with_aquestalk`
 - `examples/PlatformIO_SDL/src` → `platformio_sdl`
 - `examples/Test/build_test` → `test_build_test`
+- `M5Cardputer/examples/Basic/Keyboard` → `cardputer_keyboard`
+- `M5Cardputer/examples/Basic/SDCard` → `cardputer_sd`
+- `M5Cardputer SDCard file read/write boundary` → `cardputer_sd_file`
+- `M5Cardputer/examples/Basic/IR_NEC` → `cardputer_ir_nec`
+- `M5Cardputer HY2.0-4P Grove I2C boundary` → `cardputer_grove_i2c`
+- `M5Cardputer HY2.0-4P Grove GPIO boundary` → `cardputer_grove_gpio`
+- `M5Cardputer HY2.0-4P Grove analog/PWM boundary` → `cardputer_grove_analog`
+- `M5Cardputer raw SPI boundary` → `cardputer_spi`
+- `M5Cardputer HY2.0-4P Grove UART boundary` → `cardputer_grove_uart`
 
 ## Run/check
 

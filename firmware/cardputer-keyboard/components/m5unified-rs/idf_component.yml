@@ -1,0 +1,4 @@
+dependencies:
+  idf: ">=5.0"
+  m5stack/M5Unified: "^0.2.8"
+  m5stack/M5GFX: "^0.2.8"
