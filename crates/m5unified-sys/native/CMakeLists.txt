@@ -12,11 +12,17 @@ cmake_minimum_required(VERSION 3.16)
 # Set M5UNIFIED_RS_ENABLE_CARDPUTER=ON from the consuming project to compile the
 # optional M5Cardputer keyboard path. The M5Cardputer Arduino library must also
 # be available to that build.
+# Set M5UNIFIED_RS_ENABLE_STACKCHAN_BSP=ON from firmware that links
+# StackChan-BSP and wants the official Stack-chan Motion hooks.
 option(M5UNIFIED_RS_USE_HOST_STUB "Build the no-op host C ABI shim instead of the firmware shim" OFF)
+option(M5UNIFIED_RS_ENABLE_STACKCHAN_BSP "Enable optional StackChan-BSP Motion C ABI hooks" OFF)
 
 set(M5UNIFIED_RS_EXTRA_REQUIRES)
 if(M5UNIFIED_RS_ENABLE_CARDPUTER)
     list(APPEND M5UNIFIED_RS_EXTRA_REQUIRES M5Cardputer)
+endif()
+if(M5UNIFIED_RS_ENABLE_STACKCHAN_BSP)
+    list(APPEND M5UNIFIED_RS_EXTRA_REQUIRES StackChan-BSP)
 endif()
 
 if(M5UNIFIED_RS_USE_HOST_STUB)
@@ -37,6 +43,9 @@ if(NOT M5UNIFIED_RS_USE_HOST_STUB)
     target_compile_definitions(${COMPONENT_LIB} PRIVATE M5UNIFIED_RS_USE_REAL_M5UNIFIED=1)
     if(M5UNIFIED_RS_ENABLE_CARDPUTER)
         target_compile_definitions(${COMPONENT_LIB} PRIVATE M5UNIFIED_RS_USE_REAL_M5CARDPUTER=1)
+    endif()
+    if(M5UNIFIED_RS_ENABLE_STACKCHAN_BSP)
+        target_compile_definitions(${COMPONENT_LIB} PRIVATE M5UNIFIED_RS_USE_STACKCHAN_BSP=1)
     endif()
 endif()
 target_compile_features(${COMPONENT_LIB} PRIVATE cxx_std_17)

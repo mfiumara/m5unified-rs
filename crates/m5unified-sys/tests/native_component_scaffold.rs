@@ -17,9 +17,12 @@ fn native_component_cmake_registers_the_shim_and_m5unified_dependencies() {
     assert!(cmake.contains("M5UNIFIED_RS_USE_REAL_M5UNIFIED"));
     assert!(cmake.contains("M5UNIFIED_RS_ENABLE_CARDPUTER"));
     assert!(cmake.contains("M5UNIFIED_RS_USE_REAL_M5CARDPUTER"));
+    assert!(cmake.contains("M5UNIFIED_RS_ENABLE_STACKCHAN_BSP"));
+    assert!(cmake.contains("M5UNIFIED_RS_USE_STACKCHAN_BSP"));
     assert!(cmake.contains("M5Unified"));
     assert!(cmake.contains("M5GFX"));
     assert!(cmake.contains("M5Cardputer"));
+    assert!(cmake.contains("StackChan-BSP"));
     assert!(cmake.contains("idf_component_register"));
 }
 

@@ -626,6 +626,24 @@ int m5u_gpio_analog_read_millivolts(int pin);
 bool m5u_gpio_analog_write(int pin, uint8_t duty);
 bool m5u_gpio_analog_write_frequency(int pin, uint32_t frequency_hz);
 bool m5u_gpio_analog_write_resolution(int pin, uint8_t resolution_bits);
+bool m5u_servo_attach(int pin, int channel, int timer, uint32_t frequency_hz, uint16_t min_us, uint16_t max_us);
+bool m5u_servo_detach(int channel);
+bool m5u_servo_write_pulse_us(int channel, uint16_t pulse_us);
+
+typedef struct {
+    bool ready;
+    bool moving;
+    int16_t yaw_tenths;
+    int16_t pitch_tenths;
+} m5u_stackchan_motion_status_t;
+
+bool m5u_stackchan_motion_begin(void);
+void m5u_stackchan_motion_update(void);
+bool m5u_stackchan_motion_move(int16_t yaw_tenths, int16_t pitch_tenths, uint16_t speed_bsp);
+bool m5u_stackchan_motion_home(uint16_t speed_bsp);
+bool m5u_stackchan_motion_nod(void);
+bool m5u_stackchan_motion_shake(void);
+bool m5u_stackchan_motion_status(m5u_stackchan_motion_status_t* out);
 bool m5u_spi_begin(int sck, int miso, int mosi, int cs);
 void m5u_spi_end(void);
 uint8_t m5u_spi_transfer_byte(uint8_t value, uint32_t frequency_hz, uint8_t mode, bool lsb_first);

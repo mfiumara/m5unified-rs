@@ -50,6 +50,14 @@ requires = ["wifi", "speaker", "display", "mp3-decoder"]
 notes = "Networking/codec dependencies remain example-level."
 
 [[example]]
+upstream = "StackChan/Servo"
+rust_bin = "stackchan_servo"
+status = "host_compiles"
+category = "stackchan"
+requires = ["servo-pwm", "display"]
+notes = "Generic PWM pan/tilt fallback only: enforce the MCP x/y/speed ranges and run neutral/look/sweep poses on two LEDC PWM channels. Official Stack-chan CoreS3 hardware requires StackChan-BSP Motion, M5StackChan.begin/update, VM_EN/IO-expander power setup, BSP speed units, and home/nod/shake/status firmware endpoints."
+
+[[example]]
 upstream = "Basic/Axp2101/IRQ/IRQExample/IRQExample.ino"
 rust_bin = "basic_axp2101_irq"
 status = "host_compiles"

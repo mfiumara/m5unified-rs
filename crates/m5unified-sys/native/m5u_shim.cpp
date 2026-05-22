@@ -2,6 +2,8 @@
 
 #include <string.h>
 
+#include <driver/ledc.h>
+
 #ifdef M5UNIFIED_RS_USE_ARDUINO_GPIO
 #include <Arduino.h>
 #endif
@@ -40,7 +42,35 @@
 #include <IRremote.hpp>
 #endif
 
+#ifdef M5UNIFIED_RS_USE_STACKCHAN_BSP
+#include <M5StackChan.h>
+#endif
+
 extern "C" {
+
+static constexpr uint8_t M5U_SERVO_MAX_CHANNELS = 8;
+static constexpr uint8_t M5U_SERVO_RESOLUTION_BITS = 14;
+static constexpr uint32_t M5U_SERVO_DUTY_MAX = (1u << M5U_SERVO_RESOLUTION_BITS) - 1u;
+
+struct m5u_servo_state_t {
+    bool attached;
+    int pin;
+    int timer;
+    uint32_t frequency_hz;
+    uint16_t min_us;
+    uint16_t max_us;
+};
+
+static m5u_servo_state_t m5u_servo_states[M5U_SERVO_MAX_CHANNELS] = {};
+
+static bool m5u_servo_valid_channel(int channel) {
+    return channel >= 0 && channel < M5U_SERVO_MAX_CHANNELS;
+}
+
+static uint32_t m5u_servo_duty_from_pulse_us(uint32_t frequency_hz, uint16_t pulse_us) {
+    const uint64_t numerator = static_cast<uint64_t>(pulse_us) * frequency_hz * M5U_SERVO_DUTY_MAX;
+    return static_cast<uint32_t>(numerator / 1000000u);
+}
 
 #ifdef M5UNIFIED_RS_USE_REAL_M5UNIFIED
 static auto m5u_log_target_from_int(int target) -> decltype(m5::log_target_serial) {
@@ -1252,6 +1282,165 @@ bool m5u_gpio_analog_write_resolution(int pin, uint8_t resolution_bits) {
     return true;
 #else
     (void)pin; (void)resolution_bits;
+    return false;
+#endif
+}
+
+bool m5u_servo_attach(int pin, int channel, int timer, uint32_t frequency_hz, uint16_t min_us, uint16_t max_us) {
+    if (pin < 0 || !m5u_servo_valid_channel(channel) || timer < 0 || timer > 3) {
+        return false;
+    }
+    if (frequency_hz == 0 || min_us == 0 || min_us >= max_us) {
+        return false;
+    }
+
+    ledc_timer_config_t timer_config = {};
+    timer_config.speed_mode = LEDC_LOW_SPEED_MODE;
+    timer_config.duty_resolution = LEDC_TIMER_14_BIT;
+    timer_config.timer_num = static_cast<ledc_timer_t>(timer);
+    timer_config.freq_hz = frequency_hz;
+    timer_config.clk_cfg = LEDC_AUTO_CLK;
+    if (ledc_timer_config(&timer_config) != ESP_OK) {
+        return false;
+    }
+
+    ledc_channel_config_t channel_config = {};
+    channel_config.gpio_num = pin;
+    channel_config.speed_mode = LEDC_LOW_SPEED_MODE;
+    channel_config.channel = static_cast<ledc_channel_t>(channel);
+    channel_config.intr_type = LEDC_INTR_DISABLE;
+    channel_config.timer_sel = static_cast<ledc_timer_t>(timer);
+    channel_config.duty = 0;
+    channel_config.hpoint = 0;
+    if (ledc_channel_config(&channel_config) != ESP_OK) {
+        return false;
+    }
+
+    m5u_servo_states[channel] = {
+        true,
+        pin,
+        timer,
+        frequency_hz,
+        min_us,
+        max_us,
+    };
+    return true;
+}
+
+bool m5u_servo_detach(int channel) {
+    if (!m5u_servo_valid_channel(channel) || !m5u_servo_states[channel].attached) {
+        return false;
+    }
+
+    const auto ledc_channel = static_cast<ledc_channel_t>(channel);
+    const bool ok = ledc_stop(LEDC_LOW_SPEED_MODE, ledc_channel, 0) == ESP_OK;
+    m5u_servo_states[channel] = {};
+    return ok;
+}
+
+bool m5u_servo_write_pulse_us(int channel, uint16_t pulse_us) {
+    if (!m5u_servo_valid_channel(channel) || !m5u_servo_states[channel].attached) {
+        return false;
+    }
+
+    const auto& state = m5u_servo_states[channel];
+    if (pulse_us < state.min_us) {
+        pulse_us = state.min_us;
+    } else if (pulse_us > state.max_us) {
+        pulse_us = state.max_us;
+    }
+
+    const auto ledc_channel = static_cast<ledc_channel_t>(channel);
+    const uint32_t duty = m5u_servo_duty_from_pulse_us(state.frequency_hz, pulse_us);
+    return ledc_set_duty(LEDC_LOW_SPEED_MODE, ledc_channel, duty) == ESP_OK
+        && ledc_update_duty(LEDC_LOW_SPEED_MODE, ledc_channel) == ESP_OK;
+}
+
+bool m5u_stackchan_motion_begin(void) {
+#ifdef M5UNIFIED_RS_USE_STACKCHAN_BSP
+    M5StackChan.begin();
+    M5StackChan.Motion.setAutoAngleSyncEnabled(false);
+    M5StackChan.Motion.setAutoTorqueReleaseEnabled(true);
+    M5StackChan.Motion.goHome(500);
+    return true;
+#else
+    return false;
+#endif
+}
+
+void m5u_stackchan_motion_update(void) {
+#ifdef M5UNIFIED_RS_USE_STACKCHAN_BSP
+    M5StackChan.update();
+#endif
+}
+
+bool m5u_stackchan_motion_move(int16_t yaw_tenths, int16_t pitch_tenths, uint16_t speed_bsp) {
+#ifdef M5UNIFIED_RS_USE_STACKCHAN_BSP
+    M5StackChan.Motion.move(yaw_tenths, pitch_tenths, speed_bsp);
+    return true;
+#else
+    (void)yaw_tenths;
+    (void)pitch_tenths;
+    (void)speed_bsp;
+    return false;
+#endif
+}
+
+bool m5u_stackchan_motion_home(uint16_t speed_bsp) {
+#ifdef M5UNIFIED_RS_USE_STACKCHAN_BSP
+    M5StackChan.Motion.goHome(speed_bsp);
+    return true;
+#else
+    (void)speed_bsp;
+    return false;
+#endif
+}
+
+bool m5u_stackchan_motion_nod(void) {
+#ifdef M5UNIFIED_RS_USE_STACKCHAN_BSP
+    M5StackChan.Motion.moveY(300, 500);
+    m5u_delay_ms(200);
+    M5StackChan.Motion.moveY(50, 600);
+    m5u_delay_ms(200);
+    M5StackChan.Motion.moveY(300, 500);
+    m5u_delay_ms(200);
+    M5StackChan.Motion.goHome(500);
+    return true;
+#else
+    return false;
+#endif
+}
+
+bool m5u_stackchan_motion_shake(void) {
+#ifdef M5UNIFIED_RS_USE_STACKCHAN_BSP
+    M5StackChan.Motion.moveX(-400, 600);
+    m5u_delay_ms(200);
+    M5StackChan.Motion.moveX(400, 600);
+    m5u_delay_ms(200);
+    M5StackChan.Motion.moveX(-400, 600);
+    m5u_delay_ms(200);
+    M5StackChan.Motion.goHome(500);
+    return true;
+#else
+    return false;
+#endif
+}
+
+bool m5u_stackchan_motion_status(m5u_stackchan_motion_status_t* out) {
+    if (out == nullptr) {
+        return false;
+    }
+#ifdef M5UNIFIED_RS_USE_STACKCHAN_BSP
+    out->ready = true;
+    out->moving = M5StackChan.Motion.isMoving();
+    out->yaw_tenths = M5StackChan.Motion.getCurrentAngleX();
+    out->pitch_tenths = M5StackChan.Motion.getCurrentAngleY();
+    return true;
+#else
+    out->ready = false;
+    out->moving = false;
+    out->yaw_tenths = 0;
+    out->pitch_tenths = 0;
     return false;
 #endif
 }

@@ -172,6 +172,29 @@ let board = cardputer.board();
 
 The generic shim still builds against plain M5Unified by default. To compile the optional C++ Cardputer path for firmware, make the `M5Cardputer` library available to ESP-IDF/Arduino and set `M5UNIFIED_RS_ENABLE_CARDPUTER=ON` for the native component so it defines `M5UNIFIED_RS_USE_REAL_M5CARDPUTER`.
 
+## Stack-chan motion contract
+
+Stack-chan motion helpers mirror the MCP/firmware contract used by `stackchan-mcp`: `x` yaw is -128..128 degrees, `y` pitch is 0..90 degrees, and `speed` is 0..100 percent. `StackChanMove` clamps that public contract and converts the official StackChan-BSP Motion boundary to 0.1 degree units, hardware pitch clamp 5..85 degrees, and BSP speed units of `speed * 10`.
+
+Official Stack-chan CoreS3 hardware is not generic PWM on Port A. It requires StackChan-BSP Motion initialization (`M5StackChan.begin()`/`update()`), board power setup including VM_EN/IO expander handling, and Motion calls for move/home/nod/shake/status. The Rust C ABI exposes `StackChanBspMotion` hooks for firmware that enables `M5UNIFIED_RS_ENABLE_STACKCHAN_BSP=ON` and links StackChan-BSP; host builds and firmware without that option return `Error::Unavailable("stackchan bsp motion")`.
+
+Generic two-axis PWM fallback control is available through `m5unified::StackChanPwmServos` for custom non-official builds. It attaches two LEDC PWM channels, writes pan/tilt angles in tenths of a degree, returns to neutral, and can step smoothly between poses.
+
+```rust
+let mut m5 = m5unified::M5Unified::begin()?;
+let command = m5unified::StackChanMove::from_mcp(0.0, 45.0, 50);
+assert_eq!(command.bsp_speed(), 500);
+
+let mut servos = m5unified::StackChanPwmServos::attach_pwm_pins(
+    m5unified::PwmServoPins::CORES3_PORT_A,
+)?;
+servos.move_to(command)?;
+servos.write_pose(m5unified::StackChanPose::LEFT)?;
+servos.smooth_move_to(m5unified::StackChanPose::NEUTRAL, 50, 20, |ms| m5.delay_ms(ms))?;
+```
+
+`examples/src/bin/stackchan_servo.rs` is the generic PWM fallback example only. Official Stack-chan MCP firmware should keep the BSP Motion path and expose `/move`, `/home`, `/nod`, `/shake`, and `/servo/status` at the firmware/MCP layer.
+
 ## Plans and publishing
 
 - [`docs/plans/2026-05-15-m5unified-rs-roadmap.md`](docs/plans/2026-05-15-m5unified-rs-roadmap.md) contains the original implementation roadmap.

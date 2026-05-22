@@ -833,6 +833,20 @@ impl M5Unified {
     pub fn canvas(&mut self) -> Option<Canvas> {
         Canvas::for_display()
     }
+
+    pub fn stackchan_servos(
+        &mut self,
+        config: StackChanServoConfig,
+    ) -> Result<StackChanServos, Error> {
+        StackChanServos::attach(config)
+    }
+
+    pub fn stackchan_pwm_servos(
+        &mut self,
+        config: StackChanPwmServoConfig,
+    ) -> Result<StackChanPwmServos, Error> {
+        StackChanPwmServos::attach(config)
+    }
 }
 
 impl Cardputer {
@@ -1068,6 +1082,336 @@ pub struct CardputerGrove;
 
 #[derive(Debug, Copy, Clone)]
 pub struct CardputerSpi;
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct PwmServoPins {
+    pub pan: i32,
+    pub tilt: i32,
+}
+
+impl PwmServoPins {
+    /// CoreS3 Port A pins for an external PWM pan/tilt fallback build.
+    ///
+    /// Official Stack-chan CoreS3 hardware is not generic PWM on Port A. It
+    /// uses StackChan-BSP Motion plus board power setup for its servos.
+    pub const CORES3_PORT_A: Self = Self { pan: 2, tilt: 1 };
+
+    pub const fn new(pan: i32, tilt: i32) -> Self {
+        Self { pan, tilt }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct PwmServoConfig {
+    pub pin: i32,
+    pub channel: u8,
+    pub timer: u8,
+    pub frequency_hz: u32,
+    pub min_pulse_us: u16,
+    pub max_pulse_us: u16,
+    pub min_angle_tenths: i16,
+    pub max_angle_tenths: i16,
+    pub neutral_angle_tenths: i16,
+}
+
+impl PwmServoConfig {
+    pub const DEFAULT_FREQUENCY_HZ: u32 = 50;
+    pub const DEFAULT_MIN_PULSE_US: u16 = 500;
+    pub const DEFAULT_MAX_PULSE_US: u16 = 2500;
+
+    pub const fn new(
+        pin: i32,
+        channel: u8,
+        timer: u8,
+        min_angle_tenths: i16,
+        max_angle_tenths: i16,
+        neutral_angle_tenths: i16,
+    ) -> Self {
+        Self {
+            pin,
+            channel,
+            timer,
+            frequency_hz: Self::DEFAULT_FREQUENCY_HZ,
+            min_pulse_us: Self::DEFAULT_MIN_PULSE_US,
+            max_pulse_us: Self::DEFAULT_MAX_PULSE_US,
+            min_angle_tenths,
+            max_angle_tenths,
+            neutral_angle_tenths,
+        }
+    }
+
+    pub const fn with_pulse_range(mut self, min_pulse_us: u16, max_pulse_us: u16) -> Self {
+        self.min_pulse_us = min_pulse_us;
+        self.max_pulse_us = max_pulse_us;
+        self
+    }
+
+    pub const fn with_frequency(mut self, frequency_hz: u32) -> Self {
+        self.frequency_hz = frequency_hz;
+        self
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct StackChanPwmServoConfig {
+    pub pan: PwmServoConfig,
+    pub tilt: PwmServoConfig,
+}
+
+impl StackChanPwmServoConfig {
+    pub const PAN_MIN_TENTHS: i16 = StackChanMotionContract::X_MIN_TENTHS;
+    pub const PAN_MAX_TENTHS: i16 = StackChanMotionContract::X_MAX_TENTHS;
+    pub const PAN_NEUTRAL_TENTHS: i16 = StackChanMotionContract::X_NEUTRAL_TENTHS;
+    pub const TILT_MIN_TENTHS: i16 = StackChanMotionContract::Y_MIN_TENTHS;
+    pub const TILT_MAX_TENTHS: i16 = StackChanMotionContract::Y_MAX_TENTHS;
+    pub const TILT_NEUTRAL_TENTHS: i16 = StackChanMotionContract::Y_NEUTRAL_TENTHS;
+
+    pub const fn pwm_pins(pins: PwmServoPins) -> Self {
+        Self {
+            pan: PwmServoConfig::new(
+                pins.pan,
+                0,
+                0,
+                Self::PAN_MIN_TENTHS,
+                Self::PAN_MAX_TENTHS,
+                Self::PAN_NEUTRAL_TENTHS,
+            ),
+            tilt: PwmServoConfig::new(
+                pins.tilt,
+                1,
+                0,
+                Self::TILT_MIN_TENTHS,
+                Self::TILT_MAX_TENTHS,
+                Self::TILT_NEUTRAL_TENTHS,
+            ),
+        }
+    }
+}
+
+impl Default for StackChanPwmServoConfig {
+    fn default() -> Self {
+        Self::pwm_pins(PwmServoPins::CORES3_PORT_A)
+    }
+}
+
+/// Compatibility alias for earlier versions of the PWM fallback API.
+///
+/// Prefer `StackChanPwmServoConfig` for generic PWM builds. Official
+/// Stack-chan CoreS3 hardware should use `StackChanBspMotion` or firmware that
+/// exposes the same StackChan-BSP Motion contract.
+pub type StackChanServoConfig = StackChanPwmServoConfig;
+
+/// Stack-chan MCP/firmware motion limits.
+///
+/// The HTTP/MCP contract uses `x` yaw in -128..128 degrees, `y` pitch in 0..90
+/// degrees, and `speed` in 0..100 percent. Official StackChan-BSP Motion sends
+/// angles in 0.1 degree units and clamps physical pitch to 5..85 degrees.
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct StackChanMotionContract;
+
+impl StackChanMotionContract {
+    pub const X_MIN_DEGREES: i16 = -128;
+    pub const X_MAX_DEGREES: i16 = 128;
+    pub const X_NEUTRAL_DEGREES: i16 = 0;
+    pub const Y_MIN_DEGREES: i16 = 0;
+    pub const Y_MAX_DEGREES: i16 = 90;
+    pub const Y_HARDWARE_MIN_DEGREES: i16 = 5;
+    pub const Y_HARDWARE_MAX_DEGREES: i16 = 85;
+    pub const Y_NEUTRAL_DEGREES: i16 = 45;
+    pub const SPEED_MIN_PERCENT: u8 = 0;
+    pub const SPEED_MAX_PERCENT: u8 = 100;
+
+    pub const X_MIN_TENTHS: i16 = Self::X_MIN_DEGREES * 10;
+    pub const X_MAX_TENTHS: i16 = Self::X_MAX_DEGREES * 10;
+    pub const X_NEUTRAL_TENTHS: i16 = Self::X_NEUTRAL_DEGREES * 10;
+    pub const Y_MIN_TENTHS: i16 = Self::Y_MIN_DEGREES * 10;
+    pub const Y_MAX_TENTHS: i16 = Self::Y_MAX_DEGREES * 10;
+    pub const Y_HARDWARE_MIN_TENTHS: i16 = Self::Y_HARDWARE_MIN_DEGREES * 10;
+    pub const Y_HARDWARE_MAX_TENTHS: i16 = Self::Y_HARDWARE_MAX_DEGREES * 10;
+    pub const Y_NEUTRAL_TENTHS: i16 = Self::Y_NEUTRAL_DEGREES * 10;
+
+    pub const fn clamp_x_tenths(x_tenths: i16) -> i16 {
+        if x_tenths < Self::X_MIN_TENTHS {
+            Self::X_MIN_TENTHS
+        } else if x_tenths > Self::X_MAX_TENTHS {
+            Self::X_MAX_TENTHS
+        } else {
+            x_tenths
+        }
+    }
+
+    pub const fn clamp_y_tenths(y_tenths: i16) -> i16 {
+        if y_tenths < Self::Y_MIN_TENTHS {
+            Self::Y_MIN_TENTHS
+        } else if y_tenths > Self::Y_MAX_TENTHS {
+            Self::Y_MAX_TENTHS
+        } else {
+            y_tenths
+        }
+    }
+
+    pub const fn clamp_hardware_y_tenths(y_tenths: i16) -> i16 {
+        if y_tenths < Self::Y_HARDWARE_MIN_TENTHS {
+            Self::Y_HARDWARE_MIN_TENTHS
+        } else if y_tenths > Self::Y_HARDWARE_MAX_TENTHS {
+            Self::Y_HARDWARE_MAX_TENTHS
+        } else {
+            y_tenths
+        }
+    }
+
+    pub const fn clamp_speed_percent(speed: u8) -> u8 {
+        if speed > Self::SPEED_MAX_PERCENT {
+            Self::SPEED_MAX_PERCENT
+        } else {
+            speed
+        }
+    }
+
+    pub const fn speed_percent_to_bsp(speed: u8) -> u16 {
+        Self::clamp_speed_percent(speed) as u16 * 10
+    }
+
+    pub fn clamp_x_degrees(x: f32) -> f32 {
+        clamp_f32(x, Self::X_MIN_DEGREES as f32, Self::X_MAX_DEGREES as f32)
+    }
+
+    pub fn clamp_y_degrees(y: f32) -> f32 {
+        clamp_f32(y, Self::Y_MIN_DEGREES as f32, Self::Y_MAX_DEGREES as f32)
+    }
+
+    pub const fn clamp_speed_i32(speed: i32) -> u8 {
+        if speed < Self::SPEED_MIN_PERCENT as i32 {
+            Self::SPEED_MIN_PERCENT
+        } else if speed > Self::SPEED_MAX_PERCENT as i32 {
+            Self::SPEED_MAX_PERCENT
+        } else {
+            speed as u8
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct StackChanPose {
+    pub pan_tenths: i16,
+    pub tilt_tenths: i16,
+}
+
+impl StackChanPose {
+    pub const NEUTRAL: Self = Self {
+        pan_tenths: StackChanMotionContract::X_NEUTRAL_TENTHS,
+        tilt_tenths: StackChanMotionContract::Y_NEUTRAL_TENTHS,
+    };
+    pub const LEFT: Self = Self {
+        pan_tenths: 900,
+        tilt_tenths: StackChanMotionContract::Y_NEUTRAL_TENTHS,
+    };
+    pub const RIGHT: Self = Self {
+        pan_tenths: -900,
+        tilt_tenths: StackChanMotionContract::Y_NEUTRAL_TENTHS,
+    };
+    pub const UP: Self = Self {
+        pan_tenths: StackChanMotionContract::X_NEUTRAL_TENTHS,
+        tilt_tenths: 900,
+    };
+    pub const DOWN: Self = Self {
+        pan_tenths: StackChanMotionContract::X_NEUTRAL_TENTHS,
+        tilt_tenths: 0,
+    };
+
+    pub const fn new(pan_tenths: i16, tilt_tenths: i16) -> Self {
+        Self {
+            pan_tenths,
+            tilt_tenths,
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct StackChanMove {
+    pub x_tenths: i16,
+    pub y_tenths: i16,
+    pub speed_percent: u8,
+}
+
+impl StackChanMove {
+    pub const DEFAULT_SPEED_PERCENT: u8 = 50;
+
+    pub fn from_mcp(x: f32, y: f32, speed: i32) -> Self {
+        Self::from_tenths(
+            degrees_to_tenths(StackChanMotionContract::clamp_x_degrees(x)),
+            degrees_to_tenths(StackChanMotionContract::clamp_y_degrees(y)),
+            StackChanMotionContract::clamp_speed_i32(speed),
+        )
+    }
+
+    pub const fn new(x_degrees: i16, y_degrees: i16, speed_percent: u8) -> Self {
+        Self::from_tenths(
+            x_degrees.saturating_mul(10),
+            y_degrees.saturating_mul(10),
+            speed_percent,
+        )
+    }
+
+    pub const fn from_tenths(x_tenths: i16, y_tenths: i16, speed_percent: u8) -> Self {
+        Self {
+            x_tenths: StackChanMotionContract::clamp_x_tenths(x_tenths),
+            y_tenths: StackChanMotionContract::clamp_y_tenths(y_tenths),
+            speed_percent: StackChanMotionContract::clamp_speed_percent(speed_percent),
+        }
+    }
+
+    pub const fn neutral(speed_percent: u8) -> Self {
+        Self::from_tenths(
+            StackChanMotionContract::X_NEUTRAL_TENTHS,
+            StackChanMotionContract::Y_NEUTRAL_TENTHS,
+            speed_percent,
+        )
+    }
+
+    pub const fn pose(self) -> StackChanPose {
+        StackChanPose::new(self.x_tenths, self.y_tenths)
+    }
+
+    pub const fn bsp_y_tenths(self) -> i16 {
+        StackChanMotionContract::clamp_hardware_y_tenths(self.y_tenths)
+    }
+
+    pub const fn bsp_speed(self) -> u16 {
+        StackChanMotionContract::speed_percent_to_bsp(self.speed_percent)
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct StackChanMotionStatus {
+    pub ready: bool,
+    pub moving: bool,
+    pub pose: StackChanPose,
+}
+
+#[derive(Debug)]
+pub struct StackChanBspMotion {
+    pose: StackChanPose,
+}
+
+#[derive(Debug)]
+pub struct PwmServo {
+    config: PwmServoConfig,
+    angle_tenths: i16,
+}
+
+#[derive(Debug)]
+pub struct StackChanPwmServos {
+    pan: PwmServo,
+    tilt: PwmServo,
+    pose: StackChanPose,
+}
+
+/// Compatibility alias for earlier versions of the PWM fallback API.
+///
+/// Prefer `StackChanPwmServos`; official Stack-chan CoreS3 hardware requires
+/// StackChan-BSP Motion rather than this generic LEDC PWM implementation.
+pub type StackChanServos = StackChanPwmServos;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct CardputerSdPins {
@@ -2551,6 +2895,283 @@ impl CardputerIr {
         self.send_nec(frame)
             .then_some(())
             .ok_or(Error::Unavailable("cardputer ir"))
+    }
+}
+
+impl PwmServo {
+    pub fn attach(config: PwmServoConfig) -> Result<Self, Error> {
+        validate_pwm_servo_config(config)?;
+        let ok = unsafe {
+            m5unified_sys::m5u_servo_attach(
+                config.pin as c_int,
+                config.channel as c_int,
+                config.timer as c_int,
+                config.frequency_hz,
+                config.min_pulse_us,
+                config.max_pulse_us,
+            )
+        };
+        if !ok {
+            return Err(Error::Unavailable("pwm servo"));
+        }
+
+        let mut servo = Self {
+            config,
+            angle_tenths: config.neutral_angle_tenths,
+        };
+        servo.write_angle_tenths(config.neutral_angle_tenths)?;
+        Ok(servo)
+    }
+
+    pub fn detach(self) -> bool {
+        unsafe { m5unified_sys::m5u_servo_detach(self.config.channel as c_int) }
+    }
+
+    pub const fn config(&self) -> PwmServoConfig {
+        self.config
+    }
+
+    pub const fn angle_tenths(&self) -> i16 {
+        self.angle_tenths
+    }
+
+    pub fn write_angle_degrees(&mut self, degrees: i16) -> Result<(), Error> {
+        self.write_angle_tenths(
+            degrees
+                .checked_mul(10)
+                .ok_or(Error::InvalidValue("servo angle"))?,
+        )
+    }
+
+    pub fn write_angle_tenths(&mut self, angle_tenths: i16) -> Result<(), Error> {
+        if angle_tenths < self.config.min_angle_tenths
+            || angle_tenths > self.config.max_angle_tenths
+        {
+            return Err(Error::InvalidValue("servo angle"));
+        }
+
+        let pulse = self.pulse_us_for_angle(angle_tenths);
+        self.write_pulse_us(pulse)?;
+        self.angle_tenths = angle_tenths;
+        Ok(())
+    }
+
+    pub fn write_pulse_us(&mut self, pulse_us: u16) -> Result<(), Error> {
+        if pulse_us < self.config.min_pulse_us || pulse_us > self.config.max_pulse_us {
+            return Err(Error::InvalidValue("servo pulse"));
+        }
+
+        unsafe { m5unified_sys::m5u_servo_write_pulse_us(self.config.channel as c_int, pulse_us) }
+            .then_some(())
+            .ok_or(Error::Unavailable("pwm servo"))
+    }
+
+    pub fn neutral(&mut self) -> Result<(), Error> {
+        self.write_angle_tenths(self.config.neutral_angle_tenths)
+    }
+
+    fn pulse_us_for_angle(&self, angle_tenths: i16) -> u16 {
+        let angle_span =
+            i32::from(self.config.max_angle_tenths) - i32::from(self.config.min_angle_tenths);
+        let pulse_span = u32::from(self.config.max_pulse_us - self.config.min_pulse_us);
+        let angle_offset = i32::from(angle_tenths) - i32::from(self.config.min_angle_tenths);
+        let pulse_offset = (u32::try_from(angle_offset).unwrap_or(0) * pulse_span)
+            / u32::try_from(angle_span).unwrap_or(1);
+        self.config.min_pulse_us + u16::try_from(pulse_offset).unwrap_or(u16::MAX)
+    }
+}
+
+impl StackChanBspMotion {
+    pub fn begin() -> Result<Self, Error> {
+        unsafe { m5unified_sys::m5u_stackchan_motion_begin() }
+            .then_some(Self {
+                pose: StackChanPose::NEUTRAL,
+            })
+            .ok_or(Error::Unavailable("stackchan bsp motion"))
+    }
+
+    pub fn update(&mut self) {
+        unsafe { m5unified_sys::m5u_stackchan_motion_update() }
+    }
+
+    pub const fn pose(&self) -> StackChanPose {
+        self.pose
+    }
+
+    pub fn move_to(&mut self, command: StackChanMove) -> Result<(), Error> {
+        unsafe {
+            m5unified_sys::m5u_stackchan_motion_move(
+                command.x_tenths,
+                command.bsp_y_tenths(),
+                command.bsp_speed(),
+            )
+        }
+        .then_some(())
+        .ok_or(Error::Unavailable("stackchan bsp motion"))?;
+        self.pose = command.pose();
+        Ok(())
+    }
+
+    pub fn home(&mut self, speed_percent: u8) -> Result<(), Error> {
+        let speed_bsp = StackChanMotionContract::speed_percent_to_bsp(speed_percent);
+        unsafe { m5unified_sys::m5u_stackchan_motion_home(speed_bsp) }
+            .then_some(())
+            .ok_or(Error::Unavailable("stackchan bsp motion"))?;
+        self.pose = StackChanPose::NEUTRAL;
+        Ok(())
+    }
+
+    pub fn neutral(&mut self, speed_percent: u8) -> Result<(), Error> {
+        self.home(speed_percent)
+    }
+
+    pub fn nod(&mut self) -> Result<(), Error> {
+        unsafe { m5unified_sys::m5u_stackchan_motion_nod() }
+            .then_some(())
+            .ok_or(Error::Unavailable("stackchan bsp motion"))?;
+        self.pose = StackChanPose::NEUTRAL;
+        Ok(())
+    }
+
+    pub fn shake(&mut self) -> Result<(), Error> {
+        unsafe { m5unified_sys::m5u_stackchan_motion_shake() }
+            .then_some(())
+            .ok_or(Error::Unavailable("stackchan bsp motion"))?;
+        self.pose = StackChanPose::NEUTRAL;
+        Ok(())
+    }
+
+    pub fn status(&self) -> Result<StackChanMotionStatus, Error> {
+        let mut raw = m5unified_sys::m5u_stackchan_motion_status_t::default();
+        unsafe { m5unified_sys::m5u_stackchan_motion_status(&mut raw) }
+            .then_some(StackChanMotionStatus {
+                ready: raw.ready,
+                moving: raw.moving,
+                pose: StackChanPose::new(raw.yaw_tenths, raw.pitch_tenths),
+            })
+            .ok_or(Error::Unavailable("stackchan bsp motion"))
+    }
+}
+
+impl StackChanPwmServos {
+    pub fn attach(config: StackChanPwmServoConfig) -> Result<Self, Error> {
+        let pan = PwmServo::attach(config.pan)?;
+        let tilt = match PwmServo::attach(config.tilt) {
+            Ok(tilt) => tilt,
+            Err(error) => {
+                let _ = pan.detach();
+                return Err(error);
+            }
+        };
+        let pose = StackChanPose::new(pan.angle_tenths(), tilt.angle_tenths());
+        Ok(Self { pan, tilt, pose })
+    }
+
+    pub fn attach_pwm_pins(pins: PwmServoPins) -> Result<Self, Error> {
+        Self::attach(StackChanPwmServoConfig::pwm_pins(pins))
+    }
+
+    pub fn detach(self) -> bool {
+        self.pan.detach() && self.tilt.detach()
+    }
+
+    pub const fn pose(&self) -> StackChanPose {
+        self.pose
+    }
+
+    pub fn neutral(&mut self) -> Result<(), Error> {
+        self.write_pose(StackChanPose::NEUTRAL)
+    }
+
+    pub fn move_to(&mut self, command: StackChanMove) -> Result<(), Error> {
+        self.write_pose(command.pose())
+    }
+
+    pub fn home(&mut self, _speed_percent: u8) -> Result<(), Error> {
+        self.neutral()
+    }
+
+    pub fn nod<F>(&mut self, mut delay: F) -> Result<(), Error>
+    where
+        F: FnMut(u32),
+    {
+        for pose in [
+            StackChanPose::new(0, 300),
+            StackChanPose::new(0, 50),
+            StackChanPose::new(0, 300),
+            StackChanPose::NEUTRAL,
+        ] {
+            self.write_pose(pose)?;
+            delay(200);
+        }
+        Ok(())
+    }
+
+    pub fn shake<F>(&mut self, mut delay: F) -> Result<(), Error>
+    where
+        F: FnMut(u32),
+    {
+        for pose in [
+            StackChanPose::new(-400, StackChanPose::NEUTRAL.tilt_tenths),
+            StackChanPose::new(400, StackChanPose::NEUTRAL.tilt_tenths),
+            StackChanPose::new(-400, StackChanPose::NEUTRAL.tilt_tenths),
+            StackChanPose::NEUTRAL,
+        ] {
+            self.write_pose(pose)?;
+            delay(200);
+        }
+        Ok(())
+    }
+
+    pub fn status(&self) -> StackChanMotionStatus {
+        StackChanMotionStatus {
+            ready: true,
+            moving: false,
+            pose: self.pose,
+        }
+    }
+
+    pub fn write_pose(&mut self, pose: StackChanPose) -> Result<(), Error> {
+        validate_stackchan_pose(pose)?;
+        self.pan.write_angle_tenths(pose.pan_tenths)?;
+        self.tilt.write_angle_tenths(pose.tilt_tenths)?;
+        self.pose = pose;
+        Ok(())
+    }
+
+    pub fn write_pan_tenths(&mut self, pan_tenths: i16) -> Result<(), Error> {
+        self.write_pose(StackChanPose::new(pan_tenths, self.pose.tilt_tenths))
+    }
+
+    pub fn write_tilt_tenths(&mut self, tilt_tenths: i16) -> Result<(), Error> {
+        self.write_pose(StackChanPose::new(self.pose.pan_tenths, tilt_tenths))
+    }
+
+    pub fn smooth_move_to<F>(
+        &mut self,
+        target: StackChanPose,
+        step_tenths: u16,
+        delay_ms: u32,
+        mut delay: F,
+    ) -> Result<(), Error>
+    where
+        F: FnMut(u32),
+    {
+        validate_stackchan_pose(target)?;
+        if step_tenths == 0 {
+            return Err(Error::InvalidValue("servo step"));
+        }
+
+        while self.pose != target {
+            let next = StackChanPose::new(
+                step_axis(self.pose.pan_tenths, target.pan_tenths, step_tenths),
+                step_axis(self.pose.tilt_tenths, target.tilt_tenths, step_tenths),
+            );
+            self.write_pose(next)?;
+            delay(delay_ms);
+        }
+
+        Ok(())
     }
 }
 
@@ -6239,6 +6860,72 @@ fn validate_i2c_config(config: I2cConfig) -> Result<(), Error> {
 
 fn validate_analog_output_config(config: AnalogOutputConfig) -> Result<(), Error> {
     validate_frequency_hz(config.frequency_hz)
+}
+
+fn validate_pwm_servo_config(config: PwmServoConfig) -> Result<(), Error> {
+    validate_frequency_hz(config.frequency_hz)?;
+    if config.pin < 0 {
+        return Err(Error::InvalidValue("servo pin"));
+    }
+    if config.channel > 7 {
+        return Err(Error::InvalidValue("servo channel"));
+    }
+    if config.timer > 3 {
+        return Err(Error::InvalidValue("servo timer"));
+    }
+    if config.min_pulse_us == 0 || config.min_pulse_us >= config.max_pulse_us {
+        return Err(Error::InvalidValue("servo pulse"));
+    }
+    if config.min_angle_tenths >= config.max_angle_tenths {
+        return Err(Error::InvalidValue("servo angle"));
+    }
+    if config.neutral_angle_tenths < config.min_angle_tenths
+        || config.neutral_angle_tenths > config.max_angle_tenths
+    {
+        return Err(Error::InvalidValue("servo neutral"));
+    }
+    Ok(())
+}
+
+fn validate_stackchan_pose(pose: StackChanPose) -> Result<(), Error> {
+    if pose.pan_tenths < StackChanServoConfig::PAN_MIN_TENTHS
+        || pose.pan_tenths > StackChanServoConfig::PAN_MAX_TENTHS
+    {
+        return Err(Error::InvalidValue("stackchan pan"));
+    }
+    if pose.tilt_tenths < StackChanServoConfig::TILT_MIN_TENTHS
+        || pose.tilt_tenths > StackChanServoConfig::TILT_MAX_TENTHS
+    {
+        return Err(Error::InvalidValue("stackchan tilt"));
+    }
+    Ok(())
+}
+
+fn step_axis(current: i16, target: i16, step_tenths: u16) -> i16 {
+    let step = i16::try_from(step_tenths).unwrap_or(i16::MAX);
+    if current < target {
+        current.saturating_add(step).min(target)
+    } else if current > target {
+        current.saturating_sub(step).max(target)
+    } else {
+        current
+    }
+}
+
+fn clamp_f32(value: f32, min: f32, max: f32) -> f32 {
+    if value.is_nan() {
+        0.0
+    } else if value < min {
+        min
+    } else if value > max {
+        max
+    } else {
+        value
+    }
+}
+
+fn degrees_to_tenths(degrees: f32) -> i16 {
+    (degrees * 10.0).round() as i16
 }
 
 fn validate_baud(baud: u32) -> Result<(), Error> {
@@ -11252,6 +11939,47 @@ mod tests {
         );
         assert!(i2c_scan().is_empty());
         i2c_end();
+    }
+
+    #[test]
+    fn stackchan_motion_contract_clamps_like_mcp() {
+        let command = StackChanMove::from_mcp(12.25, 91.0, -5);
+        assert_eq!(command.x_tenths, 123);
+        assert_eq!(command.y_tenths, StackChanMotionContract::Y_MAX_TENTHS);
+        assert_eq!(
+            command.speed_percent,
+            StackChanMotionContract::SPEED_MIN_PERCENT
+        );
+
+        let command = StackChanMove::new(180, -10, 150);
+        assert_eq!(command.x_tenths, StackChanMotionContract::X_MAX_TENTHS);
+        assert_eq!(command.y_tenths, StackChanMotionContract::Y_MIN_TENTHS);
+        assert_eq!(
+            command.speed_percent,
+            StackChanMotionContract::SPEED_MAX_PERCENT
+        );
+        assert_eq!(
+            command.bsp_y_tenths(),
+            StackChanMotionContract::Y_HARDWARE_MIN_TENTHS
+        );
+        assert_eq!(command.bsp_speed(), 1000);
+
+        let command = StackChanMove::from_tenths(-2000, 900, 42);
+        assert_eq!(command.x_tenths, StackChanMotionContract::X_MIN_TENTHS);
+        assert_eq!(command.y_tenths, StackChanMotionContract::Y_MAX_TENTHS);
+        assert_eq!(
+            command.bsp_y_tenths(),
+            StackChanMotionContract::Y_HARDWARE_MAX_TENTHS
+        );
+        assert_eq!(command.bsp_speed(), 420);
+    }
+
+    #[test]
+    fn stackchan_bsp_motion_uses_host_stub_boundary() {
+        assert!(matches!(
+            StackChanBspMotion::begin(),
+            Err(Error::Unavailable("stackchan bsp motion"))
+        ));
     }
 
     #[test]

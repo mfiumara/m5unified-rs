@@ -36,6 +36,7 @@ They compile against the local `m5unified` Rust API. On non-ESP-IDF host targets
 - `M5Cardputer HY2.0-4P Grove analog/PWM boundary` → `cardputer_grove_analog`
 - `M5Cardputer raw SPI boundary` → `cardputer_spi`
 - `M5Cardputer HY2.0-4P Grove UART boundary` → `cardputer_grove_uart`
+- `M5Stack StackChan generic PWM fallback` → `stackchan_servo`
 
 ## Run/check
 
@@ -44,8 +45,11 @@ bash scripts/check-host.sh
 cargo run
 cargo run -p m5unified-examples --bin basic_displays
 cargo run --bin basic_button
+cargo run -p m5unified-examples --bin stackchan_servo
 ```
 
 From the workspace root, plain `cargo run` launches `basic_how_to_use` as the default host-checkable smoke example. Use `cargo run --bin <name>` for any specific translated upstream example listed above.
 
 The advanced network/Bluetooth/codec examples currently define the Rust API boundary and compile-time sample shape. They intentionally leave codec/network stack selection to the application crate while routing display/speaker/control operations through `m5unified`.
+
+`stackchan_servo` is scoped to the generic PWM pan/tilt fallback useful for custom Stack-chan style builds: attach two servos, move to neutral/look poses, and run a small smooth sweep. Official Stack-chan CoreS3 bodies are not Port A PWM devices; MCP-compatible firmware should use StackChan-BSP Motion with `M5StackChan.begin()`/`update()`, VM_EN/IO-expander power setup, yaw `x` -128..128, pitch `y` 0..90 with hardware clamp 5..85, speed percent mapped to BSP speed * 10, and home/nod/shake/status endpoints.

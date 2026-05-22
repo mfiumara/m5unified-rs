@@ -97,6 +97,15 @@ pub struct m5u_touch_point_t {
 }
 
 #[repr(C)]
+#[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]
+pub struct m5u_stackchan_motion_status_t {
+    pub ready: bool,
+    pub moving: bool,
+    pub yaw_tenths: i16,
+    pub pitch_tenths: i16,
+}
+
+#[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct m5u_cardputer_keyboard_state_t {
     pub tab: bool,
@@ -1292,6 +1301,23 @@ extern "C" {
     pub fn m5u_gpio_analog_write(pin: c_int, duty: u8) -> bool;
     pub fn m5u_gpio_analog_write_frequency(pin: c_int, frequency_hz: u32) -> bool;
     pub fn m5u_gpio_analog_write_resolution(pin: c_int, resolution_bits: u8) -> bool;
+    pub fn m5u_servo_attach(
+        pin: c_int,
+        channel: c_int,
+        timer: c_int,
+        frequency_hz: u32,
+        min_us: u16,
+        max_us: u16,
+    ) -> bool;
+    pub fn m5u_servo_detach(channel: c_int) -> bool;
+    pub fn m5u_servo_write_pulse_us(channel: c_int, pulse_us: u16) -> bool;
+    pub fn m5u_stackchan_motion_begin() -> bool;
+    pub fn m5u_stackchan_motion_update();
+    pub fn m5u_stackchan_motion_move(yaw_tenths: i16, pitch_tenths: i16, speed_bsp: u16) -> bool;
+    pub fn m5u_stackchan_motion_home(speed_bsp: u16) -> bool;
+    pub fn m5u_stackchan_motion_nod() -> bool;
+    pub fn m5u_stackchan_motion_shake() -> bool;
+    pub fn m5u_stackchan_motion_status(out: *mut m5u_stackchan_motion_status_t) -> bool;
     pub fn m5u_spi_begin(sck: c_int, miso: c_int, mosi: c_int, cs: c_int) -> bool;
     pub fn m5u_spi_end();
     pub fn m5u_spi_transfer_byte(value: u8, frequency_hz: u32, mode: u8, lsb_first: bool) -> u8;
@@ -3384,6 +3410,48 @@ mod host_stubs {
         false
     }
     pub unsafe fn m5u_gpio_analog_write_resolution(_pin: c_int, _resolution_bits: u8) -> bool {
+        false
+    }
+    pub unsafe fn m5u_servo_attach(
+        _pin: c_int,
+        _channel: c_int,
+        _timer: c_int,
+        _frequency_hz: u32,
+        _min_us: u16,
+        _max_us: u16,
+    ) -> bool {
+        false
+    }
+    pub unsafe fn m5u_servo_detach(_channel: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_servo_write_pulse_us(_channel: c_int, _pulse_us: u16) -> bool {
+        false
+    }
+    pub unsafe fn m5u_stackchan_motion_begin() -> bool {
+        false
+    }
+    pub unsafe fn m5u_stackchan_motion_update() {}
+    pub unsafe fn m5u_stackchan_motion_move(
+        _yaw_tenths: i16,
+        _pitch_tenths: i16,
+        _speed_bsp: u16,
+    ) -> bool {
+        false
+    }
+    pub unsafe fn m5u_stackchan_motion_home(_speed_bsp: u16) -> bool {
+        false
+    }
+    pub unsafe fn m5u_stackchan_motion_nod() -> bool {
+        false
+    }
+    pub unsafe fn m5u_stackchan_motion_shake() -> bool {
+        false
+    }
+    pub unsafe fn m5u_stackchan_motion_status(out: *mut m5u_stackchan_motion_status_t) -> bool {
+        if let Some(out) = out.as_mut() {
+            *out = m5u_stackchan_motion_status_t::default();
+        }
         false
     }
     pub unsafe fn m5u_spi_begin(_sck: c_int, _miso: c_int, _mosi: c_int, _cs: c_int) -> bool {

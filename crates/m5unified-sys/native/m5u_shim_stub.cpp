@@ -108,6 +108,50 @@ bool m5u_btn_c_was_released(void) {
     return false;
 }
 
+bool m5u_servo_attach(int pin, int channel, int timer, uint32_t frequency_hz, uint16_t min_us, uint16_t max_us) {
+    (void)pin; (void)channel; (void)timer; (void)frequency_hz; (void)min_us; (void)max_us;
+    return false;
+}
+
+bool m5u_servo_detach(int channel) {
+    (void)channel;
+    return false;
+}
+
+bool m5u_servo_write_pulse_us(int channel, uint16_t pulse_us) {
+    (void)channel; (void)pulse_us;
+    return false;
+}
+
+bool m5u_stackchan_motion_begin(void) { return false; }
+
+void m5u_stackchan_motion_update(void) {}
+
+bool m5u_stackchan_motion_move(int16_t yaw_tenths, int16_t pitch_tenths, uint16_t speed_bsp) {
+    (void)yaw_tenths; (void)pitch_tenths; (void)speed_bsp;
+    return false;
+}
+
+bool m5u_stackchan_motion_home(uint16_t speed_bsp) {
+    (void)speed_bsp;
+    return false;
+}
+
+bool m5u_stackchan_motion_nod(void) { return false; }
+
+bool m5u_stackchan_motion_shake(void) { return false; }
+
+bool m5u_stackchan_motion_status(m5u_stackchan_motion_status_t* out) {
+    if (out == nullptr) {
+        return false;
+    }
+    out->ready = false;
+    out->moving = false;
+    out->yaw_tenths = 0;
+    out->pitch_tenths = 0;
+    return false;
+}
+
 bool m5u_mic_begin(void) {
     return false;
 }
