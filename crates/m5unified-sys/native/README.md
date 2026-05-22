@@ -12,15 +12,16 @@ This directory contains the C ABI shim that lets Rust call the real C++ M5Unifie
 
 ## Intended integration
 
-For the first on-device spike, copy or symlink this directory into an `esp-idf-sys` firmware project as a component, for example:
+For on-device builds, expose this directory through an `esp-idf-sys` component,
+as the repository's `examples` package does for `hello_display`:
 
 ```text
-firmware/
+examples/
   Cargo.toml
   build.rs
   sdkconfig.defaults
   components/
-    m5unified-rs-shim/
+    m5unified-rs/
       CMakeLists.txt
       idf_component.yml
       m5u_shim.cpp
@@ -32,8 +33,7 @@ Then build the firmware for ESP32-S3 with the Rust ESP-IDF toolchain. Firmware b
 
 For host-side C ABI checks that need a C++ object without M5Unified, configure the component with `M5UNIFIED_RS_USE_HOST_STUB=ON` so CMake selects `m5u_shim_stub.cpp` instead. The normal Rust host tests use Rust-side stubs and do not compile either C++ file.
 
-Cardputer firmware should also make the M5Cardputer Arduino library available to ESP-IDF/Arduino and define `M5UNIFIED_RS_USE_REAL_M5CARDPUTER=1`. Define `M5UNIFIED_RS_USE_ARDUINO_GPIO=1` when Arduino GPIO helpers are available and the firmware wants Grove GPIO helpers. Define `M5UNIFIED_RS_USE_ARDUINO_SD=1` when the Arduino `SPI`/`SD` libraries are available and the firmware wants the Cardputer microSD mount, status, and file helpers. Define `M5UNIFIED_RS_USE_ARDUINO_SERIAL=1` when Arduino `Serial1` is available and the firmware wants Grove UART helpers. Define `M5UNIFIED_RS_USE_ARDUINO_WIRE=1` when Arduino `Wire` is available and the firmware wants Grove I2C helpers. Define `M5UNIFIED_RS_USE_ARDUINO_IRREMOTE=1` when Arduino-IRremote is available and the firmware wants NEC IR transmit helpers. The repository's `firmware/cardputer-keyboard` package shows the intended CMake wiring for that path.
-
 ## Current limitation
 
-This is a component scaffold, not a fully automated Cargo-to-ESP-IDF linkage path yet. The firmware packages under `firmware/` consume the shim by relative path and are the hardware validation targets.
+This is a component scaffold. The `examples` package owns the current
+Cargo-to-ESP-IDF linkage for hardware smoke samples.

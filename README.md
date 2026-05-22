@@ -1,90 +1,117 @@
 # m5unified-rs
 
-Rust bindings for [M5Unified](https://github.com/m5stack/M5Unified).
+[![crates.io](https://img.shields.io/crates/v/m5unified.svg)](https://crates.io/crates/m5unified)
+[![crates.io](https://img.shields.io/crates/v/m5unified-sys.svg)](https://crates.io/crates/m5unified-sys)
 
-This repository is planned as a Cargo workspace containing two crates:
+Rust bindings for [M5Unified](https://github.com/m5stack/M5Unified), the
+board support library used across M5Stack ESP32 devices.
 
-- `m5unified-sys` — raw/unsafe Rust bindings to a tiny C ABI shim over the C++ M5Unified API.
-- `m5unified` — safe ergonomic Rust wrapper around `m5unified-sys`.
+The project publishes two crates:
 
-## Initial goal
+- [`m5unified`](https://docs.rs/m5unified) - safe Rust API for common
+  M5Unified display, button, microphone, speaker, IMU, touch, RTC, power, log,
+  and SD-card operations.
+- [`m5unified-sys`](https://docs.rs/m5unified-sys) - raw FFI declarations plus
+  the C/C++ ESP-IDF component shim used by the safe crate.
 
-The first milestone is intentionally small:
+The binding strategy is intentionally narrow: Rust calls a plain `extern "C"`
+shim instead of trying to bind the full M5Unified C++ class surface directly.
 
-1. Build M5Unified/M5GFX as ESP-IDF components inside a Rust ESP-IDF project.
-2. Call `M5.begin()` from Rust through a C shim.
-3. Draw basic text or fill the screen from Rust.
-4. Read M5StickS3 buttons from Rust.
-5. Add microphone recording after display/button are proven.
+## Install
 
-This is not intended to bind the full C++ API directly. The Rust side should bind plain `extern "C"` functions exposed by a small C++ shim.
+For applications, depend on the safe wrapper:
 
-## Repository layout
+```toml
+[dependencies]
+m5unified = "0.3"
+```
+
+Use `m5unified-sys` directly only when writing lower-level bindings or firmware
+integration code that needs the raw C ABI.
+
+## Quick Start
+
+```rust
+use m5unified::{colors, M5Unified};
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let mut m5 = M5Unified::begin()?;
+
+    m5.display.fill_screen(colors::BLACK);
+    m5.display.set_text_size(2);
+    m5.display.println("hello from Rust")?;
+
+    loop {
+        m5.update();
+        if m5.buttons.a().was_pressed() {
+            m5.display.println("Button A")?;
+        }
+        m5.delay_ms(16);
+    }
+}
+```
+
+## Target Support
+
+On ESP-IDF targets, `m5unified-sys` declares the C ABI that is implemented by
+the native shim in this repository. Firmware projects should include that shim
+as an ESP-IDF component so the Rust crate links against the real M5Unified and
+M5GFX libraries.
+
+On non-ESP-IDF host targets, `m5unified-sys` provides no-op Rust stubs. This
+keeps the safe wrapper and translated examples buildable in CI and on developer
+machines without M5Stack hardware. Host stubs are for compile-time checking, not
+hardware simulation.
+
+## API Surface
+
+The current wrapper covers the API used by the translated upstream examples:
+
+- startup configuration through `M5UnifiedConfig` and `M5Unified::begin_with_config`
+- display drawing primitives, Bezier/wide/gradient lines, ellipse arcs, smooth fills, gradient fills, pivot/clip/scroll state, power/inversion/color-depth state, raw/base color state, windowed transactions, block/fill writes, display capability/DMA status, progress bars, RGB565 image buffer push/readback, BMP/JPG/PNG/QOI image drawing, QR codes, text, text metrics, numeric text drawing, `core::fmt::Write` formatting, color, fonts, EPD modes, scrolling, transactions, and indexed multi-display drawing
+- button press, release, hold, click, click-count, timing, threshold, and state helpers
+- microphone recording, recording state, sample-rate, configuration helpers, and simple RMS calculation
+- speaker configuration, running/playing state, tone, PCM, WAV, channel, repeat, and volume controls
+- IMU acceleration, gyro, temperature, sensor masks, axis order, calibration, raw data, NVS offsets, and direct AK8963/BMM150/BMI270/MPU6886/SH200Q sensor helpers
+- touch points, touch detail state, flick/drag state helpers, and touch thresholds
+- RTC init, date/time, date-only/time-only, low-voltage and IRQ helpers, direct PCF8563/RX8130/PowerHub RTC access, system-time sync, power PMIC type, battery/VBUS/external-port readings, sleep/power-off, output/charge controls, direct AXP192, AXP2101, AW32001, PY32 PMIC, IP5306, BQ27220 gauge, INA226, and INA3221 power-monitor helpers, LED control/color batches/type queries, direct PowerHub LED and RMT LED strip helpers, logging dump/path/configuration/callbacks, `core::fmt::Write` log formatting, and SD SPI mount helpers
+- internal/external I2C bus setup, raw transfers, register helpers, device helpers, bit helpers, address scanning, board IO expander helpers, and direct PI4IOE5V6408 control
+- named board identity, timing helpers, `M5Timer` callback scheduling, pin lookup, primary/log display selection, and touch-button sizing
+
+This is not a complete M5Unified port yet. Missing APIs should be added through
+the C ABI shim first, then wrapped by `m5unified`.
+
+## Repository Layout
 
 ```text
 crates/
-  m5unified-sys/   raw bindings + native C/C++ shim
+  m5unified-sys/   raw bindings and native C/C++ shim
   m5unified/       safe Rust wrapper
 examples/          host-checkable Rust ports of upstream M5Unified examples
-firmware/          ESP-IDF Rust firmware spikes for real hardware validation
+docs/              example mapping, project plans, and release notes
 ```
-
-## Status
-
-The workspace now has a host-checkable Rust API surface for the upstream example categories:
-
-- display drawing/text
-- display enumeration and primary-display selection
-- Cardputer keyboard input
-- Cardputer microSD mount/status and file helpers
-- Cardputer IR NEC transmit boundary
-- Cardputer Grove I2C boundary
-- Cardputer Grove GPIO boundary
-- Cardputer Grove analog/PWM boundary
-- Cardputer raw SPI boundary
-- Cardputer Grove UART boundary
-- runtime board detection
-- timing helpers
-- buttons
-- board-aware pin lookup
-- microphone/speaker
-- IMU
-- touch
-- touch button geometry
-- RTC
-- power/battery
-- RGB LED
-- logging
-- log target configuration
-- SD-card boundary
-
-The C++ shim declares the matching C ABI. Host builds use no-op stubs so examples compile without hardware. ESP-IDF builds now have a native component scaffold in [`crates/m5unified-sys/native`](crates/m5unified-sys/native), plus a first firmware package in [`firmware/hello-display`](firmware/hello-display) that consumes that shim as an ESP-IDF component for M5StickS3-class hardware validation.
 
 ## Examples
 
-Rust translations/smoke ports of every upstream M5Unified example directory live in the `examples` workspace package. See [`examples/README.md`](examples/README.md) for the upstream-to-Rust mapping.
+Rust translations and smoke ports of upstream M5Unified examples live in the
+repository's `examples` workspace package. They are intentionally not published
+as a crate.
 
 ```bash
 bash scripts/check-host.sh
 cargo run -p m5unified-examples --bin basic_displays
-cargo run -p m5unified-examples --bin cardputer_keyboard
-cargo run -p m5unified-examples --bin cardputer_sd
-cargo run -p m5unified-examples --bin cardputer_sd_file
-cargo run -p m5unified-examples --bin cardputer_ir_nec
-cargo run -p m5unified-examples --bin cardputer_grove_i2c
-cargo run -p m5unified-examples --bin cardputer_grove_gpio
-cargo run -p m5unified-examples --bin cardputer_grove_analog
-cargo run -p m5unified-examples --bin cardputer_spi
-cargo run -p m5unified-examples --bin cardputer_grove_uart
 ```
 
-## Firmware spike
+See the repository docs for the upstream-to-Rust example mapping and firmware
+bring-up instructions.
 
-The first ESP-IDF Rust firmware package lives in [`firmware/hello-display`](firmware/hello-display). It is excluded from the host workspace because it requires the esp-rs `xtensa-esp32s3-espidf` toolchain.
+## On-Device Hello Display
 
-The first Cardputer-specific firmware package lives in [`firmware/cardputer-keyboard`](firmware/cardputer-keyboard). It enables the optional `M5Cardputer` shim path and validates display output plus keyboard input from Rust.
+The `examples` package includes `hello_display`, a M5StickS3 smoke sample that
+can be built for `xtensa-esp32s3-espidf` while the rest of the workspace remains
+host-checkable through stubs.
 
-If Cargo reports `custom toolchain 'esp' ... is not installed`, install the esp-rs toolchain first:
+Install the esp-rs tools before building for hardware:
 
 ```bash
 cargo +stable install espup
@@ -93,88 +120,34 @@ espup install
 cargo +stable install espflash
 ```
 
-Use `+stable` for the install commands, or run them outside `firmware/hello-display`, because that directory's `rust-toolchain.toml` selects the not-yet-installed `esp` toolchain.
-
-On macOS, if the ESP-IDF build later reports missing native build tools, install:
+Then build and flash the sample:
 
 ```bash
-brew install cmake ninja dfu-util ccache
+bash tools/build_espidf_smoke.sh
+espflash flash --monitor target/xtensa-esp32s3-espidf/debug/hello_display
 ```
 
-If the ESP-IDF install fails while creating an environment named like `idf5.3_py3.14_env`, Homebrew's `python3` is too new for this ESP-IDF version. Use Python 3.12 for the build:
+Expected hardware behavior: the display shows `hello from rust`; Button A/B
+presses change the screen.
+
+Record hardware runs in `docs/examples/hardware-verification.md`.
+
+## Release Checks
 
 ```bash
-brew install python@3.12
-export PATH="$(brew --prefix python@3.12)/libexec/bin:$PATH"
-python3 --version  # should print Python 3.12.x
-rm -rf firmware/hello-display/.embuild/espressif/python_env
+python3 tools/check_examples_manifest.py
+python3 tools/check_no_sys_in_examples.py
+bash scripts/check-host.sh
+bash tools/build_espidf_smoke.sh
+cargo package -p m5unified-sys
+cargo publish -p m5unified-sys --dry-run
 ```
 
-If Python 3.12 then fails in `ensurepip` with a `pyexpat`/`libexpat` symbol error, repair Homebrew's expat linkage or use pyenv:
+Publish `m5unified-sys` before `m5unified`, because the safe crate depends on
+the exact sys crate version through crates.io. Package and dry-run `m5unified`
+after the sys crate upload has propagated. See `docs/publishing.md` in the
+repository for the full release checklist.
 
-```bash
-brew reinstall expat python@3.12
-export PATH="$(brew --prefix python@3.12)/libexec/bin:$PATH"
-export DYLD_LIBRARY_PATH="$(brew --prefix expat)/lib:${DYLD_LIBRARY_PATH:-}"
-python3 -c 'import pyexpat; print(pyexpat.EXPAT_VERSION)'
-rm -rf firmware/hello-display/.embuild/espressif/python_env
-```
+## License
 
-Fallback:
-
-```bash
-brew install pyenv
-pyenv install 3.11.9
-export PATH="$(pyenv root)/versions/3.11.9/bin:$PATH"
-python3 -c 'import pyexpat; print(pyexpat.EXPAT_VERSION)'
-rm -rf firmware/hello-display/.embuild/espressif/python_env
-```
-
-```bash
-cd firmware/hello-display
-cargo build --target xtensa-esp32s3-espidf
-espflash flash --monitor target/xtensa-esp32s3-espidf/debug/m5unified-hello-display
-```
-
-Expected hardware behavior: the display shows `hello from rust`; Button A/B presses change the screen.
-
-For the Cardputer keyboard firmware:
-
-```bash
-cd firmware/cardputer-keyboard
-cargo build --target xtensa-esp32s3-espidf
-espflash flash --monitor target/xtensa-esp32s3-espidf/debug/m5unified-cardputer-keyboard
-```
-
-Expected hardware behavior: typed keys appear on the display, Backspace deletes one character, Enter clears the input line, Button A toggles caps lock and sends a sample NEC IR frame, and the screen reports whether the built-in microSD slot, IR transmitter, and Grove I2C bus initialized.
-
-## Cardputer support
-
-Cardputer-specific Rust APIs start at `m5unified::Cardputer`. The first supported board-specific surfaces are the keyboard, built-in microSD slot, IR NEC transmit boundary, and Grove I2C/GPIO/UART boundaries:
-
-```rust
-let mut cardputer = m5unified::Cardputer::begin()?;
-cardputer.update();
-if let Some(state) = cardputer.keyboard.state() {
-    let typed = state.word_lossy();
-}
-let sd_mounted = cardputer.sd.begin();
-let _written = cardputer.sd.write_file("/m5rs.txt", b"hello")?;
-let ir_ready = cardputer.ir.begin();
-let grove_ready = cardputer.grove.i2c_try_begin().is_ok();
-let uart_ready = cardputer.grove.uart_try_begin(115_200).is_ok();
-let grove_adc = cardputer.grove.analog_read(m5unified::GrovePin::G1);
-let spi_ready = cardputer.spi.begin_with(m5unified::SpiPins::CARDPUTER_SD);
-cardputer.led.set_all_color(m5unified::rgb::GREEN);
-let port_a_sda = cardputer.pin(m5unified::PinName::PORT_A_SDA);
-let board = cardputer.board();
-```
-
-The generic shim still builds against plain M5Unified by default. To compile the optional C++ Cardputer path for firmware, make the `M5Cardputer` library available to ESP-IDF/Arduino and set `M5UNIFIED_RS_ENABLE_CARDPUTER=ON` for the native component so it defines `M5UNIFIED_RS_USE_REAL_M5CARDPUTER`.
-
-## Plans and publishing
-
-- [`docs/plans/2026-05-15-m5unified-rs-roadmap.md`](docs/plans/2026-05-15-m5unified-rs-roadmap.md) contains the original implementation roadmap.
-- [`docs/plans/2026-05-16-complete-m5unified-examples.md`](docs/plans/2026-05-16-complete-m5unified-examples.md) tracks the full upstream-example parity plan.
-- [`docs/examples/upstream-examples.toml`](docs/examples/upstream-examples.toml) maps upstream examples to Rust bins.
-- [`docs/publishing.md`](docs/publishing.md) documents the crates.io release order for `m5unified-sys` and `m5unified`.
+Licensed under either MIT or Apache-2.0, at your option.

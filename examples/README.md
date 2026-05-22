@@ -27,15 +27,7 @@ They compile against the local `m5unified` Rust API. On non-ESP-IDF host targets
 - `examples/Advanced/Speak_with_AquesTalk` → `advanced_speak_with_aquestalk`
 - `examples/PlatformIO_SDL/src` → `platformio_sdl`
 - `examples/Test/build_test` → `test_build_test`
-- `M5Cardputer/examples/Basic/Keyboard` → `cardputer_keyboard`
-- `M5Cardputer/examples/Basic/SDCard` → `cardputer_sd`
-- `M5Cardputer SDCard file read/write boundary` → `cardputer_sd_file`
-- `M5Cardputer/examples/Basic/IR_NEC` → `cardputer_ir_nec`
-- `M5Cardputer HY2.0-4P Grove I2C boundary` → `cardputer_grove_i2c`
-- `M5Cardputer HY2.0-4P Grove GPIO boundary` → `cardputer_grove_gpio`
-- `M5Cardputer HY2.0-4P Grove analog/PWM boundary` → `cardputer_grove_analog`
-- `M5Cardputer raw SPI boundary` → `cardputer_spi`
-- `M5Cardputer HY2.0-4P Grove UART boundary` → `cardputer_grove_uart`
+- local M5StickS3 hardware smoke sample → `hello_display`
 
 ## Run/check
 
@@ -48,4 +40,12 @@ cargo run --bin basic_button
 
 From the workspace root, plain `cargo run` launches `basic_how_to_use` as the default host-checkable smoke example. Use `cargo run --bin <name>` for any specific translated upstream example listed above.
 
-The advanced network/Bluetooth/codec examples currently define the Rust API boundary and compile-time sample shape. They intentionally leave codec/network stack selection to the application crate while routing display/speaker/control operations through `m5unified`.
+To build and flash the M5StickS3 hello-display smoke sample:
+
+```bash
+cd examples
+cargo build --bin hello_display --target xtensa-esp32s3-espidf
+espflash flash --monitor ../target/xtensa-esp32s3-espidf/debug/hello_display
+```
+
+The advanced network/Bluetooth/codec/TTS examples compile, but entries that need ESP8266Audio, Bluetooth A2DP, or AquesTalk are marked `blocked` in `docs/examples/upstream-examples.toml`. They show a clear unavailable path while keeping codec, network, Bluetooth, and licensed TTS stack selection outside the core `m5unified` crate.

@@ -587,6 +587,22 @@ Generated from `/tmp/M5Unified-examples-inventory`.
 
 ### `Power`
 - `getBatteryLevel`
+- `getBatteryVoltage`
+- `getBatteryCurrent`
+- `getExtOutput`
+- `getKeyState`
+- `getType`
+- `getUsbOutput`
+- `getVBUSVoltage`
+- `isCharging`
+- `setBatteryCharge`
+- `setChargeCurrent`
+- `setChargeVoltage`
+- `setExtOutput`
+- `setExtPower`
+- `setLed`
+- `setUsbOutput`
+- `setVibration`
 
 ### `Rtc`
 - `getDateTime`

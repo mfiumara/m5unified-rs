@@ -4,31 +4,27 @@ use m5unified_examples::{banner, ExampleResult};
 fn main() -> ExampleResult {
     let mut m5 = M5Unified::begin()?;
     banner(&mut m5, "Basic/Imu")?;
-    if m5.imu.try_begin().is_err() {
+    if !m5.imu.begin() {
         m5.display.println("imu unavailable")?;
         return Ok(());
     }
-    if let Ok(data) = m5.imu.try_data() {
+    if let Some(data) = m5.imu.data() {
+        let accel = data.accel;
         m5.display.println(&format!(
-            "accel: {:.2}, {:.2}, {:.2} |g|={:.2}",
-            data.accel.x,
-            data.accel.y,
-            data.accel.z,
-            data.accel_magnitude()
+            "accel: {:.2}, {:.2}, {:.2}",
+            accel.x, accel.y, accel.z
         ))?;
+        let gyro = data.gyro;
         m5.display.println(&format!(
-            "gyro: {:.2}, {:.2}, {:.2} |dps|={:.2}",
-            data.gyro.x,
-            data.gyro.y,
-            data.gyro.z,
-            data.gyro_magnitude()
+            "gyro: {:.2}, {:.2}, {:.2}",
+            gyro.x, gyro.y, gyro.z
         ))?;
-        if let Some(temp) = data.temperature_c {
-            m5.display.println(&format!("temp: {temp:.1} C"))?;
-        }
+        let mag = data.mag;
+        m5.display
+            .println(&format!("mag: {:.2}, {:.2}, {:.2}", mag.x, mag.y, mag.z))?;
     }
-    let raw = m5.imu.raw_data_array();
-    m5.display
-        .println(&format!("raw[0..3]: {}, {}, {}", raw[0], raw[1], raw[2]))?;
+    if let Some(temp) = m5.imu.temperature_c() {
+        m5.display.println(&format!("temp: {temp:.1} C"))?;
+    }
     Ok(())
 }
