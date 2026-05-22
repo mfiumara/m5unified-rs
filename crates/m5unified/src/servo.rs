@@ -170,7 +170,7 @@ impl StackChanServos {
 
     /// Set the in-memory zero position for `id` to the servo's current raw position.
     ///
-    /// Call [`save_calibration`] afterwards to persist to NVS.
+    /// Call [`Self::save_calibration`] afterwards to persist to NVS.
     /// Returns the new zero raw value, or `None` on bus error.
     pub fn calibrate_from_current_pos(&mut self, id: u8) -> Option<u16> {
         let raw = self.read_raw_pos(id)?;

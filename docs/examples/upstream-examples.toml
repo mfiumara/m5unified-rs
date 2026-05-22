@@ -163,3 +163,102 @@ category = "extra"
 requires = ["display"]
 extra = true
 notes = "Repository-local smoke/example target, not an upstream .ino example."
+
+[[example]]
+upstream = "extra/cardputer_keyboard"
+rust_bin = "cardputer_keyboard"
+status = "host_compiles"
+category = "extra"
+requires = ["cardputer", "keyboard", "display"]
+extra = true
+notes = "Repository-local Cardputer keyboard smoke example."
+
+[[example]]
+upstream = "extra/cardputer_grove_analog"
+rust_bin = "cardputer_grove_analog"
+status = "host_compiles"
+category = "extra"
+requires = ["cardputer", "grove", "analog", "display"]
+extra = true
+notes = "Repository-local Cardputer Grove analog/PWM smoke example."
+
+[[example]]
+upstream = "extra/cardputer_grove_gpio"
+rust_bin = "cardputer_grove_gpio"
+status = "host_compiles"
+category = "extra"
+requires = ["cardputer", "grove", "gpio", "display"]
+extra = true
+notes = "Repository-local Cardputer Grove GPIO smoke example."
+
+[[example]]
+upstream = "extra/cardputer_grove_i2c"
+rust_bin = "cardputer_grove_i2c"
+status = "host_compiles"
+category = "extra"
+requires = ["cardputer", "grove", "i2c", "display"]
+extra = true
+notes = "Repository-local Cardputer Grove I2C smoke example."
+
+[[example]]
+upstream = "extra/cardputer_grove_uart"
+rust_bin = "cardputer_grove_uart"
+status = "host_compiles"
+category = "extra"
+requires = ["cardputer", "grove", "uart", "display"]
+extra = true
+notes = "Repository-local Cardputer Grove UART smoke example."
+
+[[example]]
+upstream = "extra/cardputer_ir_nec"
+rust_bin = "cardputer_ir_nec"
+status = "host_compiles"
+category = "extra"
+requires = ["cardputer", "ir", "display"]
+extra = true
+notes = "Repository-local Cardputer NEC IR smoke example."
+
+[[example]]
+upstream = "extra/cardputer_sd"
+rust_bin = "cardputer_sd"
+status = "host_compiles"
+category = "extra"
+requires = ["cardputer", "sd", "display"]
+extra = true
+notes = "Repository-local Cardputer SD card info smoke example."
+
+[[example]]
+upstream = "extra/cardputer_sd_file"
+rust_bin = "cardputer_sd_file"
+status = "host_compiles"
+category = "extra"
+requires = ["cardputer", "sd", "display"]
+extra = true
+notes = "Repository-local Cardputer SD file operations smoke example."
+
+[[example]]
+upstream = "extra/cardputer_spi"
+rust_bin = "cardputer_spi"
+status = "host_compiles"
+category = "extra"
+requires = ["cardputer", "spi", "display"]
+extra = true
+notes = "Repository-local Cardputer SPI smoke example."
+
+[[example]]
+upstream = "extra/servo_calibrate"
+rust_bin = "servo_calibrate"
+status = "host_compiles"
+category = "extra"
+requires = ["display", "buttons", "servo", "nvs"]
+extra = true
+notes = "Repository-local StackChan servo calibration utility."
+
+[[example]]
+upstream = "extra/stackchan_face"
+rust_bin = "stackchan_face"
+status = "host_compiles"
+category = "extra"
+requires = ["display", "canvas", "servo"]
+extra = true
+notes = "Repository-local StackChan face and servo demo."
