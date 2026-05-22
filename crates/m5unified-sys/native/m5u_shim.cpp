@@ -1,6 +1,24 @@
 #include "m5u_shim.h"
 
 #include <M5Unified.h>
+#ifdef M5UNIFIED_RS_USE_REAL_M5CARDPUTER
+#include <M5Cardputer.h>
+#endif
+#if defined(M5UNIFIED_RS_USE_ARDUINO_GPIO) || defined(M5UNIFIED_RS_USE_ARDUINO_SERIAL)
+#include <Arduino.h>
+#endif
+#ifdef M5UNIFIED_RS_USE_ARDUINO_WIRE
+#include <Wire.h>
+#endif
+#ifdef M5UNIFIED_RS_USE_ARDUINO_IRREMOTE
+#ifndef DISABLE_CODE_FOR_RECEIVER
+#define DISABLE_CODE_FOR_RECEIVER
+#endif
+#ifndef SEND_PWM_BY_TIMER
+#define SEND_PWM_BY_TIMER
+#endif
+#include <IRremote.hpp>
+#endif
 #include <utility/PI4IOE5V6408_Class.hpp>
 #include <utility/imu/AK8963_Class.hpp>
 #include <utility/imu/BMI270_Class.hpp>
@@ -4608,6 +4626,343 @@ void m5u_servo_deinit(void) {
     if (!s_servo_initialized) return;
     uart_driver_delete(M5U_SERVO_UART_NUM);
     s_servo_initialized = false;
+}
+
+bool m5u_cardputer_begin(bool enable_keyboard) {
+#ifdef M5UNIFIED_RS_USE_REAL_M5CARDPUTER
+    M5Cardputer.begin(m5u_apply_config(nullptr), enable_keyboard);
+    return true;
+#else
+    (void)enable_keyboard;
+    return false;
+#endif
+}
+
+bool m5u_cardputer_begin_with_config(const m5u_config_t* config, bool enable_keyboard) {
+#ifdef M5UNIFIED_RS_USE_REAL_M5CARDPUTER
+    M5Cardputer.begin(m5u_apply_config(config), enable_keyboard);
+    return true;
+#else
+    (void)config;
+    (void)enable_keyboard;
+    return false;
+#endif
+}
+
+void m5u_cardputer_update(void) {
+#ifdef M5UNIFIED_RS_USE_REAL_M5CARDPUTER
+    M5Cardputer.update();
+#endif
+}
+
+void m5u_cardputer_keyboard_begin(void) {
+#ifdef M5UNIFIED_RS_USE_REAL_M5CARDPUTER
+    M5Cardputer.Keyboard.begin();
+#endif
+}
+
+bool m5u_cardputer_keyboard_is_pressed(void) {
+#ifdef M5UNIFIED_RS_USE_REAL_M5CARDPUTER
+    return M5Cardputer.Keyboard.isPressed() != 0;
+#else
+    return false;
+#endif
+}
+
+uint8_t m5u_cardputer_keyboard_pressed_count(void) {
+#ifdef M5UNIFIED_RS_USE_REAL_M5CARDPUTER
+    return M5Cardputer.Keyboard.isPressed();
+#else
+    return 0;
+#endif
+}
+
+bool m5u_cardputer_keyboard_is_change(void) {
+#ifdef M5UNIFIED_RS_USE_REAL_M5CARDPUTER
+    return M5Cardputer.Keyboard.isChange();
+#else
+    return false;
+#endif
+}
+
+bool m5u_cardputer_keyboard_is_key_pressed(uint8_t key) {
+#ifdef M5UNIFIED_RS_USE_REAL_M5CARDPUTER
+    return M5Cardputer.Keyboard.isKeyPressed((char)key);
+#else
+    (void)key;
+    return false;
+#endif
+}
+
+uint8_t m5u_cardputer_keyboard_get_key(uint8_t x, uint8_t y) {
+#ifdef M5UNIFIED_RS_USE_REAL_M5CARDPUTER
+    Point2D_t key_coor;
+    key_coor.x = x;
+    key_coor.y = y;
+    return M5Cardputer.Keyboard.getKey(key_coor);
+#else
+    (void)x;
+    (void)y;
+    return 0;
+#endif
+}
+
+bool m5u_cardputer_keyboard_get_key_value(uint8_t x, uint8_t y, m5u_cardputer_key_value_t* out) {
+    if (!out) { return false; }
+    memset(out, 0, sizeof(*out));
+#ifdef M5UNIFIED_RS_USE_REAL_M5CARDPUTER
+    if (x >= 14 || y >= 4) { return false; }
+    Point2D_t key_coor;
+    key_coor.x = x;
+    key_coor.y = y;
+    auto value = M5Cardputer.Keyboard.getKeyValue(key_coor);
+    out->first = static_cast<uint8_t>(value.value_first);
+    out->second = static_cast<uint8_t>(value.value_second);
+    return true;
+#else
+    (void)x;
+    (void)y;
+    return false;
+#endif
+}
+
+bool m5u_cardputer_keyboard_get_state(m5u_cardputer_keyboard_state_t* out) {
+    if (!out) { return false; }
+    memset(out, 0, sizeof(*out));
+#ifdef M5UNIFIED_RS_USE_REAL_M5CARDPUTER
+    M5Cardputer.Keyboard.updateKeysState();
+    auto& state = M5Cardputer.Keyboard.keysState();
+    out->tab = state.tab;
+    out->fn_key = state.fn;
+    out->shift = state.shift;
+    out->ctrl = state.ctrl;
+    out->opt = state.opt;
+    out->alt = state.alt;
+    out->del = state.del;
+    out->enter = state.enter;
+    out->space = state.space;
+    out->modifiers = state.modifiers;
+
+    out->word_len = state.word.size();
+    if (out->word_len > M5U_CARDPUTER_KEYBOARD_WORD_CAPACITY) {
+        out->word_len = M5U_CARDPUTER_KEYBOARD_WORD_CAPACITY;
+    }
+    for (size_t i = 0; i < out->word_len; ++i) {
+        out->word[i] = static_cast<uint8_t>(state.word[i]);
+    }
+
+    out->hid_len = state.hid_keys.size();
+    if (out->hid_len > M5U_CARDPUTER_KEYBOARD_HID_CAPACITY) {
+        out->hid_len = M5U_CARDPUTER_KEYBOARD_HID_CAPACITY;
+    }
+    for (size_t i = 0; i < out->hid_len; ++i) {
+        out->hid_keys[i] = static_cast<uint8_t>(state.hid_keys[i]);
+    }
+
+    out->modifier_len = state.modifier_keys.size();
+    if (out->modifier_len > M5U_CARDPUTER_KEYBOARD_MODIFIER_CAPACITY) {
+        out->modifier_len = M5U_CARDPUTER_KEYBOARD_MODIFIER_CAPACITY;
+    }
+    for (size_t i = 0; i < out->modifier_len; ++i) {
+        out->modifier_keys[i] = static_cast<uint8_t>(state.modifier_keys[i]);
+    }
+#endif
+    return true;
+}
+
+bool m5u_cardputer_keyboard_capslocked(void) {
+#ifdef M5UNIFIED_RS_USE_REAL_M5CARDPUTER
+    return M5Cardputer.Keyboard.capslocked();
+#else
+    return false;
+#endif
+}
+
+void m5u_cardputer_keyboard_set_capslocked(bool locked) {
+#ifdef M5UNIFIED_RS_USE_REAL_M5CARDPUTER
+    M5Cardputer.Keyboard.setCapsLocked(locked);
+#else
+    (void)locked;
+#endif
+}
+
+bool m5u_cardputer_ir_begin(int pin) {
+#ifdef M5UNIFIED_RS_USE_ARDUINO_IRREMOTE
+    IrSender.begin(DISABLE_LED_FEEDBACK);
+    IrSender.setSendPin(pin);
+    return true;
+#else
+    (void)pin;
+    return false;
+#endif
+}
+
+bool m5u_cardputer_ir_send_nec(uint16_t address, uint8_t command, uint8_t repeats) {
+#ifdef M5UNIFIED_RS_USE_ARDUINO_IRREMOTE
+    IrSender.sendNEC(address, command, repeats);
+    return true;
+#else
+    (void)address;
+    (void)command;
+    (void)repeats;
+    return false;
+#endif
+}
+
+bool m5u_cardputer_grove_i2c_begin(int sda, int scl, uint32_t frequency_hz) {
+#ifdef M5UNIFIED_RS_USE_ARDUINO_WIRE
+    return Wire.begin(sda, scl, frequency_hz);
+#else
+    (void)sda;
+    (void)scl;
+    (void)frequency_hz;
+    return false;
+#endif
+}
+
+void m5u_cardputer_grove_i2c_end(void) {
+#ifdef M5UNIFIED_RS_USE_ARDUINO_WIRE
+    Wire.end();
+#endif
+}
+
+bool m5u_cardputer_grove_i2c_probe(uint8_t address) {
+#ifdef M5UNIFIED_RS_USE_ARDUINO_WIRE
+    Wire.beginTransmission(address);
+    return Wire.endTransmission() == 0;
+#else
+    (void)address;
+    return false;
+#endif
+}
+
+bool m5u_cardputer_grove_i2c_write(uint8_t address, const uint8_t* data, size_t len) {
+#ifdef M5UNIFIED_RS_USE_ARDUINO_WIRE
+    Wire.beginTransmission(address);
+    if (data && len) {
+        Wire.write(data, len);
+    }
+    return Wire.endTransmission() == 0;
+#else
+    (void)address;
+    (void)data;
+    (void)len;
+    return false;
+#endif
+}
+
+size_t m5u_cardputer_grove_i2c_read(uint8_t address, uint8_t* data, size_t len) {
+#ifdef M5UNIFIED_RS_USE_ARDUINO_WIRE
+    if (!data || !len) { return 0; }
+    size_t requested = Wire.requestFrom((int)address, (int)len);
+    size_t read_len = 0;
+    while (Wire.available() && read_len < requested && read_len < len) {
+        data[read_len++] = static_cast<uint8_t>(Wire.read());
+    }
+    return read_len;
+#else
+    (void)address;
+    (void)data;
+    (void)len;
+    return 0;
+#endif
+}
+
+bool m5u_cardputer_grove_gpio_pin_mode(int pin, int mode) {
+#ifdef M5UNIFIED_RS_USE_ARDUINO_GPIO
+    switch (mode) {
+    case 0: pinMode(pin, INPUT); return true;
+    case 1: pinMode(pin, OUTPUT); return true;
+    case 2: pinMode(pin, INPUT_PULLUP); return true;
+    case 3: pinMode(pin, INPUT_PULLDOWN); return true;
+    default: return false;
+    }
+#else
+    (void)pin;
+    (void)mode;
+    return false;
+#endif
+}
+
+bool m5u_cardputer_grove_gpio_write(int pin, bool high) {
+#ifdef M5UNIFIED_RS_USE_ARDUINO_GPIO
+    digitalWrite(pin, high ? HIGH : LOW);
+    return true;
+#else
+    (void)pin;
+    (void)high;
+    return false;
+#endif
+}
+
+int m5u_cardputer_grove_gpio_read(int pin) {
+#ifdef M5UNIFIED_RS_USE_ARDUINO_GPIO
+    return digitalRead(pin) == HIGH ? 1 : 0;
+#else
+    (void)pin;
+    return -1;
+#endif
+}
+
+bool m5u_cardputer_grove_uart_begin(int rx, int tx, uint32_t baud) {
+#ifdef M5UNIFIED_RS_USE_ARDUINO_SERIAL
+    Serial1.begin(baud, SERIAL_8N1, rx, tx);
+    return true;
+#else
+    (void)rx;
+    (void)tx;
+    (void)baud;
+    return false;
+#endif
+}
+
+void m5u_cardputer_grove_uart_end(void) {
+#ifdef M5UNIFIED_RS_USE_ARDUINO_SERIAL
+    Serial1.end();
+#endif
+}
+
+size_t m5u_cardputer_grove_uart_available(void) {
+#ifdef M5UNIFIED_RS_USE_ARDUINO_SERIAL
+    int available = Serial1.available();
+    return available > 0 ? static_cast<size_t>(available) : 0;
+#else
+    return 0;
+#endif
+}
+
+size_t m5u_cardputer_grove_uart_read(uint8_t* data, size_t len) {
+#ifdef M5UNIFIED_RS_USE_ARDUINO_SERIAL
+    if (!data || !len) { return 0; }
+    size_t read_len = 0;
+    while (read_len < len && Serial1.available() > 0) {
+        int value = Serial1.read();
+        if (value < 0) { break; }
+        data[read_len++] = static_cast<uint8_t>(value);
+    }
+    return read_len;
+#else
+    (void)data;
+    (void)len;
+    return 0;
+#endif
+}
+
+size_t m5u_cardputer_grove_uart_write(const uint8_t* data, size_t len) {
+#ifdef M5UNIFIED_RS_USE_ARDUINO_SERIAL
+    if (!data || !len) { return 0; }
+    return Serial1.write(data, len);
+#else
+    (void)data;
+    (void)len;
+    return 0;
+#endif
+}
+
+void m5u_cardputer_grove_uart_flush(void) {
+#ifdef M5UNIFIED_RS_USE_ARDUINO_SERIAL
+    Serial1.flush();
+#endif
 }
 
 // ─── NVS helpers ────────────────────────────────────────────────────────────

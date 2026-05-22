@@ -843,6 +843,64 @@ bool m5u_sd_begin_spi(const m5u_sd_spi_config_t* config);
 bool m5u_sd_is_mounted(void);
 void m5u_sd_end(void);
 
+#define M5U_CARDPUTER_KEYBOARD_WORD_CAPACITY 32
+#define M5U_CARDPUTER_KEYBOARD_HID_CAPACITY 32
+#define M5U_CARDPUTER_KEYBOARD_MODIFIER_CAPACITY 8
+
+typedef struct {
+    bool tab;
+    bool fn_key;
+    bool shift;
+    bool ctrl;
+    bool opt;
+    bool alt;
+    bool del;
+    bool enter;
+    bool space;
+    uint8_t modifiers;
+    size_t word_len;
+    uint8_t word[M5U_CARDPUTER_KEYBOARD_WORD_CAPACITY];
+    size_t hid_len;
+    uint8_t hid_keys[M5U_CARDPUTER_KEYBOARD_HID_CAPACITY];
+    size_t modifier_len;
+    uint8_t modifier_keys[M5U_CARDPUTER_KEYBOARD_MODIFIER_CAPACITY];
+} m5u_cardputer_keyboard_state_t;
+
+typedef struct {
+    uint8_t first;
+    uint8_t second;
+} m5u_cardputer_key_value_t;
+
+bool m5u_cardputer_begin(bool enable_keyboard);
+bool m5u_cardputer_begin_with_config(const m5u_config_t* config, bool enable_keyboard);
+void m5u_cardputer_update(void);
+void m5u_cardputer_keyboard_begin(void);
+bool m5u_cardputer_keyboard_is_pressed(void);
+uint8_t m5u_cardputer_keyboard_pressed_count(void);
+bool m5u_cardputer_keyboard_is_change(void);
+bool m5u_cardputer_keyboard_is_key_pressed(uint8_t key);
+uint8_t m5u_cardputer_keyboard_get_key(uint8_t x, uint8_t y);
+bool m5u_cardputer_keyboard_get_key_value(uint8_t x, uint8_t y, m5u_cardputer_key_value_t* out);
+bool m5u_cardputer_keyboard_get_state(m5u_cardputer_keyboard_state_t* out);
+bool m5u_cardputer_keyboard_capslocked(void);
+void m5u_cardputer_keyboard_set_capslocked(bool locked);
+bool m5u_cardputer_ir_begin(int pin);
+bool m5u_cardputer_ir_send_nec(uint16_t address, uint8_t command, uint8_t repeats);
+bool m5u_cardputer_grove_i2c_begin(int sda, int scl, uint32_t frequency_hz);
+void m5u_cardputer_grove_i2c_end(void);
+bool m5u_cardputer_grove_i2c_probe(uint8_t address);
+bool m5u_cardputer_grove_i2c_write(uint8_t address, const uint8_t* data, size_t len);
+size_t m5u_cardputer_grove_i2c_read(uint8_t address, uint8_t* data, size_t len);
+bool m5u_cardputer_grove_gpio_pin_mode(int pin, int mode);
+bool m5u_cardputer_grove_gpio_write(int pin, bool high);
+int m5u_cardputer_grove_gpio_read(int pin);
+bool m5u_cardputer_grove_uart_begin(int rx, int tx, uint32_t baud);
+void m5u_cardputer_grove_uart_end(void);
+size_t m5u_cardputer_grove_uart_available(void);
+size_t m5u_cardputer_grove_uart_read(uint8_t* data, size_t len);
+size_t m5u_cardputer_grove_uart_write(const uint8_t* data, size_t len);
+void m5u_cardputer_grove_uart_flush(void);
+
 // Off-screen canvas (LGFX_Sprite) — draw everything here, then push to display
 // in one DMA transfer to eliminate per-primitive flicker.
 

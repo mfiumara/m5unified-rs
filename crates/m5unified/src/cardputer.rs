@@ -9,8 +9,8 @@ use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 
 use crate::{
-    sd_begin_with_config, sd_end, sd_is_mounted, Button, ButtonId, Buttons, Display, Error, I2cBus,
-    Led, Log, M5UnifiedConfig, Mic, Power, SdSpiConfig, Speaker, SD_MOUNT_PATH,
+    sd_begin_with_config, sd_end, sd_is_mounted, Button, ButtonId, Buttons, Display, Error, Led,
+    Log, M5UnifiedConfig, Mic, Power, SdSpiConfig, Speaker, SD_MOUNT_PATH,
 };
 
 #[derive(Debug)]
@@ -39,16 +39,18 @@ impl Cardputer {
         Self::begin_with_config_and_keyboard(config, true)
     }
 
-    pub fn begin_with_keyboard(_enable_keyboard: bool) -> Result<Self, Error> {
-        Self::from_begin_result(unsafe { m5unified_sys::m5u_begin() })
+    pub fn begin_with_keyboard(enable_keyboard: bool) -> Result<Self, Error> {
+        Self::from_begin_result(unsafe { m5unified_sys::m5u_cardputer_begin(enable_keyboard) })
     }
 
     pub fn begin_with_config_and_keyboard(
         config: &M5UnifiedConfig,
-        _enable_keyboard: bool,
+        enable_keyboard: bool,
     ) -> Result<Self, Error> {
         let raw = config.to_raw();
-        Self::from_begin_result(unsafe { m5unified_sys::m5u_begin_with_config(&raw) })
+        Self::from_begin_result(unsafe {
+            m5unified_sys::m5u_cardputer_begin_with_config(&raw, enable_keyboard)
+        })
     }
 
     fn from_begin_result(ok: bool) -> Result<Self, Error> {
@@ -75,7 +77,7 @@ impl Cardputer {
     }
 
     pub fn update(&mut self) {
-        unsafe { m5unified_sys::m5u_update() }
+        unsafe { m5unified_sys::m5u_cardputer_update() }
     }
 
     pub fn delay_ms(&self, ms: u32) {
@@ -181,26 +183,32 @@ impl CardputerKeyboard {
     pub const COLUMNS: u8 = 14;
     pub const ROWS: u8 = 4;
 
-    pub fn begin(&mut self) {}
+    pub fn begin(&mut self) {
+        unsafe { m5unified_sys::m5u_cardputer_keyboard_begin() }
+    }
 
     pub fn is_pressed(&self) -> bool {
-        false
+        unsafe { m5unified_sys::m5u_cardputer_keyboard_is_pressed() }
     }
 
     pub fn pressed_count(&self) -> u8 {
-        0
+        unsafe { m5unified_sys::m5u_cardputer_keyboard_pressed_count() }
     }
 
     pub fn is_change(&self) -> bool {
-        false
+        unsafe { m5unified_sys::m5u_cardputer_keyboard_is_change() }
     }
 
-    pub fn is_key_pressed(&self, _key: u8) -> bool {
-        false
+    pub fn is_key_pressed(&self, key: u8) -> bool {
+        unsafe { m5unified_sys::m5u_cardputer_keyboard_is_key_pressed(key) }
     }
 
     pub fn key_at(&self, x: u8, y: u8) -> Option<u8> {
-        (x < Self::COLUMNS && y < Self::ROWS).then_some(0)
+        if x >= Self::COLUMNS || y >= Self::ROWS {
+            return None;
+        }
+        let key = unsafe { m5unified_sys::m5u_cardputer_keyboard_get_key(x, y) };
+        (key != 0).then_some(key)
     }
 
     pub fn try_key_at(&self, x: u8, y: u8) -> Result<u8, Error> {
@@ -209,7 +217,15 @@ impl CardputerKeyboard {
     }
 
     pub fn key_value_at(&self, x: u8, y: u8) -> Option<CardputerKeyValue> {
-        (x < Self::COLUMNS && y < Self::ROWS).then_some(CardputerKeyValue::default())
+        if x >= Self::COLUMNS || y >= Self::ROWS {
+            return None;
+        }
+        let mut raw = m5unified_sys::m5u_cardputer_key_value_t::default();
+        let ok = unsafe { m5unified_sys::m5u_cardputer_keyboard_get_key_value(x, y, &mut raw) };
+        ok.then_some(CardputerKeyValue {
+            first: raw.first,
+            second: raw.second,
+        })
     }
 
     pub fn try_key_value_at(&self, x: u8, y: u8) -> Result<CardputerKeyValue, Error> {
@@ -218,7 +234,35 @@ impl CardputerKeyboard {
     }
 
     pub fn state(&self) -> Option<CardputerKeyboardState> {
-        Some(CardputerKeyboardState::default())
+        let mut raw = m5unified_sys::m5u_cardputer_keyboard_state_t::default();
+        let ok = unsafe { m5unified_sys::m5u_cardputer_keyboard_get_state(&mut raw) };
+        if !ok {
+            return None;
+        }
+        let word_len = raw
+            .word_len
+            .min(m5unified_sys::M5U_CARDPUTER_KEYBOARD_WORD_CAPACITY);
+        let hid_len = raw
+            .hid_len
+            .min(m5unified_sys::M5U_CARDPUTER_KEYBOARD_HID_CAPACITY);
+        let modifier_len = raw
+            .modifier_len
+            .min(m5unified_sys::M5U_CARDPUTER_KEYBOARD_MODIFIER_CAPACITY);
+        Some(CardputerKeyboardState {
+            tab: raw.tab,
+            fn_key: raw.fn_key,
+            shift: raw.shift,
+            ctrl: raw.ctrl,
+            opt: raw.opt,
+            alt: raw.alt,
+            del: raw.del,
+            enter: raw.enter,
+            space: raw.space,
+            modifiers: raw.modifiers,
+            word: raw.word[..word_len].to_vec(),
+            hid_keys: raw.hid_keys[..hid_len].to_vec(),
+            modifier_keys: raw.modifier_keys[..modifier_len].to_vec(),
+        })
     }
 
     pub fn try_state(&self) -> Result<CardputerKeyboardState, Error> {
@@ -234,10 +278,12 @@ impl CardputerKeyboard {
     }
 
     pub fn capslocked(&self) -> bool {
-        false
+        unsafe { m5unified_sys::m5u_cardputer_keyboard_capslocked() }
     }
 
-    pub fn set_capslocked(&mut self, _locked: bool) {}
+    pub fn set_capslocked(&mut self, locked: bool) {
+        unsafe { m5unified_sys::m5u_cardputer_keyboard_set_capslocked(locked) }
+    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -522,19 +568,25 @@ impl CardputerIr {
     pub const BUILTIN_TX_PIN: i32 = 44;
 
     pub fn try_begin(&mut self) -> Result<(), Error> {
-        Err(Error::Unavailable("cardputer ir"))
+        self.try_begin_on_pin(Self::BUILTIN_TX_PIN)
     }
 
-    pub fn try_begin_on_pin(&mut self, _pin: i32) -> Result<(), Error> {
-        Err(Error::Unavailable("cardputer ir"))
+    pub fn try_begin_on_pin(&mut self, pin: i32) -> Result<(), Error> {
+        unsafe { m5unified_sys::m5u_cardputer_ir_begin(pin) }
+            .then_some(())
+            .ok_or(Error::Unavailable("cardputer ir"))
     }
 
     pub fn send_nec(&mut self, frame: NecFrame) -> bool {
         self.try_send_nec(frame).is_ok()
     }
 
-    pub fn try_send_nec(&mut self, _frame: NecFrame) -> Result<(), Error> {
-        Err(Error::Unavailable("cardputer ir"))
+    pub fn try_send_nec(&mut self, frame: NecFrame) -> Result<(), Error> {
+        unsafe {
+            m5unified_sys::m5u_cardputer_ir_send_nec(frame.address, frame.command, frame.repeats)
+        }
+        .then_some(())
+        .ok_or(Error::Unavailable("cardputer ir"))
     }
 }
 
@@ -582,6 +634,17 @@ pub enum GpioMode {
     InputPulldown,
 }
 
+impl GpioMode {
+    pub const fn raw(self) -> i32 {
+        match self {
+            Self::Input => 0,
+            Self::Output => 1,
+            Self::InputPullup => 2,
+            Self::InputPulldown => 3,
+        }
+    }
+}
+
 impl CardputerGrove {
     pub const DEFAULT_I2C_FREQUENCY_HZ: u32 = 100_000;
     pub const I2C_SDA: i32 = 2;
@@ -592,60 +655,68 @@ impl CardputerGrove {
     }
 
     pub fn i2c_try_begin_with_frequency(&mut self, frequency_hz: u32) -> Result<(), Error> {
-        let mut bus = I2cBus::EXTERNAL;
-        bus.begin_with_port(0, Self::I2C_SDA, Self::I2C_SCL)
-            .then_some(())
-            .ok_or(Error::Unavailable("cardputer grove i2c"))?;
-        let _ = frequency_hz;
-        Ok(())
+        unsafe {
+            m5unified_sys::m5u_cardputer_grove_i2c_begin(Self::I2C_SDA, Self::I2C_SCL, frequency_hz)
+        }
+        .then_some(())
+        .ok_or(Error::Unavailable("cardputer grove i2c"))
     }
 
     pub fn i2c_end(&mut self) {
-        let mut bus = I2cBus::EXTERNAL;
-        let _ = bus.release();
+        unsafe { m5unified_sys::m5u_cardputer_grove_i2c_end() }
     }
 
     pub fn i2c_scan(&self) -> Vec<I2cAddress> {
-        I2cBus::EXTERNAL
-            .scan(Self::DEFAULT_I2C_FREQUENCY_HZ)
-            .iter()
-            .enumerate()
-            .filter_map(|(index, present)| present.then(|| I2cAddress::new(index as u8)).flatten())
+        (0..=I2cAddress::MAX_7BIT)
+            .filter_map(|address| {
+                unsafe { m5unified_sys::m5u_cardputer_grove_i2c_probe(address) }
+                    .then(|| I2cAddress::new(address))
+                    .flatten()
+            })
             .collect()
     }
 
     pub fn i2c_try_write(&mut self, address: I2cAddress, data: &[u8]) -> Result<(), Error> {
-        let mut bus = I2cBus::EXTERNAL;
-        if !bus.start(address.raw(), false, Self::DEFAULT_I2C_FREQUENCY_HZ) {
-            return Err(Error::Unavailable("cardputer grove i2c"));
+        unsafe {
+            m5unified_sys::m5u_cardputer_grove_i2c_write(address.raw(), data.as_ptr(), data.len())
         }
-        let ok = bus.write(data);
-        let _ = bus.stop();
-        ok.then_some(())
-            .ok_or(Error::Unavailable("cardputer grove i2c"))
+        .then_some(())
+        .ok_or(Error::Unavailable("cardputer grove i2c"))
     }
 
     pub fn i2c_try_read(&mut self, address: I2cAddress, buffer: &mut [u8]) -> Result<usize, Error> {
-        let mut bus = I2cBus::EXTERNAL;
-        if !bus.start(address.raw(), true, Self::DEFAULT_I2C_FREQUENCY_HZ) {
-            return Err(Error::Unavailable("cardputer grove i2c"));
+        let read = unsafe {
+            m5unified_sys::m5u_cardputer_grove_i2c_read(
+                address.raw(),
+                buffer.as_mut_ptr(),
+                buffer.len(),
+            )
+        };
+        if read == buffer.len() {
+            Ok(read)
+        } else {
+            Err(Error::Unavailable("cardputer grove i2c"))
         }
-        let ok = bus.read(buffer, true);
-        let _ = bus.stop();
-        ok.then_some(buffer.len())
-            .ok_or(Error::Unavailable("cardputer grove i2c"))
     }
 
-    pub fn gpio_try_pin_mode(&mut self, _pin: GrovePin, _mode: GpioMode) -> Result<(), Error> {
-        Err(Error::Unavailable("cardputer grove gpio"))
+    pub fn gpio_try_pin_mode(&mut self, pin: GrovePin, mode: GpioMode) -> Result<(), Error> {
+        unsafe { m5unified_sys::m5u_cardputer_grove_gpio_pin_mode(pin.raw(), mode.raw()) }
+            .then_some(())
+            .ok_or(Error::Unavailable("cardputer grove gpio"))
     }
 
-    pub fn gpio_try_read(&self, _pin: GrovePin) -> Result<bool, Error> {
-        Err(Error::Unavailable("cardputer grove gpio"))
+    pub fn gpio_try_read(&self, pin: GrovePin) -> Result<bool, Error> {
+        match unsafe { m5unified_sys::m5u_cardputer_grove_gpio_read(pin.raw()) } {
+            0 => Ok(false),
+            1 => Ok(true),
+            _ => Err(Error::Unavailable("cardputer grove gpio")),
+        }
     }
 
-    pub fn gpio_try_write(&mut self, _pin: GrovePin, _high: bool) -> Result<(), Error> {
-        Err(Error::Unavailable("cardputer grove gpio"))
+    pub fn gpio_try_write(&mut self, pin: GrovePin, high: bool) -> Result<(), Error> {
+        unsafe { m5unified_sys::m5u_cardputer_grove_gpio_write(pin.raw(), high) }
+            .then_some(())
+            .ok_or(Error::Unavailable("cardputer grove gpio"))
     }
 
     pub fn analog_read_millivolts(&self, pin: GrovePin) -> Option<u16> {
@@ -680,29 +751,44 @@ impl CardputerGrove {
         Err(Error::Unavailable("cardputer grove analog"))
     }
 
-    pub fn uart_try_begin(&mut self, _baud: u32) -> Result<(), Error> {
-        Err(Error::Unavailable("cardputer grove uart"))
+    pub fn uart_try_begin(&mut self, baud: u32) -> Result<(), Error> {
+        unsafe { m5unified_sys::m5u_cardputer_grove_uart_begin(Self::I2C_SCL, Self::I2C_SDA, baud) }
+            .then_some(())
+            .ok_or(Error::Unavailable("cardputer grove uart"))
     }
 
-    pub fn uart_end(&mut self) {}
+    pub fn uart_end(&mut self) {
+        unsafe { m5unified_sys::m5u_cardputer_grove_uart_end() }
+    }
 
     pub fn uart_available(&self) -> usize {
-        0
+        unsafe { m5unified_sys::m5u_cardputer_grove_uart_available() }
     }
 
-    pub fn uart_try_read(&mut self, _buffer: &mut [u8]) -> Result<usize, Error> {
-        Err(Error::Unavailable("cardputer grove uart"))
+    pub fn uart_try_read(&mut self, buffer: &mut [u8]) -> Result<usize, Error> {
+        let read = unsafe {
+            m5unified_sys::m5u_cardputer_grove_uart_read(buffer.as_mut_ptr(), buffer.len())
+        };
+        (read > 0)
+            .then_some(read)
+            .ok_or(Error::Unavailable("cardputer grove uart"))
     }
 
-    pub fn uart_try_write_all(&mut self, _data: &[u8]) -> Result<usize, Error> {
-        Err(Error::Unavailable("cardputer grove uart"))
+    pub fn uart_try_write_all(&mut self, data: &[u8]) -> Result<usize, Error> {
+        let written =
+            unsafe { m5unified_sys::m5u_cardputer_grove_uart_write(data.as_ptr(), data.len()) };
+        (written == data.len())
+            .then_some(written)
+            .ok_or(Error::Unavailable("cardputer grove uart"))
     }
 
     pub fn uart_try_write_str(&mut self, text: &str) -> Result<usize, Error> {
         self.uart_try_write_all(text.as_bytes())
     }
 
-    pub fn uart_flush(&mut self) {}
+    pub fn uart_flush(&mut self) {
+        unsafe { m5unified_sys::m5u_cardputer_grove_uart_flush() }
+    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]

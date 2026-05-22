@@ -2242,6 +2242,45 @@ void m5u_canvas_fill_arc(int /*x*/, int /*y*/, int /*r0*/, int /*r1*/, float /*a
 void m5u_canvas_fill_ellipse(int /*x*/, int /*y*/, int /*rx*/, int /*ry*/, uint16_t /*c*/) {}
 void m5u_canvas_draw_ellipse(int /*x*/, int /*y*/, int /*rx*/, int /*ry*/, uint16_t /*c*/) {}
 
+bool m5u_cardputer_begin(bool /*enable_keyboard*/) { return false; }
+bool m5u_cardputer_begin_with_config(const m5u_config_t* /*config*/, bool /*enable_keyboard*/) { return false; }
+void m5u_cardputer_update(void) {}
+void m5u_cardputer_keyboard_begin(void) {}
+bool m5u_cardputer_keyboard_is_pressed(void) { return false; }
+uint8_t m5u_cardputer_keyboard_pressed_count(void) { return 0; }
+bool m5u_cardputer_keyboard_is_change(void) { return false; }
+bool m5u_cardputer_keyboard_is_key_pressed(uint8_t /*key*/) { return false; }
+uint8_t m5u_cardputer_keyboard_get_key(uint8_t /*x*/, uint8_t /*y*/) { return 0; }
+bool m5u_cardputer_keyboard_get_key_value(uint8_t /*x*/, uint8_t /*y*/, m5u_cardputer_key_value_t* out) {
+    if (!out) { return false; }
+    out->first = 0;
+    out->second = 0;
+    return false;
+}
+bool m5u_cardputer_keyboard_get_state(m5u_cardputer_keyboard_state_t* out) {
+    if (!out) { return false; }
+    *out = {};
+    return true;
+}
+bool m5u_cardputer_keyboard_capslocked(void) { return false; }
+void m5u_cardputer_keyboard_set_capslocked(bool /*locked*/) {}
+bool m5u_cardputer_ir_begin(int /*pin*/) { return false; }
+bool m5u_cardputer_ir_send_nec(uint16_t /*address*/, uint8_t /*command*/, uint8_t /*repeats*/) { return false; }
+bool m5u_cardputer_grove_i2c_begin(int /*sda*/, int /*scl*/, uint32_t /*frequency_hz*/) { return false; }
+void m5u_cardputer_grove_i2c_end(void) {}
+bool m5u_cardputer_grove_i2c_probe(uint8_t /*address*/) { return false; }
+bool m5u_cardputer_grove_i2c_write(uint8_t /*address*/, const uint8_t* /*data*/, size_t /*len*/) { return false; }
+size_t m5u_cardputer_grove_i2c_read(uint8_t /*address*/, uint8_t* /*data*/, size_t /*len*/) { return 0; }
+bool m5u_cardputer_grove_gpio_pin_mode(int /*pin*/, int /*mode*/) { return false; }
+bool m5u_cardputer_grove_gpio_write(int /*pin*/, bool /*high*/) { return false; }
+int m5u_cardputer_grove_gpio_read(int /*pin*/) { return -1; }
+bool m5u_cardputer_grove_uart_begin(int /*rx*/, int /*tx*/, uint32_t /*baud*/) { return false; }
+void m5u_cardputer_grove_uart_end(void) {}
+size_t m5u_cardputer_grove_uart_available(void) { return 0; }
+size_t m5u_cardputer_grove_uart_read(uint8_t* /*data*/, size_t /*len*/) { return 0; }
+size_t m5u_cardputer_grove_uart_write(const uint8_t* /*data*/, size_t /*len*/) { return 0; }
+void m5u_cardputer_grove_uart_flush(void) {}
+
 bool m5u_servo_init(int /*tx_pin*/, int /*rx_pin*/, int /*baud_rate*/) { return false; }
 bool m5u_servo_write_raw_pos(uint8_t /*id*/, uint16_t /*raw_pos*/, uint16_t /*time_ms*/, uint16_t /*speed*/) { return false; }
 int  m5u_servo_read_raw_pos(uint8_t /*id*/) { return -1; }

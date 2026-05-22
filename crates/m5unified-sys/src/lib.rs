@@ -49,6 +49,61 @@ impl Default for m5u_sd_spi_config_t {
     }
 }
 
+pub const M5U_CARDPUTER_KEYBOARD_WORD_CAPACITY: usize = 32;
+pub const M5U_CARDPUTER_KEYBOARD_HID_CAPACITY: usize = 32;
+pub const M5U_CARDPUTER_KEYBOARD_MODIFIER_CAPACITY: usize = 8;
+
+#[repr(C)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct m5u_cardputer_keyboard_state_t {
+    pub tab: bool,
+    pub fn_key: bool,
+    pub shift: bool,
+    pub ctrl: bool,
+    pub opt: bool,
+    pub alt: bool,
+    pub del: bool,
+    pub enter: bool,
+    pub space: bool,
+    pub modifiers: u8,
+    pub word_len: usize,
+    pub word: [u8; M5U_CARDPUTER_KEYBOARD_WORD_CAPACITY],
+    pub hid_len: usize,
+    pub hid_keys: [u8; M5U_CARDPUTER_KEYBOARD_HID_CAPACITY],
+    pub modifier_len: usize,
+    pub modifier_keys: [u8; M5U_CARDPUTER_KEYBOARD_MODIFIER_CAPACITY],
+}
+
+impl Default for m5u_cardputer_keyboard_state_t {
+    fn default() -> Self {
+        Self {
+            tab: false,
+            fn_key: false,
+            shift: false,
+            ctrl: false,
+            opt: false,
+            alt: false,
+            del: false,
+            enter: false,
+            space: false,
+            modifiers: 0,
+            word_len: 0,
+            word: [0; M5U_CARDPUTER_KEYBOARD_WORD_CAPACITY],
+            hid_len: 0,
+            hid_keys: [0; M5U_CARDPUTER_KEYBOARD_HID_CAPACITY],
+            modifier_len: 0,
+            modifier_keys: [0; M5U_CARDPUTER_KEYBOARD_MODIFIER_CAPACITY],
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Default, PartialEq, Eq)]
+pub struct m5u_cardputer_key_value_t {
+    pub first: u8,
+    pub second: u8,
+}
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct m5u_config_t {
@@ -1637,6 +1692,42 @@ extern "C" {
     pub fn m5u_sd_begin_spi(config: *const m5u_sd_spi_config_t) -> bool;
     pub fn m5u_sd_is_mounted() -> bool;
     pub fn m5u_sd_end();
+    pub fn m5u_cardputer_begin(enable_keyboard: bool) -> bool;
+    pub fn m5u_cardputer_begin_with_config(
+        config: *const m5u_config_t,
+        enable_keyboard: bool,
+    ) -> bool;
+    pub fn m5u_cardputer_update();
+    pub fn m5u_cardputer_keyboard_begin();
+    pub fn m5u_cardputer_keyboard_is_pressed() -> bool;
+    pub fn m5u_cardputer_keyboard_pressed_count() -> u8;
+    pub fn m5u_cardputer_keyboard_is_change() -> bool;
+    pub fn m5u_cardputer_keyboard_is_key_pressed(key: u8) -> bool;
+    pub fn m5u_cardputer_keyboard_get_key(x: u8, y: u8) -> u8;
+    pub fn m5u_cardputer_keyboard_get_key_value(
+        x: u8,
+        y: u8,
+        out: *mut m5u_cardputer_key_value_t,
+    ) -> bool;
+    pub fn m5u_cardputer_keyboard_get_state(out: *mut m5u_cardputer_keyboard_state_t) -> bool;
+    pub fn m5u_cardputer_keyboard_capslocked() -> bool;
+    pub fn m5u_cardputer_keyboard_set_capslocked(locked: bool);
+    pub fn m5u_cardputer_ir_begin(pin: c_int) -> bool;
+    pub fn m5u_cardputer_ir_send_nec(address: u16, command: u8, repeats: u8) -> bool;
+    pub fn m5u_cardputer_grove_i2c_begin(sda: c_int, scl: c_int, frequency_hz: u32) -> bool;
+    pub fn m5u_cardputer_grove_i2c_end();
+    pub fn m5u_cardputer_grove_i2c_probe(address: u8) -> bool;
+    pub fn m5u_cardputer_grove_i2c_write(address: u8, data: *const u8, len: usize) -> bool;
+    pub fn m5u_cardputer_grove_i2c_read(address: u8, data: *mut u8, len: usize) -> usize;
+    pub fn m5u_cardputer_grove_gpio_pin_mode(pin: c_int, mode: c_int) -> bool;
+    pub fn m5u_cardputer_grove_gpio_write(pin: c_int, high: bool) -> bool;
+    pub fn m5u_cardputer_grove_gpio_read(pin: c_int) -> c_int;
+    pub fn m5u_cardputer_grove_uart_begin(rx: c_int, tx: c_int, baud: u32) -> bool;
+    pub fn m5u_cardputer_grove_uart_end();
+    pub fn m5u_cardputer_grove_uart_available() -> usize;
+    pub fn m5u_cardputer_grove_uart_read(data: *mut u8, len: usize) -> usize;
+    pub fn m5u_cardputer_grove_uart_write(data: *const u8, len: usize) -> usize;
+    pub fn m5u_cardputer_grove_uart_flush();
     pub fn m5u_canvas_create(width: c_int, height: c_int) -> bool;
     pub fn m5u_canvas_push(x: c_int, y: c_int);
     pub fn m5u_canvas_delete();
@@ -4221,6 +4312,104 @@ mod host_stubs {
         false
     }
     pub unsafe fn m5u_sd_end() {}
+    pub unsafe fn m5u_cardputer_begin(_enable_keyboard: bool) -> bool {
+        false
+    }
+    pub unsafe fn m5u_cardputer_begin_with_config(
+        _config: *const m5u_config_t,
+        _enable_keyboard: bool,
+    ) -> bool {
+        false
+    }
+    pub unsafe fn m5u_cardputer_update() {}
+    pub unsafe fn m5u_cardputer_keyboard_begin() {}
+    pub unsafe fn m5u_cardputer_keyboard_is_pressed() -> bool {
+        false
+    }
+    pub unsafe fn m5u_cardputer_keyboard_pressed_count() -> u8 {
+        0
+    }
+    pub unsafe fn m5u_cardputer_keyboard_is_change() -> bool {
+        false
+    }
+    pub unsafe fn m5u_cardputer_keyboard_is_key_pressed(_key: u8) -> bool {
+        false
+    }
+    pub unsafe fn m5u_cardputer_keyboard_get_key(_x: u8, _y: u8) -> u8 {
+        0
+    }
+    pub unsafe fn m5u_cardputer_keyboard_get_key_value(
+        _x: u8,
+        _y: u8,
+        out: *mut m5u_cardputer_key_value_t,
+    ) -> bool {
+        if !out.is_null() {
+            *out = m5u_cardputer_key_value_t::default();
+        }
+        false
+    }
+    pub unsafe fn m5u_cardputer_keyboard_get_state(
+        out: *mut m5u_cardputer_keyboard_state_t,
+    ) -> bool {
+        if !out.is_null() {
+            *out = m5u_cardputer_keyboard_state_t::default();
+        }
+        true
+    }
+    pub unsafe fn m5u_cardputer_keyboard_capslocked() -> bool {
+        false
+    }
+    pub unsafe fn m5u_cardputer_keyboard_set_capslocked(_locked: bool) {}
+    pub unsafe fn m5u_cardputer_ir_begin(_pin: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_cardputer_ir_send_nec(_address: u16, _command: u8, _repeats: u8) -> bool {
+        false
+    }
+    pub unsafe fn m5u_cardputer_grove_i2c_begin(
+        _sda: c_int,
+        _scl: c_int,
+        _frequency_hz: u32,
+    ) -> bool {
+        false
+    }
+    pub unsafe fn m5u_cardputer_grove_i2c_end() {}
+    pub unsafe fn m5u_cardputer_grove_i2c_probe(_address: u8) -> bool {
+        false
+    }
+    pub unsafe fn m5u_cardputer_grove_i2c_write(
+        _address: u8,
+        _data: *const u8,
+        _len: usize,
+    ) -> bool {
+        false
+    }
+    pub unsafe fn m5u_cardputer_grove_i2c_read(_address: u8, _data: *mut u8, _len: usize) -> usize {
+        0
+    }
+    pub unsafe fn m5u_cardputer_grove_gpio_pin_mode(_pin: c_int, _mode: c_int) -> bool {
+        false
+    }
+    pub unsafe fn m5u_cardputer_grove_gpio_write(_pin: c_int, _high: bool) -> bool {
+        false
+    }
+    pub unsafe fn m5u_cardputer_grove_gpio_read(_pin: c_int) -> c_int {
+        -1
+    }
+    pub unsafe fn m5u_cardputer_grove_uart_begin(_rx: c_int, _tx: c_int, _baud: u32) -> bool {
+        false
+    }
+    pub unsafe fn m5u_cardputer_grove_uart_end() {}
+    pub unsafe fn m5u_cardputer_grove_uart_available() -> usize {
+        0
+    }
+    pub unsafe fn m5u_cardputer_grove_uart_read(_data: *mut u8, _len: usize) -> usize {
+        0
+    }
+    pub unsafe fn m5u_cardputer_grove_uart_write(_data: *const u8, _len: usize) -> usize {
+        0
+    }
+    pub unsafe fn m5u_cardputer_grove_uart_flush() {}
     pub unsafe fn m5u_canvas_create(_w: c_int, _h: c_int) -> bool {
         false
     }
