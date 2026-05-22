@@ -35,6 +35,10 @@ jobs:
   esp32s3-firmware:
     name: ESP32-S3 firmware build
     runs-on: ubuntu-latest
+    env:
+      CARGO_BUILD_JOBS: "4"
+      CMAKE_BUILD_PARALLEL_LEVEL: "4"
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -51,22 +55,21 @@ jobs:
             python3 \
             python3-pip
 
-      - name: Install stable Rust for espup
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Install esp-rs toolchain
-        run: |
-          cargo +stable install espup --locked
-          cargo +stable install ldproxy --locked
-          espup install
+      - name: Install ESP32-S3 Rust toolchain
+        uses: esp-rs/xtensa-toolchain@v1.7.0
+        with:
+          buildtargets: esp32s3
+          ldproxy: true
 
       - name: Cache ESP-IDF firmware cargo artifacts
         uses: Swatinem/rust-cache@v2
         with:
-          workspaces: firmware/hello-display -> target
+          workspaces: . -> target
+          cache-directories: .embuild
+          cache-on-failure: true
           key: esp32s3-firmware
 
       - name: Build hello-display firmware
         run: |
-          . ~/export-esp.sh
+          . "${ESPUP_EXPORT_FILE:-$HOME/export-esp.sh}"
           bash scripts/check-esp32s3-firmware.sh
