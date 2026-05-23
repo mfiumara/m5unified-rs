@@ -1733,9 +1733,19 @@ extern "C" {
     pub fn m5u_canvas_delete();
     pub fn m5u_canvas_fill_screen(color: u16);
     pub fn m5u_canvas_fill_smooth_circle(x: c_int, y: c_int, r: c_int, color: u16);
+    pub fn m5u_canvas_draw_line(x0: c_int, y0: c_int, x1: c_int, y1: c_int, color: u16);
     pub fn m5u_canvas_draw_circle(x: c_int, y: c_int, r: c_int, color: u16);
     pub fn m5u_canvas_fill_circle(x: c_int, y: c_int, r: c_int, color: u16);
     pub fn m5u_canvas_fill_rect(x: c_int, y: c_int, w: c_int, h: c_int, color: u16);
+    pub fn m5u_canvas_fill_triangle(
+        x0: c_int,
+        y0: c_int,
+        x1: c_int,
+        y1: c_int,
+        x2: c_int,
+        y2: c_int,
+        color: u16,
+    );
     pub fn m5u_canvas_fill_smooth_round_rect(
         x: c_int,
         y: c_int,
@@ -1755,6 +1765,11 @@ extern "C" {
     );
     pub fn m5u_canvas_fill_ellipse(x: c_int, y: c_int, rx: c_int, ry: c_int, color: u16);
     pub fn m5u_canvas_draw_ellipse(x: c_int, y: c_int, rx: c_int, ry: c_int, color: u16);
+    pub fn m5u_canvas_set_text_size(size: c_int);
+    pub fn m5u_canvas_set_text_color(fg: u16, bg: u16);
+    pub fn m5u_canvas_set_text_datum(datum: c_int);
+    pub fn m5u_canvas_text_width(text: *const c_char) -> c_int;
+    pub fn m5u_canvas_draw_string(text: *const c_char, x: c_int, y: c_int) -> c_int;
     pub fn m5u_servo_init(tx_pin: c_int, rx_pin: c_int, baud_rate: c_int) -> bool;
     pub fn m5u_servo_write_raw_pos(id: u8, raw_pos: u16, time_ms: u16, speed: u16) -> bool;
     pub fn m5u_servo_read_raw_pos(id: u8) -> c_int;
@@ -4417,9 +4432,20 @@ mod host_stubs {
     pub unsafe fn m5u_canvas_delete() {}
     pub unsafe fn m5u_canvas_fill_screen(_c: u16) {}
     pub unsafe fn m5u_canvas_fill_smooth_circle(_x: c_int, _y: c_int, _r: c_int, _c: u16) {}
+    pub unsafe fn m5u_canvas_draw_line(_x0: c_int, _y0: c_int, _x1: c_int, _y1: c_int, _c: u16) {}
     pub unsafe fn m5u_canvas_draw_circle(_x: c_int, _y: c_int, _r: c_int, _c: u16) {}
     pub unsafe fn m5u_canvas_fill_circle(_x: c_int, _y: c_int, _r: c_int, _c: u16) {}
     pub unsafe fn m5u_canvas_fill_rect(_x: c_int, _y: c_int, _w: c_int, _h: c_int, _c: u16) {}
+    pub unsafe fn m5u_canvas_fill_triangle(
+        _x0: c_int,
+        _y0: c_int,
+        _x1: c_int,
+        _y1: c_int,
+        _x2: c_int,
+        _y2: c_int,
+        _c: u16,
+    ) {
+    }
     pub unsafe fn m5u_canvas_fill_smooth_round_rect(
         _x: c_int,
         _y: c_int,
@@ -4441,6 +4467,15 @@ mod host_stubs {
     }
     pub unsafe fn m5u_canvas_fill_ellipse(_x: c_int, _y: c_int, _rx: c_int, _ry: c_int, _c: u16) {}
     pub unsafe fn m5u_canvas_draw_ellipse(_x: c_int, _y: c_int, _rx: c_int, _ry: c_int, _c: u16) {}
+    pub unsafe fn m5u_canvas_set_text_size(_size: c_int) {}
+    pub unsafe fn m5u_canvas_set_text_color(_fg: u16, _bg: u16) {}
+    pub unsafe fn m5u_canvas_set_text_datum(_datum: c_int) {}
+    pub unsafe fn m5u_canvas_text_width(_text: *const c_char) -> c_int {
+        0
+    }
+    pub unsafe fn m5u_canvas_draw_string(_text: *const c_char, _x: c_int, _y: c_int) -> c_int {
+        0
+    }
     pub unsafe fn m5u_servo_init(_tx_pin: c_int, _rx_pin: c_int, _baud_rate: c_int) -> bool {
         false
     }

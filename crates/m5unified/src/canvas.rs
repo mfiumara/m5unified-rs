@@ -4,7 +4,9 @@
 //! transfer the complete image to the display in a single DMA transaction,
 //! eliminating per-primitive flicker.
 
-use crate::{Point, Rect};
+use std::ffi::CString;
+
+use crate::{Error, Point, Rect, TextDatum};
 
 /// Off-screen canvas.  Drop frees the sprite buffer.
 pub struct Canvas {
@@ -33,6 +35,10 @@ impl Canvas {
         unsafe { m5unified_sys::m5u_canvas_fill_smooth_circle(center.x, center.y, r, color) }
     }
 
+    pub fn draw_line(&mut self, start: Point, end: Point, color: u16) {
+        unsafe { m5unified_sys::m5u_canvas_draw_line(start.x, start.y, end.x, end.y, color) }
+    }
+
     pub fn draw_circle(&mut self, x: i32, y: i32, r: i32, color: u16) {
         unsafe { m5unified_sys::m5u_canvas_draw_circle(x, y, r, color) }
     }
@@ -43,6 +49,10 @@ impl Canvas {
 
     pub fn fill_rect(&mut self, x: i32, y: i32, w: i32, h: i32, color: u16) {
         unsafe { m5unified_sys::m5u_canvas_fill_rect(x, y, w, h, color) }
+    }
+
+    pub fn fill_triangle(&mut self, a: Point, b: Point, c: Point, color: u16) {
+        unsafe { m5unified_sys::m5u_canvas_fill_triangle(a.x, a.y, b.x, b.y, c.x, c.y, color) }
     }
 
     pub fn fill_smooth_round_rect(&mut self, rect: Rect, r: i32, color: u16) {
@@ -75,6 +85,28 @@ impl Canvas {
 
     pub fn draw_ellipse(&mut self, x: i32, y: i32, rx: i32, ry: i32, color: u16) {
         unsafe { m5unified_sys::m5u_canvas_draw_ellipse(x, y, rx, ry, color) }
+    }
+
+    pub fn set_text_size(&mut self, size: i32) {
+        unsafe { m5unified_sys::m5u_canvas_set_text_size(size) }
+    }
+
+    pub fn set_text_color(&mut self, fg: u16, bg: u16) {
+        unsafe { m5unified_sys::m5u_canvas_set_text_color(fg, bg) }
+    }
+
+    pub fn set_text_datum(&mut self, datum: TextDatum) {
+        unsafe { m5unified_sys::m5u_canvas_set_text_datum(datum as i32) }
+    }
+
+    pub fn text_width(&self, text: &str) -> Result<i32, Error> {
+        let text = CString::new(text).map_err(|_| Error::InvalidString)?;
+        Ok(unsafe { m5unified_sys::m5u_canvas_text_width(text.as_ptr()) as i32 })
+    }
+
+    pub fn draw_string(&mut self, text: &str, x: i32, y: i32) -> Result<i32, Error> {
+        let text = CString::new(text).map_err(|_| Error::InvalidString)?;
+        Ok(unsafe { m5unified_sys::m5u_canvas_draw_string(text.as_ptr(), x, y) as i32 })
     }
 }
 

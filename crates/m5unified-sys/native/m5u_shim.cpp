@@ -4476,6 +4476,9 @@ void m5u_canvas_fill_screen(uint16_t color) {
 void m5u_canvas_fill_smooth_circle(int x, int y, int r, uint16_t color) {
     if (s_canvas) s_canvas->fillSmoothCircle(x, y, r, color);
 }
+void m5u_canvas_draw_line(int x0, int y0, int x1, int y1, uint16_t color) {
+    if (s_canvas) s_canvas->drawLine(x0, y0, x1, y1, color);
+}
 void m5u_canvas_draw_circle(int x, int y, int r, uint16_t color) {
     if (s_canvas) s_canvas->drawCircle(x, y, r, color);
 }
@@ -4484,6 +4487,9 @@ void m5u_canvas_fill_circle(int x, int y, int r, uint16_t color) {
 }
 void m5u_canvas_fill_rect(int x, int y, int w, int h, uint16_t color) {
     if (s_canvas) s_canvas->fillRect(x, y, w, h, color);
+}
+void m5u_canvas_fill_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color) {
+    if (s_canvas) s_canvas->fillTriangle(x0, y0, x1, y1, x2, y2, color);
 }
 void m5u_canvas_fill_smooth_round_rect(int x, int y, int w, int h, int r, uint16_t color) {
     if (s_canvas) s_canvas->fillSmoothRoundRect(x, y, w, h, r, color);
@@ -4496,6 +4502,21 @@ void m5u_canvas_fill_ellipse(int x, int y, int rx, int ry, uint16_t color) {
 }
 void m5u_canvas_draw_ellipse(int x, int y, int rx, int ry, uint16_t color) {
     if (s_canvas) s_canvas->drawEllipse(x, y, rx, ry, color);
+}
+void m5u_canvas_set_text_size(int size) {
+    if (s_canvas) s_canvas->setTextSize(size);
+}
+void m5u_canvas_set_text_color(uint16_t fg, uint16_t bg) {
+    if (s_canvas) s_canvas->setTextColor(fg, bg);
+}
+void m5u_canvas_set_text_datum(int datum) {
+    if (s_canvas) s_canvas->setTextDatum((textdatum_t)datum);
+}
+int m5u_canvas_text_width(const char* text) {
+    return (s_canvas && text) ? s_canvas->textWidth(text) : 0;
+}
+int m5u_canvas_draw_string(const char* text, int x, int y) {
+    return (s_canvas && text) ? (int)s_canvas->drawString(text, x, y) : 0;
 }
 
 // ─── FEETECH SCSCL bus servo (StackChan head) ───────────────────────────────

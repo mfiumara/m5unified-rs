@@ -1,0 +1,24 @@
+[package]
+name = "m5unified-avatar"
+version = "0.1.0"
+edition.workspace = true
+rust-version = "1.85"
+license.workspace = true
+repository.workspace = true
+readme = "../../README.md"
+documentation = "https://docs.rs/m5unified-avatar"
+description = "Rust-native expressive avatar renderer for m5unified displays."
+keywords = ["m5stack", "stackchan", "avatar", "esp32", "embedded"]
+categories = ["embedded", "graphics", "hardware-support"]
+include = [
+    "Cargo.toml",
+    "src/**",
+    "../../README.md",
+    "../../LICENSE",
+]
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+m5unified = { path = "../m5unified", version = "0.3.7" }

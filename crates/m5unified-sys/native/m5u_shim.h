@@ -909,13 +909,20 @@ void m5u_canvas_push(int x, int y);
 void m5u_canvas_delete(void);
 void m5u_canvas_fill_screen(uint16_t color);
 void m5u_canvas_fill_smooth_circle(int x, int y, int r, uint16_t color);
+void m5u_canvas_draw_line(int x0, int y0, int x1, int y1, uint16_t color);
 void m5u_canvas_draw_circle(int x, int y, int r, uint16_t color);
 void m5u_canvas_fill_circle(int x, int y, int r, uint16_t color);
 void m5u_canvas_fill_rect(int x, int y, int w, int h, uint16_t color);
+void m5u_canvas_fill_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color);
 void m5u_canvas_fill_smooth_round_rect(int x, int y, int w, int h, int r, uint16_t color);
 void m5u_canvas_fill_arc(int x, int y, int r0, int r1, float a0, float a1, uint16_t color);
 void m5u_canvas_fill_ellipse(int x, int y, int rx, int ry, uint16_t color);
 void m5u_canvas_draw_ellipse(int x, int y, int rx, int ry, uint16_t color);
+void m5u_canvas_set_text_size(int size);
+void m5u_canvas_set_text_color(uint16_t fg, uint16_t bg);
+void m5u_canvas_set_text_datum(int datum);
+int m5u_canvas_text_width(const char* text);
+int m5u_canvas_draw_string(const char* text, int x, int y);
 
 // FEETECH SCSCL bus servo control (StackChan head servos)
 // Uses ESP-IDF UART driver. On non-firmware (host stub) builds these are no-ops.

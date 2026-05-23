@@ -8,6 +8,7 @@ default-run = "basic_how_to_use"
 
 [dependencies]
 m5unified = { path = "../crates/m5unified" }
+m5unified-avatar = { path = "../crates/m5unified-avatar" }
 
 [target.'cfg(target_os = "espidf")'.dependencies]
 esp-idf-sys = { version = "0.37.2", default-features = false, features = ["std", "binstart"] }

@@ -6,13 +6,15 @@
 Rust bindings for [M5Unified](https://github.com/m5stack/M5Unified), the
 board support library used across M5Stack ESP32 devices.
 
-The project publishes two crates:
+The project publishes three crates:
 
 - [`m5unified`](https://docs.rs/m5unified) - safe Rust API for common
   M5Unified display, button, microphone, speaker, IMU, touch, RTC, power, log,
   and SD-card operations.
 - [`m5unified-sys`](https://docs.rs/m5unified-sys) - raw FFI declarations plus
   the C/C++ ESP-IDF component shim used by the safe crate.
+- `m5unified-avatar` - Rust-native expressive Stack-chan-style avatar renderer
+  built on top of `m5unified::Canvas`.
 
 The binding strategy is intentionally narrow: Rust calls a plain `extern "C"`
 shim instead of trying to bind the full M5Unified C++ class surface directly.
@@ -28,6 +30,14 @@ m5unified = "0.3"
 
 Use `m5unified-sys` directly only when writing lower-level bindings or firmware
 integration code that needs the raw C ABI.
+
+For expressive Stack-chan-style faces, add the avatar helper crate too:
+
+```toml
+[dependencies]
+m5unified = "0.3"
+m5unified-avatar = "0.1"
+```
 
 ## Quick Start
 
@@ -87,6 +97,7 @@ the C ABI shim first, then wrapped by `m5unified`.
 crates/
   m5unified-sys/   raw bindings and native C/C++ shim
   m5unified/       safe Rust wrapper
+  m5unified-avatar/ expressive avatar renderer built on Canvas
 examples/          host-checkable Rust ports of upstream M5Unified examples
 docs/              example mapping, project plans, and release notes
 ```
@@ -140,13 +151,15 @@ python3 tools/check_no_sys_in_examples.py
 bash scripts/check-host.sh
 bash tools/build_espidf_smoke.sh
 cargo package -p m5unified-sys
+cargo package -p m5unified-avatar
 cargo publish -p m5unified-sys --dry-run
 ```
 
 Publish `m5unified-sys` before `m5unified`, because the safe crate depends on
 the exact sys crate version through crates.io. Package and dry-run `m5unified`
-after the sys crate upload has propagated. See `docs/publishing.md` in the
-repository for the full release checklist.
+after the sys crate upload has propagated. `m5unified-avatar` can be published
+after `m5unified`. See `docs/publishing.md` in the repository for the full
+release checklist.
 
 ## License
 
