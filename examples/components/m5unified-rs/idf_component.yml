@@ -1,4 +1,6 @@
 dependencies:
-  idf: ">=5.0"
-  m5stack/M5Unified: ">=0.2.13"
-  m5stack/M5GFX: ">=0.2.8"
+  # M5Unified 0.2.x / M5GFX 0.2.x still pull the legacy I2C driver. ESP-IDF
+  # 5.5 can also pull driver_ng I2C paths, which aborts when both are linked.
+  idf: ">=5.0,<5.5"
+  m5stack/M5Unified: "^0.2.13"
+  m5stack/M5GFX: "^0.2.19"

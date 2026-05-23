@@ -16,4 +16,4 @@ repository = "https://github.com/mfiumara/m5unified-rs"
 readme = "README.md"
 
 [workspace.dependencies]
-m5unified-sys = { path = "crates/m5unified-sys", version = "0.3.5" }
+m5unified-sys = { path = "crates/m5unified-sys", version = "0.3.6" }

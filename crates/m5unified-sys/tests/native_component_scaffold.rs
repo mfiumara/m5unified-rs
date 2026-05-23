@@ -26,6 +26,10 @@ fn native_component_manifest_declares_managed_dependencies() {
     let manifest = fs::read_to_string(&manifest_path)
         .unwrap_or_else(|err| panic!("failed to read {}: {err}", manifest_path.display()));
 
+    assert!(manifest.contains("idf: \">=5.0,<5.5\""));
+    assert!(!manifest.contains("idf: \">=5.0\""));
     assert!(manifest.contains("m5stack/M5Unified"));
+    assert!(manifest.contains("m5stack/M5Unified: \"^0.2.13\""));
     assert!(manifest.contains("m5stack/M5GFX"));
+    assert!(manifest.contains("m5stack/M5GFX: \"^0.2.19\""));
 }
