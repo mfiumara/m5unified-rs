@@ -1,7 +1,7 @@
 description: Rust-facing C ABI shim component for M5Unified
 url: https://github.com/mfiumara/m5unified-rs
 repository: https://github.com/mfiumara/m5unified-rs.git
-version: 0.3.6
+version: 0.3.7
 dependencies:
   # M5Unified 0.2.x / M5GFX 0.2.x still pull the legacy I2C driver. ESP-IDF
   # 5.5 can also pull driver_ng I2C paths, which aborts when both are linked.

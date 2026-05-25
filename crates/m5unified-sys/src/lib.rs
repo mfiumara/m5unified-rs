@@ -466,6 +466,8 @@ extern "C" {
     pub fn m5u_millis() -> u32;
     pub fn m5u_micros() -> u32;
     pub fn m5u_get_update_msec() -> u32;
+    pub fn m5u_heap_get_free_size(caps: u32) -> usize;
+    pub fn m5u_heap_get_largest_free_block(caps: u32) -> usize;
     pub fn m5u_get_board() -> c_int;
     pub fn m5u_get_pin(name: c_int) -> c_int;
     pub fn m5u_set_primary_display_index(index: usize) -> bool;
@@ -1418,6 +1420,14 @@ extern "C" {
         sample_rate_hz: u32,
         stereo: bool,
     ) -> bool;
+    pub fn m5u_audio_capture_begin(
+        sample_rate_hz: u32,
+        dma_frame_num: usize,
+        dma_desc_num: usize,
+        out_channels: *mut u8,
+    ) -> bool;
+    pub fn m5u_audio_capture_read_i16(buffer: *mut i16, samples: usize, timeout_ms: u32) -> usize;
+    pub fn m5u_audio_capture_end();
     pub fn m5u_mic_set_sample_rate(sample_rate_hz: u32);
     pub fn m5u_mic_get_config(out: *mut m5u_mic_config_t) -> bool;
     pub fn m5u_mic_set_config(config: *const m5u_mic_config_t) -> bool;
@@ -1806,6 +1816,12 @@ mod host_stubs {
         0
     }
     pub unsafe fn m5u_get_update_msec() -> u32 {
+        0
+    }
+    pub unsafe fn m5u_heap_get_free_size(_caps: u32) -> usize {
+        0
+    }
+    pub unsafe fn m5u_heap_get_largest_free_block(_caps: u32) -> usize {
         0
     }
     pub unsafe fn m5u_get_board() -> c_int {
@@ -3628,6 +3644,25 @@ mod host_stubs {
     ) -> bool {
         m5u_mic_record_u8(buffer, samples)
     }
+    pub unsafe fn m5u_audio_capture_begin(
+        _sample_rate_hz: u32,
+        _dma_frame_num: usize,
+        _dma_desc_num: usize,
+        out_channels: *mut u8,
+    ) -> bool {
+        if !out_channels.is_null() {
+            *out_channels = 0;
+        }
+        false
+    }
+    pub unsafe fn m5u_audio_capture_read_i16(
+        _buffer: *mut i16,
+        _samples: usize,
+        _timeout_ms: u32,
+    ) -> usize {
+        0
+    }
+    pub unsafe fn m5u_audio_capture_end() {}
     pub unsafe fn m5u_mic_set_sample_rate(_sample_rate_hz: u32) {}
     pub unsafe fn m5u_mic_get_noise_filter_level() -> c_int {
         0

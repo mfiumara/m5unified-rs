@@ -31,11 +31,18 @@
 #include <utility/rtc/RTC_PowerHub_Class.hpp>
 #include <utility/rtc/RX8130_Class.hpp>
 #include <driver/gpio.h>
+#if __has_include(<driver/i2s_std.h>)
+#include <driver/i2s_std.h>
+#include <hal/i2s_ll.h>
+#include <soc/i2s_struct.h>
+#endif
 #include <driver/sdspi_host.h>
 #include <driver/spi_common.h>
 #include <esp_err.h>
+#include <esp_heap_caps.h>
 #include <esp_vfs_fat.h>
 #include <sdmmc_cmd.h>
+#include <cstring>
 #include <limits>
 #include <memory>
 #include <string>
@@ -48,6 +55,172 @@ static constexpr const char* M5U_SD_MOUNT_POINT = "/sdcard";
 static sdmmc_card_t* s_m5u_sd_card = nullptr;
 static spi_host_device_t s_m5u_sd_host = SPI2_HOST;
 static bool s_m5u_sd_owns_bus = false;
+
+namespace m5 {
+void calcClockDiv(uint32_t* div_a, uint32_t* div_b, uint32_t* div_n, uint32_t baseClock, uint32_t targetFreq);
+}
+
+#if __has_include(<driver/i2s_std.h>)
+static i2s_chan_handle_t s_m5u_audio_capture_rx = nullptr;
+static uint8_t s_m5u_audio_capture_channels = 0;
+
+static bool m5u_audio_capture_set_mic_enabled(bool enabled) {
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+    auto cfg = M5.Mic.config();
+    if (cfg.pin_bck != GPIO_NUM_34) {
+        return true;
+    }
+
+    static constexpr uint8_t es7210_i2c_addr = 0x40;
+    bool ok = M5.In_I2C.writeRegister8(es7210_i2c_addr, 0x00, 0xFF, 400000);
+    if (!enabled) {
+        return ok;
+    }
+
+    struct reg_data_t {
+        uint8_t reg;
+        uint8_t value;
+    };
+    static constexpr reg_data_t data[] = {
+        { 0x00, 0x41 }, // RESET_CTL
+        { 0x01, 0x1f }, // CLK_ON_OFF
+        { 0x06, 0x00 }, // DIGITAL_PDN
+        { 0x07, 0x20 }, // ADC_OSR
+        { 0x08, 0x10 }, // MODE_CFG
+        { 0x09, 0x30 }, // TCT0_CHPINI
+        { 0x0A, 0x30 }, // TCT1_CHPINI
+        { 0x20, 0x0a }, // ADC34_HPF2
+        { 0x21, 0x2a }, // ADC34_HPF1
+        { 0x22, 0x0a }, // ADC12_HPF2
+        { 0x23, 0x2a }, // ADC12_HPF1
+        { 0x02, 0xC1 },
+        { 0x04, 0x01 },
+        { 0x05, 0x00 },
+        { 0x11, 0x60 },
+        { 0x40, 0x42 }, // ANALOG_SYS
+        { 0x41, 0x70 }, // MICBIAS12
+        { 0x42, 0x70 }, // MICBIAS34
+        { 0x43, 0x1B }, // MIC1_GAIN
+        { 0x44, 0x1B }, // MIC2_GAIN
+        { 0x45, 0x00 }, // MIC3_GAIN
+        { 0x46, 0x00 }, // MIC4_GAIN
+        { 0x47, 0x00 }, // MIC1_LP
+        { 0x48, 0x00 }, // MIC2_LP
+        { 0x49, 0x00 }, // MIC3_LP
+        { 0x4A, 0x00 }, // MIC4_LP
+        { 0x4B, 0x00 }, // MIC12_PDN
+        { 0x4C, 0xFF }, // MIC34_PDN
+        { 0x01, 0x14 }, // CLK_ON_OFF
+    };
+
+    for (const auto& d : data) {
+        ok = M5.In_I2C.writeRegister8(es7210_i2c_addr, d.reg, d.value, 400000) && ok;
+    }
+    return ok;
+#else
+    (void)enabled;
+    return true;
+#endif
+}
+
+static void m5u_audio_capture_apply_rx_clock(i2s_port_t port, uint32_t sample_rate_hz, uint32_t over_sampling, bool use_pdm) {
+#if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3) || defined(CONFIG_IDF_TARGET_ESP32C6) || defined(CONFIG_IDF_TARGET_ESP32P4)
+#if defined(CONFIG_IDF_TARGET_ESP32P4)
+    static constexpr uint32_t pll_d2_clk = 20 * 1000 * 1000;
+#else
+    static constexpr uint32_t pll_d2_clk = 120 * 1000 * 1000;
+#endif
+    uint32_t oversampling = over_sampling;
+    if (oversampling < 1) {
+        oversampling = 1;
+    } else if (oversampling > 8) {
+        oversampling = 8;
+    }
+
+    uint32_t bits = 16;
+    uint32_t div_m = 8;
+    if (use_pdm) {
+        bits = 64;
+        div_m = 2;
+    }
+
+    uint32_t div_a = 0;
+    uint32_t div_b = 0;
+    uint32_t div_n = 0;
+    m5::calcClockDiv(&div_a, &div_b, &div_n, pll_d2_clk / (bits * div_m), sample_rate_hz * oversampling);
+
+    auto dev = &I2S0;
+#if SOC_I2S_NUM >= 2
+    if (port == I2S_NUM_1) {
+        dev = &I2S1;
+    }
+#if SOC_I2S_NUM >= 3
+    else if (port == I2S_NUM_2) {
+        dev = &I2S2;
+    }
+#if SOC_I2S_NUM >= 4
+    else if (port == I2S_NUM_3) {
+        dev = &I2S3;
+    }
+#endif
+#endif
+#endif
+
+    dev->rx_conf.rx_pdm_en = use_pdm;
+    dev->rx_conf.rx_tdm_en = !use_pdm;
+#if defined(I2S_RX_PDM2PCM_CONF_REG)
+    dev->rx_pdm2pcm_conf.rx_pdm2pcm_en = use_pdm;
+    dev->rx_pdm2pcm_conf.rx_pdm_sinc_dsr_16_en = 1;
+#elif defined(I2S_RX_PDM2PCM_EN)
+    dev->rx_conf.rx_pdm2pcm_en = use_pdm;
+    dev->rx_conf.rx_pdm_sinc_dsr_16_en = 1;
+#endif
+    dev->rx_conf.rx_update = 1;
+
+#if defined(CONFIG_IDF_TARGET_ESP32P4)
+    dev->rx_conf.rx_bck_div_num = div_m - 1;
+#else
+    dev->rx_conf1.rx_bck_div_num = div_m - 1;
+#endif
+
+    bool yn1 = div_b > (div_a >> 1);
+    if (yn1) {
+        div_b = div_a - div_b;
+    }
+
+    int div_x = 0;
+    int div_y = 1;
+    if (div_b) {
+        div_x = div_a / div_b - 1;
+        div_y = div_a % div_b;
+        if (div_y == 0) {
+            div_y = 1;
+            div_b = 511;
+        }
+    }
+
+    i2s_ll_rx_set_raw_clk_div(dev, div_n, div_x, div_y, div_b, yn1);
+
+#if defined(I2S_RX_CLKM_DIV_X)
+    dev->rx_clkm_div_conf.rx_clkm_div_x = div_x;
+    dev->rx_clkm_div_conf.rx_clkm_div_y = div_y;
+    dev->rx_clkm_div_conf.rx_clkm_div_z = div_b;
+    dev->rx_clkm_div_conf.rx_clkm_div_yn1 = yn1;
+    dev->rx_clkm_conf.rx_clkm_div_num = div_n;
+    dev->rx_clkm_conf.rx_clk_sel = 1;
+    dev->tx_clkm_conf.clk_en = 1;
+    dev->rx_clkm_conf.rx_clk_active = 1;
+    dev->rx_conf.rx_update = 1;
+    dev->rx_conf.rx_update = 0;
+#endif
+#else
+    (void)port;
+    (void)sample_rate_hz;
+    (void)over_sampling;
+    (void)use_pdm;
+#endif
+}
+#endif
 
 #if defined(CONFIG_IDF_TARGET_ESP32C3) || defined(CONFIG_IDF_TARGET_ESP32C6) || defined(CONFIG_IDF_TARGET_ESP32P4)
 #define M5U_HAS_AXP2101 0
@@ -154,6 +327,14 @@ uint32_t m5u_micros(void) {
 
 uint32_t m5u_get_update_msec(void) {
     return M5.getUpdateMsec();
+}
+
+size_t m5u_heap_get_free_size(uint32_t caps) {
+    return heap_caps_get_free_size(caps);
+}
+
+size_t m5u_heap_get_largest_free_block(uint32_t caps) {
+    return heap_caps_get_largest_free_block(caps);
 }
 
 int m5u_get_board(void) {
@@ -1230,8 +1411,11 @@ bool m5u_sd_begin_spi(const m5u_sd_spi_config_t* config) {
     slot_config.gpio_cs = (gpio_num_t)config->pin_cs;
     slot_config.host_id = spi_host;
 
-    esp_vfs_fat_mount_config_t mount_config = VFS_FAT_MOUNT_DEFAULT_CONFIG();
+    esp_vfs_fat_mount_config_t mount_config = {};
     mount_config.format_if_mount_failed = config->format_if_mount_failed != 0;
+    mount_config.max_files = 5;
+    mount_config.allocation_unit_size = 0;
+    mount_config.disk_status_check_enable = false;
     if (config->max_files > 0) {
         mount_config.max_files = config->max_files;
     }
@@ -2577,6 +2761,129 @@ bool m5u_mic_record_i16_ex(int16_t* buffer, size_t samples, uint32_t sample_rate
 
 bool m5u_mic_record_u8_ex(uint8_t* buffer, size_t samples, uint32_t sample_rate_hz, bool stereo) {
     return M5.Mic.record(buffer, samples, sample_rate_hz, stereo);
+}
+
+bool m5u_audio_capture_begin(uint32_t sample_rate_hz, size_t dma_frame_num, size_t dma_desc_num, uint8_t* out_channels) {
+#if __has_include(<driver/i2s_std.h>)
+    if (out_channels) {
+        *out_channels = 0;
+    }
+    m5u_audio_capture_end();
+    M5.Mic.end();
+    M5.Speaker.end();
+
+    auto cfg = M5.Mic.config();
+    if (cfg.pin_data_in < 0 || cfg.pin_bck < 0 || cfg.pin_ws < 0) {
+        return false;
+    }
+
+    if (!m5u_audio_capture_set_mic_enabled(true)) {
+        return false;
+    }
+
+    i2s_chan_config_t chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(cfg.i2s_port, I2S_ROLE_MASTER);
+    chan_cfg.dma_desc_num = dma_desc_num ? dma_desc_num : cfg.dma_buf_count;
+    chan_cfg.dma_frame_num = dma_frame_num ? dma_frame_num : cfg.dma_buf_len;
+
+    esp_err_t err = i2s_new_channel(&chan_cfg, nullptr, &s_m5u_audio_capture_rx);
+    if (err != ESP_OK) {
+        s_m5u_audio_capture_rx = nullptr;
+        return false;
+    }
+
+    const bool stereo = cfg.stereo;
+    const bool use_pdm = cfg.pin_bck < 0 && !cfg.use_adc;
+    i2s_std_config_t i2s_config;
+    memset(&i2s_config, 0, sizeof(i2s_std_config_t));
+    i2s_config.clk_cfg.clk_src = i2s_clock_src_t::I2S_CLK_SRC_PLL_160M;
+    i2s_config.clk_cfg.sample_rate_hz = 48000;
+    i2s_config.clk_cfg.mclk_multiple = i2s_mclk_multiple_t::I2S_MCLK_MULTIPLE_128;
+    i2s_config.slot_cfg.data_bit_width = i2s_data_bit_width_t::I2S_DATA_BIT_WIDTH_16BIT;
+    i2s_config.slot_cfg.slot_bit_width = i2s_slot_bit_width_t::I2S_SLOT_BIT_WIDTH_16BIT;
+    i2s_config.slot_cfg.slot_mode = stereo ? I2S_SLOT_MODE_STEREO : I2S_SLOT_MODE_MONO;
+    i2s_config.slot_cfg.slot_mask = stereo
+        ? I2S_STD_SLOT_BOTH
+        : (cfg.left_channel ? I2S_STD_SLOT_LEFT : I2S_STD_SLOT_RIGHT);
+    i2s_config.slot_cfg.ws_width = 16;
+    i2s_config.slot_cfg.bit_shift = true;
+#if SOC_I2S_HW_VERSION_1
+    i2s_config.slot_cfg.msb_right = false;
+#else
+    i2s_config.slot_cfg.left_align = true;
+    i2s_config.slot_cfg.big_endian = false;
+    i2s_config.slot_cfg.bit_order_lsb = false;
+#endif
+    i2s_config.gpio_cfg.mclk = (gpio_num_t)cfg.pin_mck;
+    i2s_config.gpio_cfg.bclk = (gpio_num_t)cfg.pin_bck;
+    i2s_config.gpio_cfg.ws = (gpio_num_t)cfg.pin_ws;
+    i2s_config.gpio_cfg.dout = I2S_GPIO_UNUSED;
+    i2s_config.gpio_cfg.din = (gpio_num_t)cfg.pin_data_in;
+    i2s_config.gpio_cfg.invert_flags.mclk_inv = false;
+    i2s_config.gpio_cfg.invert_flags.bclk_inv = false;
+    i2s_config.gpio_cfg.invert_flags.ws_inv = false;
+
+    err = i2s_channel_init_std_mode(s_m5u_audio_capture_rx, &i2s_config);
+    if (err != ESP_OK) {
+        m5u_audio_capture_end();
+        return false;
+    }
+
+    m5u_audio_capture_apply_rx_clock(cfg.i2s_port, sample_rate_hz, cfg.over_sampling, use_pdm);
+
+    err = i2s_channel_enable(s_m5u_audio_capture_rx);
+    if (err != ESP_OK) {
+        m5u_audio_capture_end();
+        return false;
+    }
+
+    s_m5u_audio_capture_channels = stereo ? 2 : 1;
+    if (out_channels) {
+        *out_channels = s_m5u_audio_capture_channels;
+    }
+    return true;
+#else
+    (void)sample_rate_hz;
+    (void)dma_frame_num;
+    (void)dma_desc_num;
+    if (out_channels) {
+        *out_channels = 0;
+    }
+    return false;
+#endif
+}
+
+size_t m5u_audio_capture_read_i16(int16_t* buffer, size_t samples, uint32_t timeout_ms) {
+#if __has_include(<driver/i2s_std.h>)
+    if (!s_m5u_audio_capture_rx || !buffer || samples == 0) {
+        return 0;
+    }
+    size_t bytes_read = 0;
+    TickType_t ticks = timeout_ms == 0 ? 0 : pdMS_TO_TICKS(timeout_ms);
+    esp_err_t err = i2s_channel_read(
+        s_m5u_audio_capture_rx,
+        buffer,
+        samples * sizeof(int16_t),
+        &bytes_read,
+        ticks);
+    return err == ESP_OK ? bytes_read / sizeof(int16_t) : 0;
+#else
+    (void)buffer;
+    (void)samples;
+    (void)timeout_ms;
+    return 0;
+#endif
+}
+
+void m5u_audio_capture_end(void) {
+#if __has_include(<driver/i2s_std.h>)
+    if (s_m5u_audio_capture_rx) {
+        i2s_channel_disable(s_m5u_audio_capture_rx);
+        i2s_del_channel(s_m5u_audio_capture_rx);
+        s_m5u_audio_capture_rx = nullptr;
+    }
+    m5u_audio_capture_set_mic_enabled(false);
+    s_m5u_audio_capture_channels = 0;
+#endif
 }
 
 void m5u_mic_set_sample_rate(uint32_t sample_rate_hz) {
@@ -4457,7 +4764,13 @@ bool m5u_canvas_create(int width, int height) {
     delete s_canvas;
     s_canvas = new LGFX_Sprite(&M5.Display);
     s_canvas->setColorDepth(16);
+    s_canvas->setPsram(true);
     void* buf = s_canvas->createSprite(width, height);
+    if (!buf) {
+        s_canvas->deleteSprite();
+        s_canvas->setPsram(false);
+        buf = s_canvas->createSprite(width, height);
+    }
     if (!buf) { delete s_canvas; s_canvas = nullptr; return false; }
     return true;
 }

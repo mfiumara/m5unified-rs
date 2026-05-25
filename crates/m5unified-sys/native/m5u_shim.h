@@ -45,6 +45,8 @@ void m5u_delay_ms(uint32_t ms);
 uint32_t m5u_millis(void);
 uint32_t m5u_micros(void);
 uint32_t m5u_get_update_msec(void);
+size_t m5u_heap_get_free_size(uint32_t caps);
+size_t m5u_heap_get_largest_free_block(uint32_t caps);
 int m5u_get_board(void);
 int m5u_get_pin(int name);
 bool m5u_set_primary_display_index(size_t index);
@@ -444,6 +446,9 @@ bool m5u_mic_record_i16_at(int16_t* buffer, size_t samples, uint32_t sample_rate
 bool m5u_mic_record_i16_ex(int16_t* buffer, size_t samples, uint32_t sample_rate_hz, bool stereo);
 bool m5u_mic_record_u8(uint8_t* buffer, size_t samples);
 bool m5u_mic_record_u8_ex(uint8_t* buffer, size_t samples, uint32_t sample_rate_hz, bool stereo);
+bool m5u_audio_capture_begin(uint32_t sample_rate_hz, size_t dma_frame_num, size_t dma_desc_num, uint8_t* out_channels);
+size_t m5u_audio_capture_read_i16(int16_t* buffer, size_t samples, uint32_t timeout_ms);
+void m5u_audio_capture_end(void);
 void m5u_mic_set_sample_rate(uint32_t sample_rate_hz);
 bool m5u_mic_get_config(m5u_mic_config_t* out);
 bool m5u_mic_set_config(const m5u_mic_config_t* config);

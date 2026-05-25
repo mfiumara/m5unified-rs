@@ -123,6 +123,10 @@ impl Mic {
             .then_some(())
             .ok_or(Error::Unavailable("microphone config"))
     }
+
+    pub fn begin_dma_capture(&mut self, config: AudioCaptureConfig) -> Result<AudioCapture, Error> {
+        AudioCapture::begin(config)
+    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -192,6 +196,67 @@ impl MicConfig {
 impl Default for MicConfig {
     fn default() -> Self {
         Self::from_raw(m5unified_sys::m5u_mic_config_t::default())
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct AudioCaptureConfig {
+    pub sample_rate_hz: u32,
+    pub dma_frame_num: usize,
+    pub dma_desc_num: usize,
+}
+
+impl Default for AudioCaptureConfig {
+    fn default() -> Self {
+        Self {
+            sample_rate_hz: 16_000,
+            dma_frame_num: 240,
+            dma_desc_num: 4,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct AudioCapture {
+    channels: u8,
+}
+
+impl AudioCapture {
+    pub fn begin(config: AudioCaptureConfig) -> Result<Self, Error> {
+        let mut channels = 0u8;
+        let ok = unsafe {
+            m5unified_sys::m5u_audio_capture_begin(
+                config.sample_rate_hz,
+                config.dma_frame_num,
+                config.dma_desc_num,
+                &mut channels,
+            )
+        };
+        if ok {
+            Ok(Self { channels })
+        } else {
+            Err(Error::Unavailable("audio DMA capture"))
+        }
+    }
+
+    pub fn channels(&self) -> u8 {
+        self.channels
+    }
+
+    pub fn read_i16(&mut self, buffer: &mut [i16], timeout_ms: u32) -> usize {
+        unsafe {
+            m5unified_sys::m5u_audio_capture_read_i16(buffer.as_mut_ptr(), buffer.len(), timeout_ms)
+        }
+    }
+
+    pub fn end(self) {
+        drop(self);
+    }
+}
+
+impl Drop for AudioCapture {
+    fn drop(&mut self) {
+        unsafe { m5unified_sys::m5u_audio_capture_end() }
     }
 }
 

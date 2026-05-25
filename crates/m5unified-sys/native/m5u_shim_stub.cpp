@@ -32,6 +32,14 @@ uint32_t m5u_get_update_msec(void) {
     return 0;
 }
 
+size_t m5u_heap_get_free_size(uint32_t caps) {
+    (void)caps; return 0;
+}
+
+size_t m5u_heap_get_largest_free_block(uint32_t caps) {
+    (void)caps; return 0;
+}
+
 int m5u_get_board(void) {
     return 0;
 }
@@ -1703,6 +1711,19 @@ bool m5u_mic_record_i16_ex(int16_t* buffer, size_t samples, uint32_t sample_rate
 
 bool m5u_mic_record_u8_ex(uint8_t* buffer, size_t samples, uint32_t sample_rate_hz, bool stereo) {
     (void)buffer; (void)samples; (void)sample_rate_hz; (void)stereo; return false;
+}
+
+bool m5u_audio_capture_begin(uint32_t sample_rate_hz, size_t dma_frame_num, size_t dma_desc_num, uint8_t* out_channels) {
+    (void)sample_rate_hz; (void)dma_frame_num; (void)dma_desc_num;
+    if (out_channels) { *out_channels = 0; }
+    return false;
+}
+
+size_t m5u_audio_capture_read_i16(int16_t* buffer, size_t samples, uint32_t timeout_ms) {
+    (void)buffer; (void)samples; (void)timeout_ms; return 0;
+}
+
+void m5u_audio_capture_end(void) {
 }
 
 void m5u_mic_set_sample_rate(uint32_t sample_rate_hz) {

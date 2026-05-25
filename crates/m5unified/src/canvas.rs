@@ -14,8 +14,8 @@ pub struct Canvas {
 }
 
 impl Canvas {
-    /// Allocate a sprite the given size.  Returns `None` on allocation failure
-    /// (unlikely on devices with PSRAM).
+    /// Allocate a sprite the given size. ESP targets prefer PSRAM for the
+    /// backing buffer and fall back to internal RAM if PSRAM is unavailable.
     pub fn create(width: i32, height: i32) -> Option<Self> {
         let ok = unsafe { m5unified_sys::m5u_canvas_create(width, height) };
         ok.then_some(Self { _private: () })

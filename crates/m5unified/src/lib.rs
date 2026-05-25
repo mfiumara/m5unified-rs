@@ -48,8 +48,8 @@ mod timer;
 mod touch;
 
 pub use audio::{
-    AudioQueueState, Mic, MicConfig, RawPlaybackOptions, RecordingOptions, Speaker, SpeakerConfig,
-    ToneOptions, WavPlaybackOptions,
+    AudioCapture, AudioCaptureConfig, AudioQueueState, Mic, MicConfig, RawPlaybackOptions,
+    RecordingOptions, Speaker, SpeakerConfig, ToneOptions, WavPlaybackOptions,
 };
 pub use buttons::{Button, ButtonId, ButtonState, Buttons};
 pub use canvas::Canvas;
@@ -88,7 +88,7 @@ pub use sd::{
 };
 pub use servo::{StackChanServos, PITCH_ZERO_DEFAULT, SERVO_PITCH, SERVO_YAW, YAW_ZERO_DEFAULT};
 pub(crate) use system::raw_display_kinds;
-pub use system::{Board, PinName};
+pub use system::{heap_stats, Board, HeapCaps, HeapStats, PinName};
 pub use timer::M5Timer;
 pub use touch::{Touch, TouchDetail, TouchPoint, TouchState};
 

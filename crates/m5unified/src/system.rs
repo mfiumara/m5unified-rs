@@ -74,6 +74,55 @@ pub(crate) fn raw_display_kinds(kinds: &[DisplayKind]) -> Vec<c_int> {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct HeapCaps(u32);
+
+impl HeapCaps {
+    pub const EIGHT_BIT: Self = Self(1 << 2);
+    pub const DMA: Self = Self(1 << 3);
+    pub const SPIRAM: Self = Self(1 << 10);
+    pub const INTERNAL: Self = Self(1 << 11);
+    pub const DEFAULT_CAPS: Self = Self(1 << 12);
+
+    pub const fn from_bits(bits: u32) -> Self {
+        Self(bits)
+    }
+
+    pub const fn bits(self) -> u32 {
+        self.0
+    }
+
+    pub const fn union(self, other: Self) -> Self {
+        Self(self.0 | other.0)
+    }
+
+    pub const fn internal_8bit() -> Self {
+        Self::INTERNAL.union(Self::EIGHT_BIT)
+    }
+
+    pub const fn psram_8bit() -> Self {
+        Self::SPIRAM.union(Self::EIGHT_BIT)
+    }
+
+    pub const fn dma_8bit() -> Self {
+        Self::DMA.union(Self::EIGHT_BIT)
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct HeapStats {
+    pub free_bytes: usize,
+    pub largest_free_block: usize,
+}
+
+pub fn heap_stats(caps: HeapCaps) -> HeapStats {
+    let bits = caps.bits();
+    HeapStats {
+        free_bytes: unsafe { m5unified_sys::m5u_heap_get_free_size(bits) },
+        largest_free_block: unsafe { m5unified_sys::m5u_heap_get_largest_free_block(bits) },
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Board {
     Unknown,
     M5Stack,
