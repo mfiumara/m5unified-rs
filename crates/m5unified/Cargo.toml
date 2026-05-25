@@ -1,6 +1,6 @@
 [package]
 name = "m5unified"
-version = "0.3.7"
+version = "0.3.8"
 edition.workspace = true
 rust-version = "1.85"
 license.workspace = true

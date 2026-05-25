@@ -21,4 +21,4 @@ include = [
 path = "src/lib.rs"
 
 [dependencies]
-m5unified = { path = "../m5unified", version = "0.3.7" }
+m5unified = { path = "../m5unified", version = "0.3.8" }
