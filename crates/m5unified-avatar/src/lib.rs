@@ -13,7 +13,10 @@ const ORIGINAL_WIDTH: f32 = 320.0;
 const ORIGINAL_HEIGHT: f32 = 240.0;
 const PRIMARY_WHITE: u16 = 0xffff;
 const BACKGROUND_BLACK: u16 = 0x0000;
-const SPEECH_TEXT_LIMIT: usize = 40;
+const SPEECH_TEXT_LIMIT: usize = 256;
+const SPEECH_VISIBLE_CHARS: usize = 23;
+const SPEECH_SCROLL_STEP_MS: u32 = 45;
+const SPEECH_SCROLL_PAUSE_MS: u32 = 300;
 
 /// Compile-time RGB888 to RGB565 conversion.
 pub const fn rgb565(r: u8, g: u8, b: u8) -> u16 {
@@ -106,6 +109,7 @@ pub struct Avatar {
     gaze_y: f32,
     mouth_open: f32,
     speech_text: String,
+    speech_started_ms: u32,
     elapsed_ms: u32,
 }
 
@@ -121,6 +125,7 @@ impl Avatar {
             gaze_y: 0.0,
             mouth_open: 0.0,
             speech_text: String::new(),
+            speech_started_ms: 0,
             elapsed_ms: 0,
         }
     }
@@ -177,11 +182,16 @@ impl Avatar {
     }
 
     pub fn set_speech_text(&mut self, text: &str) {
-        self.speech_text = speech_excerpt(text);
+        let text = speech_excerpt(text);
+        if text != self.speech_text {
+            self.speech_text = text;
+            self.speech_started_ms = self.elapsed_ms;
+        }
     }
 
     pub fn clear_speech_text(&mut self) {
         self.speech_text.clear();
+        self.speech_started_ms = self.elapsed_ms;
     }
 
     pub fn speech_text(&self) -> &str {
@@ -224,7 +234,13 @@ impl Avatar {
             },
         );
         draw_mouth(canvas, &layout, breath, self.mouth_open, self.palette);
-        draw_balloon(canvas, &layout, &self.speech_text, self.palette);
+        draw_balloon(
+            canvas,
+            &layout,
+            &self.speech_text,
+            self.elapsed_ms.wrapping_sub(self.speech_started_ms),
+            self.palette,
+        );
     }
 
     fn breath(&self) -> f32 {
@@ -245,28 +261,56 @@ impl Avatar {
     }
 }
 
-fn draw_balloon(canvas: &mut Canvas, layout: &Layout, text: &str, palette: Palette) {
+fn draw_balloon(
+    canvas: &mut Canvas,
+    layout: &Layout,
+    text: &str,
+    elapsed_ms: u32,
+    palette: Palette,
+) {
     if text.trim().is_empty() {
         return;
     }
 
     let cx = sx(240.0, layout.display_scale_x);
-    let cy = sy(220.0, layout.display_scale_y);
+    let cy = sy(137.0, layout.display_scale_y);
     let text_height = sy_len(16.0, layout.display_scale_y).max(8);
+    let max_text_width = sx_len(280.0, layout.display_scale_x).max(96);
     canvas.set_text_size(2);
     canvas.set_text_color(palette.balloon_foreground, palette.balloon_background);
     canvas.set_text_datum(TextDatum::MiddleCenter);
+    let visible_text = speech_visible_text(text, elapsed_ms);
+    let visible_text = fit_text_to_width(canvas, &visible_text, max_text_width);
     let text_width = canvas
-        .text_width(text)
+        .text_width(&visible_text)
         .ok()
         .filter(|width| *width > 0)
-        .unwrap_or_else(|| sx_len(text.chars().count() as f32 * 12.0, layout.display_scale_x));
+        .unwrap_or_else(|| {
+            sx_len(
+                visible_text.chars().count() as f32 * 12.0,
+                layout.display_scale_x,
+            )
+        });
+    let min_bubble_width = sx_len(90.0, layout.display_scale_x).max(64);
+    let max_bubble_width = sx_len(340.0, layout.display_scale_x).max(min_bubble_width);
+    let bubble_width = (text_width + sx_len(40.0, layout.display_scale_x))
+        .clamp(min_bubble_width, max_bubble_width);
+    let bubble_rx = bubble_width / 2;
+    let bubble_ry = sy_len(26.0, layout.display_scale_y).max(text_height);
+    let bubble_cx = sx(160.0, layout.display_scale_x)
+        + map_width_to_offset(
+            bubble_width,
+            min_bubble_width,
+            max_bubble_width,
+            sx_len(66.0, layout.display_scale_x),
+            0,
+        );
 
     canvas.fill_ellipse(
-        cx - sx_len(20.0, layout.display_scale_x),
+        bubble_cx,
         cy,
-        text_width + 2,
-        text_height * 2 + 2,
+        bubble_rx + 2,
+        bubble_ry + 2,
         palette.balloon_foreground,
     );
     canvas.fill_triangle(
@@ -285,10 +329,10 @@ fn draw_balloon(canvas: &mut Canvas, layout: &Layout, text: &str, palette: Palet
         palette.balloon_foreground,
     );
     canvas.fill_ellipse(
-        cx - sx_len(20.0, layout.display_scale_x),
+        bubble_cx,
         cy,
-        text_width,
-        text_height * 2,
+        bubble_rx,
+        bubble_ry,
         palette.balloon_background,
     );
     canvas.fill_triangle(
@@ -307,8 +351,13 @@ fn draw_balloon(canvas: &mut Canvas, layout: &Layout, text: &str, palette: Palet
         palette.balloon_background,
     );
 
-    let x = cx - text_width / 6 - sx_len(15.0, layout.display_scale_x);
-    let _ = canvas.draw_string(text, x, cy);
+    let _ = canvas.draw_string(&visible_text, bubble_cx, cy);
+}
+
+fn map_width_to_offset(value: i32, in_min: i32, in_max: i32, out_min: i32, out_max: i32) -> i32 {
+    let range = (in_max - in_min).max(1) as f32;
+    let t = ((value - in_min) as f32 / range).clamp(0.0, 1.0);
+    (out_min as f32 + (out_max - out_min) as f32 * t).round() as i32
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -480,6 +529,41 @@ fn speech_excerpt(text: &str) -> String {
     output
 }
 
+fn speech_visible_text(text: &str, elapsed_ms: u32) -> String {
+    let chars: Vec<char> = text.chars().collect();
+    if chars.len() <= SPEECH_VISIBLE_CHARS {
+        return text.to_owned();
+    }
+
+    let scrollable = chars.len() - SPEECH_VISIBLE_CHARS;
+    let pause_steps = (SPEECH_SCROLL_PAUSE_MS / SPEECH_SCROLL_STEP_MS).max(1) as usize;
+    let step = (elapsed_ms / SPEECH_SCROLL_STEP_MS) as usize;
+    let offset = if step < pause_steps {
+        0
+    } else if step < pause_steps + scrollable {
+        step - pause_steps
+    } else {
+        scrollable
+    };
+
+    chars[offset..offset + SPEECH_VISIBLE_CHARS]
+        .iter()
+        .collect()
+}
+
+fn fit_text_to_width(canvas: &Canvas, text: &str, max_width: i32) -> String {
+    let mut fitted = text.to_owned();
+    loop {
+        let Ok(width) = canvas.text_width(&fitted) else {
+            return fitted;
+        };
+        if width <= 0 || width <= max_width || fitted.chars().count() <= 1 {
+            return fitted;
+        }
+        fitted.pop();
+    }
+}
+
 fn clamp_unit(value: f32) -> f32 {
     value.clamp(-1.0, 1.0)
 }
@@ -536,12 +620,27 @@ mod tests {
     }
 
     #[test]
-    fn speech_text_is_sanitized_and_limited() {
+    fn speech_text_is_sanitized_and_keeps_long_messages_for_scroll() {
         let mut avatar = Avatar::new(320, 240);
         avatar
             .set_speech_text("hello\nstackchan\0this text is intentionally longer than the bubble");
         assert!(!avatar.speech_text().contains('\n'));
         assert!(!avatar.speech_text().contains('\0'));
-        assert!(avatar.speech_text().ends_with("..."));
+        assert!(avatar.speech_text().contains("intentionally longer"));
+    }
+
+    #[test]
+    fn speech_visible_text_scrolls_long_messages() {
+        let text = "abcdefghijklmnopqrstuvwxyz";
+
+        assert_eq!(&speech_visible_text(text, 0), "abcdefghijklmnopqrstuvw");
+        assert_eq!(
+            &speech_visible_text(text, SPEECH_SCROLL_PAUSE_MS + SPEECH_SCROLL_STEP_MS),
+            "bcdefghijklmnopqrstuvwx"
+        );
+        assert_eq!(
+            &speech_visible_text(text, u32::MAX),
+            "defghijklmnopqrstuvwxyz"
+        );
     }
 }
